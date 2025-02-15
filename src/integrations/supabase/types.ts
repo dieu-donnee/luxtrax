@@ -9,7 +9,122 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          address: string
+          created_at: string
+          current_step: number | null
+          id: string
+          notes: string | null
+          scheduled_date: string
+          service_id: string
+          status: Database["public"]["Enums"]["booking_status"]
+          total_steps: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          current_step?: number | null
+          id?: string
+          notes?: string | null
+          scheduled_date: string
+          service_id: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          total_steps?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          current_step?: number | null
+          id?: string
+          notes?: string | null
+          scheduled_date?: string
+          service_id?: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          total_steps?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          default_address: string | null
+          full_name: string | null
+          id: string
+          phone_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          default_address?: string | null
+          full_name?: string | null
+          id: string
+          phone_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          default_address?: string | null
+          full_name?: string | null
+          id?: string
+          phone_number?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string
+          description: string | null
+          details: string | null
+          discount_percentage: number | null
+          id: string
+          is_vip: boolean | null
+          name: string
+          price: number
+          type: Database["public"]["Enums"]["service_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          details?: string | null
+          discount_percentage?: number | null
+          id?: string
+          is_vip?: boolean | null
+          name: string
+          price: number
+          type: Database["public"]["Enums"]["service_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          details?: string | null
+          discount_percentage?: number | null
+          id?: string
+          is_vip?: boolean | null
+          name?: string
+          price?: number
+          type?: Database["public"]["Enums"]["service_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +133,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      booking_status: "pending" | "ongoing" | "completed" | "cancelled"
+      service_type: "carwash" | "laundry"
     }
     CompositeTypes: {
       [_ in never]: never
