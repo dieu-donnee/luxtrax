@@ -89,7 +89,17 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+      <div className="mb-8">
+        <a href="https://app.offixe.net" target="_blank" rel="noopener noreferrer">
+          <img 
+            src="https://offixe.fr/wp-content/uploads/2022/04/cropped-Logo-blanc-2-768x243.png" 
+            alt="Offixe Logo" 
+            className="h-16 object-contain"
+          />
+        </a>
+      </div>
+      
       <div className="max-w-md w-full space-y-8 bg-white p-6 rounded-xl shadow-sm">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900">
