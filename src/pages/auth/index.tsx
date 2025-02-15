@@ -2,16 +2,11 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { AuthHeader } from "./components/AuthHeader";
+import { SignUpForm } from "./components/SignUpForm";
+import { LoginForm } from "./components/LoginForm";
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -90,15 +85,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <div className="mb-8">
-        <a href="https://app.offixe.net" target="_blank" rel="noopener noreferrer">
-          <img 
-            src="https://offixe.fr/wp-content/uploads/2022/04/cropped-Logo-blanc-2-768x243.png" 
-            alt="Offixe Logo" 
-            className="h-16 object-contain"
-          />
-        </a>
-      </div>
+      <AuthHeader />
       
       <div className="max-w-md w-full space-y-8 bg-white p-6 rounded-xl shadow-sm">
         <div className="text-center">
@@ -136,94 +123,24 @@ export default function AuthPage() {
 
         <form onSubmit={handleAuth} className="mt-8 space-y-6">
           {isSignUp && (
-            <>
-              <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
-                  Nom complet
-                </label>
-                <Input
-                  id="fullName"
-                  type="text"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="country" className="block text-sm font-medium text-gray-700">
-                  Pays
-                </label>
-                <Input
-                  id="country"
-                  type="text"
-                  required
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="gender" className="block text-sm font-medium text-gray-700">
-                  Genre
-                </label>
-                <Select value={gender} onValueChange={setGender} required>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Sélectionnez votre genre" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Homme</SelectItem>
-                    <SelectItem value="female">Femme</SelectItem>
-                    <SelectItem value="other">Autre</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label htmlFor="carModel" className="block text-sm font-medium text-gray-700">
-                  Modèle de voiture
-                </label>
-                <Input
-                  id="carModel"
-                  type="text"
-                  required
-                  value={carModel}
-                  onChange={(e) => setCarModel(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-            </>
+            <SignUpForm
+              fullName={fullName}
+              setFullName={setFullName}
+              country={country}
+              setCountry={setCountry}
+              gender={gender}
+              setGender={setGender}
+              carModel={carModel}
+              setCarModel={setCarModel}
+            />
           )}
           
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Mot de passe
-            </label>
-            <Input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1"
-            />
-          </div>
+          <LoginForm
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+          />
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Chargement..." : isSignUp ? "S'inscrire" : "Se connecter"}
