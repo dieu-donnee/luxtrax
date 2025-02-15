@@ -61,25 +61,34 @@ export type Database = {
       }
       profiles: {
         Row: {
+          car_model: string | null
+          country: string | null
           created_at: string
           default_address: string | null
           full_name: string | null
+          gender: string | null
           id: string
           phone_number: string | null
           updated_at: string
         }
         Insert: {
+          car_model?: string | null
+          country?: string | null
           created_at?: string
           default_address?: string | null
           full_name?: string | null
+          gender?: string | null
           id: string
           phone_number?: string | null
           updated_at?: string
         }
         Update: {
+          car_model?: string | null
+          country?: string | null
           created_at?: string
           default_address?: string | null
           full_name?: string | null
+          gender?: string | null
           id?: string
           phone_number?: string | null
           updated_at?: string
