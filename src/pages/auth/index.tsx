@@ -102,121 +102,133 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <AuthHeader />
-      
-      <div className="max-w-md w-full space-y-8 bg-white p-6 rounded-xl shadow-sm">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">
-            {isSignUp ? "Créer un compte" : "Se connecter"}
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            {isSignUp ? "Déjà un compte ?" : "Pas encore de compte ?"}{" "}
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-blue-600 hover:text-blue-500"
-            >
-              {isSignUp ? "Se connecter" : "S'inscrire"}
-            </button>
-          </p>
-        </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={handleGoogleSignIn}
-        >
-          Continuer avec Google
-        </Button>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Formulaire à gauche */}
+      <div className="flex-1 flex flex-col items-center justify-center p-4">
+        <AuthHeader />
+        
+        <div className="max-w-md w-full space-y-8 bg-white p-6 rounded-xl shadow-sm">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900">
+              {isSignUp ? "Créer un compte" : "Se connecter"}
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              {isSignUp ? "Déjà un compte ?" : "Pas encore de compte ?"}{" "}
+              <button
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="text-blue-600 hover:text-blue-500"
+              >
+                {isSignUp ? "Se connecter" : "S'inscrire"}
+              </button>
+            </p>
           </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-gray-500">Ou</span>
-          </div>
-        </div>
 
-        <form onSubmit={handleAuth} className="mt-8 space-y-6">
-          {isSignUp && (
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <Button
-                  type="button"
-                  variant={!isProvider ? "default" : "outline"}
-                  onClick={() => setIsProvider(false)}
-                  className="flex-1"
-                >
-                  Client
-                </Button>
-                <Button
-                  type="button"
-                  variant={isProvider ? "default" : "outline"}
-                  onClick={() => setIsProvider(true)}
-                  className="flex-1"
-                >
-                  Prestataire
-                </Button>
-              </div>
-
-              {isProvider ? (
-                <ProviderSignUpForm
-                  fullName={fullName}
-                  setFullName={setFullName}
-                  address={address}
-                  setAddress={setAddress}
-                  experienceLevel={experienceLevel}
-                  setExperienceLevel={setExperienceLevel}
-                  documents={documents}
-                  setDocuments={setDocuments}
-                />
-              ) : (
-                <ClientSignUpForm
-                  fullName={fullName}
-                  setFullName={setFullName}
-                  address={address}
-                  setAddress={setAddress}
-                  vehicleType={vehicleType}
-                  setVehicleType={setVehicleType}
-                />
-              )}
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="terms"
-                  checked={termsAccepted}
-                  onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
-                />
-                <label
-                  htmlFor="terms"
-                  className="text-sm text-gray-600"
-                >
-                  J'accepte les{" "}
-                  <Link to="/terms" className="text-blue-600 hover:underline">
-                    conditions d'utilisation
-                  </Link>
-                  {" "}et la{" "}
-                  <Link to="/privacy" className="text-blue-600 hover:underline">
-                    politique de confidentialité
-                  </Link>
-                </label>
-              </div>
-            </div>
-          )}
-          
-          <LoginForm
-            email={email}
-            setEmail={setEmail}
-            password={password}
-            setPassword={setPassword}
-          />
-
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Chargement..." : isSignUp ? "S'inscrire" : "Se connecter"}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={handleGoogleSignIn}
+          >
+            Continuer avec Google
           </Button>
-        </form>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-gray-500">Ou</span>
+            </div>
+          </div>
+
+          <form onSubmit={handleAuth} className="mt-8 space-y-6">
+            {isSignUp && (
+              <div className="space-y-4">
+                <div className="flex items-center space-x-4">
+                  <Button
+                    type="button"
+                    variant={!isProvider ? "default" : "outline"}
+                    onClick={() => setIsProvider(false)}
+                    className="flex-1"
+                  >
+                    Client
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={isProvider ? "default" : "outline"}
+                    onClick={() => setIsProvider(true)}
+                    className="flex-1"
+                  >
+                    Prestataire
+                  </Button>
+                </div>
+
+                {isProvider ? (
+                  <ProviderSignUpForm
+                    fullName={fullName}
+                    setFullName={setFullName}
+                    address={address}
+                    setAddress={setAddress}
+                    experienceLevel={experienceLevel}
+                    setExperienceLevel={setExperienceLevel}
+                    documents={documents}
+                    setDocuments={setDocuments}
+                  />
+                ) : (
+                  <ClientSignUpForm
+                    fullName={fullName}
+                    setFullName={setFullName}
+                    address={address}
+                    setAddress={setAddress}
+                    vehicleType={vehicleType}
+                    setVehicleType={setVehicleType}
+                  />
+                )}
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="terms"
+                    checked={termsAccepted}
+                    onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+                  />
+                  <label
+                    htmlFor="terms"
+                    className="text-sm text-gray-600"
+                  >
+                    J'accepte les{" "}
+                    <Link to="/terms" className="text-blue-600 hover:underline">
+                      conditions d'utilisation
+                    </Link>
+                    {" "}et la{" "}
+                    <Link to="/privacy" className="text-blue-600 hover:underline">
+                      politique de confidentialité
+                    </Link>
+                  </label>
+                </div>
+              </div>
+            )}
+            
+            <LoginForm
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+            />
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Chargement..." : isSignUp ? "S'inscrire" : "Se connecter"}
+            </Button>
+          </form>
+        </div>
+      </div>
+
+      {/* Image à droite */}
+      <div className="hidden lg:block w-1/2 bg-cover bg-center" style={{
+        backgroundImage: `url('/lovable-uploads/7e9e1aa9-0e1a-4f55-a580-daac6d7b4865.png')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}>
+        <div className="h-full w-full bg-blue-500/10 backdrop-blur-sm" />
       </div>
     </div>
   );
