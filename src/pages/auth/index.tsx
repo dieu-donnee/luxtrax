@@ -5,17 +5,23 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { AuthHeader } from "./components/AuthHeader";
-import { SignUpForm } from "./components/SignUpForm";
+import { ClientSignUpForm } from "./components/ClientSignUpForm";
+import { ProviderSignUpForm } from "./components/ProviderSignUpForm";
 import { LoginForm } from "./components/LoginForm";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "react-router-dom";
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isProvider, setIsProvider] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [country, setCountry] = useState("");
-  const [gender, setGender] = useState("");
-  const [carModel, setCarModel] = useState("");
+  const [address, setAddress] = useState("");
+  const [vehicleType, setVehicleType] = useState("");
+  const [experienceLevel, setExperienceLevel] = useState("");
+  const [documents, setDocuments] = useState<File[]>([]);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -43,6 +49,16 @@ export default function AuthPage() {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isSignUp && !termsAccepted) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Vous devez accepter les conditions d'utilisation pour vous inscrire.",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -53,9 +69,11 @@ export default function AuthPage() {
           options: {
             data: {
               full_name: fullName,
-              country,
-              gender,
-              car_model: carModel,
+              address,
+              role: isProvider ? 'provider' : 'client',
+              vehicle_type: !isProvider ? vehicleType : null,
+              experience_level: isProvider ? experienceLevel : null,
+              terms_accepted: termsAccepted,
             },
           },
         });
@@ -123,16 +141,69 @@ export default function AuthPage() {
 
         <form onSubmit={handleAuth} className="mt-8 space-y-6">
           {isSignUp && (
-            <SignUpForm
-              fullName={fullName}
-              setFullName={setFullName}
-              country={country}
-              setCountry={setCountry}
-              gender={gender}
-              setGender={setGender}
-              carModel={carModel}
-              setCarModel={setCarModel}
-            />
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <Button
+                  type="button"
+                  variant={!isProvider ? "default" : "outline"}
+                  onClick={() => setIsProvider(false)}
+                  className="flex-1"
+                >
+                  Client
+                </Button>
+                <Button
+                  type="button"
+                  variant={isProvider ? "default" : "outline"}
+                  onClick={() => setIsProvider(true)}
+                  className="flex-1"
+                >
+                  Prestataire
+                </Button>
+              </div>
+
+              {isProvider ? (
+                <ProviderSignUpForm
+                  fullName={fullName}
+                  setFullName={setFullName}
+                  address={address}
+                  setAddress={setAddress}
+                  experienceLevel={experienceLevel}
+                  setExperienceLevel={setExperienceLevel}
+                  documents={documents}
+                  setDocuments={setDocuments}
+                />
+              ) : (
+                <ClientSignUpForm
+                  fullName={fullName}
+                  setFullName={setFullName}
+                  address={address}
+                  setAddress={setAddress}
+                  vehicleType={vehicleType}
+                  setVehicleType={setVehicleType}
+                />
+              )}
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="terms"
+                  checked={termsAccepted}
+                  onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+                />
+                <label
+                  htmlFor="terms"
+                  className="text-sm text-gray-600"
+                >
+                  J'accepte les{" "}
+                  <Link to="/terms" className="text-blue-600 hover:underline">
+                    conditions d'utilisation
+                  </Link>
+                  {" "}et la{" "}
+                  <Link to="/privacy" className="text-blue-600 hover:underline">
+                    politique de confidentialité
+                  </Link>
+                </label>
+              </div>
+            </div>
           )}
           
           <LoginForm

@@ -61,37 +61,70 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
+          avatar_url: string | null
           car_model: string | null
           country: string | null
           created_at: string
           default_address: string | null
+          documents: Json | null
+          email_verified: boolean | null
+          experience_level:
+            | Database["public"]["Enums"]["experience_level"]
+            | null
           full_name: string | null
           gender: string | null
           id: string
           phone_number: string | null
+          phone_verified: boolean | null
+          role: Database["public"]["Enums"]["user_role"]
+          terms_accepted: boolean | null
           updated_at: string
+          vehicle_type: Database["public"]["Enums"]["vehicle_type"] | null
         }
         Insert: {
+          address?: string | null
+          avatar_url?: string | null
           car_model?: string | null
           country?: string | null
           created_at?: string
           default_address?: string | null
+          documents?: Json | null
+          email_verified?: boolean | null
+          experience_level?:
+            | Database["public"]["Enums"]["experience_level"]
+            | null
           full_name?: string | null
           gender?: string | null
           id: string
           phone_number?: string | null
+          phone_verified?: boolean | null
+          role?: Database["public"]["Enums"]["user_role"]
+          terms_accepted?: boolean | null
           updated_at?: string
+          vehicle_type?: Database["public"]["Enums"]["vehicle_type"] | null
         }
         Update: {
+          address?: string | null
+          avatar_url?: string | null
           car_model?: string | null
           country?: string | null
           created_at?: string
           default_address?: string | null
+          documents?: Json | null
+          email_verified?: boolean | null
+          experience_level?:
+            | Database["public"]["Enums"]["experience_level"]
+            | null
           full_name?: string | null
           gender?: string | null
           id?: string
           phone_number?: string | null
+          phone_verified?: boolean | null
+          role?: Database["public"]["Enums"]["user_role"]
+          terms_accepted?: boolean | null
           updated_at?: string
+          vehicle_type?: Database["public"]["Enums"]["vehicle_type"] | null
         }
         Relationships: []
       }
@@ -143,7 +176,10 @@ export type Database = {
     }
     Enums: {
       booking_status: "pending" | "ongoing" | "completed" | "cancelled"
+      experience_level: "debutant" | "intermediaire" | "expert"
       service_type: "carwash" | "laundry"
+      user_role: "client" | "provider"
+      vehicle_type: "berline" | "suv" | "citadine" | "utilitaire" | "autre"
     }
     CompositeTypes: {
       [_ in never]: never
