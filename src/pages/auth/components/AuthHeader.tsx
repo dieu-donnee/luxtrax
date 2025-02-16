@@ -6,7 +6,7 @@ export function AuthHeader() {
         <img 
           src="/lovable-uploads/9cae551b-8e39-46f1-90a4-f09b982484e0.png" 
           alt="LustraX Logo" 
-          className="h-16 object-contain dark:brightness-110"
+          className="h-24 object-contain dark:brightness-110"
         />
       </a>
     </div>
