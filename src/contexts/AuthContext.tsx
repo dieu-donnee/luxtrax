@@ -5,7 +5,7 @@ import type { User } from "@supabase/supabase-js";
 
 interface AuthContextType {
   user: User | null;
-  profile: any | null; // On utilise any ici car nous n'avons pas accès aux types exacts
+  profile: any | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -21,6 +21,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", userId)
+      .single();
+
+    if (!error && data) {
+      setProfile(data);
+    }
+  };
 
   useEffect(() => {
     // Initial session check
@@ -48,18 +60,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId)
-      .single();
-
-    if (!error && data) {
-      setProfile(data);
-    }
-  };
-
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -71,4 +71,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
