@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import AuthPage from "./pages/auth";
 import PrivacyPolicy from "./pages/privacy";
+import TermsOfService from "./pages/terms";
 import NotFound from "./pages/NotFound";
 import { useAuth } from "./contexts/AuthContext";
 
@@ -40,6 +41,7 @@ const AppRoutes = () => {
       />
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
