@@ -63,6 +63,14 @@ export default function AuthPage() {
 
     try {
       if (isSignUp) {
+        // Vérifions que les champs requis sont remplis selon le type d'utilisateur
+        if (isProvider && !experienceLevel) {
+          throw new Error("Veuillez sélectionner votre niveau d'expérience");
+        }
+        if (!isProvider && !vehicleType) {
+          throw new Error("Veuillez sélectionner votre type de véhicule");
+        }
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
