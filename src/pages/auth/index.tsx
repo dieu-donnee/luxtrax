@@ -50,7 +50,7 @@ export default function AuthPage() {
           throw new Error("Veuillez sélectionner votre type de véhicule");
         }
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -64,7 +64,23 @@ export default function AuthPage() {
             },
           },
         });
+
         if (error) throw error;
+
+        // Attendons que le profil soit créé
+        if (data.user) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .select()
+            .eq('id', data.user.id)
+            .single();
+
+          if (profileError) {
+            console.error("Erreur lors de la vérification du profil:", profileError);
+            throw new Error("Erreur lors de la création du profil utilisateur");
+          }
+        }
+
         toast({
           title: "Inscription réussie",
           description: "Veuillez vérifier votre email pour confirmer votre compte.",
