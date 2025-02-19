@@ -8,8 +8,9 @@ import { AuthHeader } from "./components/AuthHeader";
 import { ClientSignUpForm } from "./components/ClientSignUpForm";
 import { ProviderSignUpForm } from "./components/ProviderSignUpForm";
 import { LoginForm } from "./components/LoginForm";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Link } from "react-router-dom";
+import { GoogleAuth } from "./components/GoogleAuth";
+import { TermsCheckbox } from "./components/TermsCheckbox";
+import { UserTypeSelector } from "./components/UserTypeSelector";
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -25,27 +26,6 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const handleGoogleSignIn = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      });
-      if (error) throw error;
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: error.message,
-      });
-    }
-  };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +43,6 @@ export default function AuthPage() {
 
     try {
       if (isSignUp) {
-        // Vérifions que les champs requis sont remplis selon le type d'utilisateur
         if (isProvider && !experienceLevel) {
           throw new Error("Veuillez sélectionner votre niveau d'expérience");
         }
@@ -111,7 +90,6 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Formulaire à gauche */}
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         <AuthHeader />
         
@@ -131,14 +109,7 @@ export default function AuthPage() {
             </p>
           </div>
 
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleSignIn}
-          >
-            Continuer avec Google
-          </Button>
+          <GoogleAuth />
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -152,24 +123,10 @@ export default function AuthPage() {
           <form onSubmit={handleAuth} className="mt-8 space-y-6">
             {isSignUp && (
               <div className="space-y-4">
-                <div className="flex items-center space-x-4">
-                  <Button
-                    type="button"
-                    variant={!isProvider ? "default" : "outline"}
-                    onClick={() => setIsProvider(false)}
-                    className="flex-1"
-                  >
-                    Client
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={isProvider ? "default" : "outline"}
-                    onClick={() => setIsProvider(true)}
-                    className="flex-1"
-                  >
-                    Prestataire
-                  </Button>
-                </div>
+                <UserTypeSelector 
+                  isProvider={isProvider}
+                  setIsProvider={setIsProvider}
+                />
 
                 {isProvider ? (
                   <ProviderSignUpForm
@@ -193,26 +150,10 @@ export default function AuthPage() {
                   />
                 )}
 
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="terms"
-                    checked={termsAccepted}
-                    onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
-                  />
-                  <label
-                    htmlFor="terms"
-                    className="text-sm text-gray-600"
-                  >
-                    J'accepte les{" "}
-                    <Link to="/terms" className="text-blue-600 hover:underline">
-                      conditions d'utilisation
-                    </Link>
-                    {" "}et la{" "}
-                    <Link to="/privacy" className="text-blue-600 hover:underline">
-                      politique de confidentialité
-                    </Link>
-                  </label>
-                </div>
+                <TermsCheckbox 
+                  termsAccepted={termsAccepted}
+                  setTermsAccepted={setTermsAccepted}
+                />
               </div>
             )}
             
@@ -230,7 +171,6 @@ export default function AuthPage() {
         </div>
       </div>
 
-      {/* Image à droite */}
       <div className="hidden lg:block w-1/2 bg-cover bg-center" style={{
         backgroundImage: `url('/lovable-uploads/7e9e1aa9-0e1a-4f55-a580-daac6d7b4865.png')`,
         backgroundSize: 'cover',
