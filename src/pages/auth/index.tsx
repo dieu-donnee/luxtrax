@@ -67,17 +67,32 @@ export default function AuthPage() {
 
         if (error) throw error;
 
-        // Attendons que le profil soit créé
+        // Attendons que le profil soit créé avec un délai et plusieurs tentatives
         if (data.user) {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .select()
-            .eq('id', data.user.id)
-            .single();
+          let profileCreated = false;
+          let attempts = 0;
+          const maxAttempts = 3;
 
-          if (profileError) {
-            console.error("Erreur lors de la vérification du profil:", profileError);
-            throw new Error("Erreur lors de la création du profil utilisateur");
+          while (!profileCreated && attempts < maxAttempts) {
+            attempts++;
+            
+            // Attendre 1 seconde entre chaque tentative
+            if (attempts > 1) {
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select()
+              .eq('id', data.user.id)
+              .maybeSingle();
+
+            if (!profileError && profile) {
+              profileCreated = true;
+            } else if (attempts === maxAttempts) {
+              console.error("Erreur lors de la vérification du profil:", profileError);
+              // On continue même si le profil n'est pas encore visible
+            }
           }
         }
 
