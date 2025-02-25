@@ -13,7 +13,7 @@ export function UserTypeSelector({ isProvider, setIsProvider }: UserTypeSelector
         type="button"
         variant={!isProvider ? "default" : "outline"}
         onClick={() => setIsProvider(false)}
-        className="flex-1"
+        className="flex-1 min-w-[120px]"
       >
         Client
       </Button>
@@ -21,7 +21,7 @@ export function UserTypeSelector({ isProvider, setIsProvider }: UserTypeSelector
         type="button"
         variant={isProvider ? "default" : "outline"}
         onClick={() => setIsProvider(true)}
-        className="flex-1"
+        className="flex-1 min-w-[120px]"
       >
         Prestataire
       </Button>
