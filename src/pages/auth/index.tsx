@@ -1,123 +1,41 @@
 
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
 import { AuthHeader } from "./components/AuthHeader";
+import { AuthFormHeader } from "./components/AuthFormHeader";
+import { AuthDivider } from "./components/AuthDivider";
 import { ClientSignUpForm } from "./components/ClientSignUpForm";
 import { ProviderSignUpForm } from "./components/ProviderSignUpForm";
 import { LoginForm } from "./components/LoginForm";
 import { GoogleAuth } from "./components/GoogleAuth";
 import { TermsCheckbox } from "./components/TermsCheckbox";
 import { UserTypeSelector } from "./components/UserTypeSelector";
+import { useAuthForm } from "./hooks/useAuthForm";
 
 export default function AuthPage() {
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [isProvider, setIsProvider] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [address, setAddress] = useState("");
-  const [vehicleType, setVehicleType] = useState("");
-  const [experienceLevel, setExperienceLevel] = useState("");
-  const [documents, setDocuments] = useState<File[]>([]);
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (isSignUp && !termsAccepted) {
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: "Vous devez accepter les conditions d'utilisation pour vous inscrire.",
-      });
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      if (isSignUp) {
-        if (isProvider && !experienceLevel) {
-          throw new Error("Veuillez sélectionner votre niveau d'expérience");
-        }
-        if (!isProvider && !vehicleType) {
-          throw new Error("Veuillez sélectionner votre type de véhicule");
-        }
-
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: fullName,
-              address,
-              role: isProvider ? 'provider' : 'client',
-              vehicle_type: !isProvider ? vehicleType : null,
-              experience_level: isProvider ? experienceLevel : null,
-              terms_accepted: termsAccepted,
-            },
-          },
-        });
-
-        if (error) throw error;
-
-        // Attendons que le profil soit créé avec un délai et plusieurs tentatives
-        if (data.user) {
-          let profileCreated = false;
-          let attempts = 0;
-          const maxAttempts = 3;
-
-          while (!profileCreated && attempts < maxAttempts) {
-            attempts++;
-            
-            // Attendre 1 seconde entre chaque tentative
-            if (attempts > 1) {
-              await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-
-            const { data: profile, error: profileError } = await supabase
-              .from('profiles')
-              .select()
-              .eq('id', data.user.id)
-              .maybeSingle();
-
-            if (!profileError && profile) {
-              profileCreated = true;
-            } else if (attempts === maxAttempts) {
-              console.error("Erreur lors de la vérification du profil:", profileError);
-              // On continue même si le profil n'est pas encore visible
-            }
-          }
-        }
-
-        toast({
-          title: "Inscription réussie",
-          description: "Veuillez vérifier votre email pour confirmer votre compte.",
-        });
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        navigate("/");
-      }
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Erreur",
-        description: error.message,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    isSignUp,
+    setIsSignUp,
+    isProvider,
+    setIsProvider,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    fullName,
+    setFullName,
+    address,
+    setAddress,
+    vehicleType,
+    setVehicleType,
+    experienceLevel,
+    setExperienceLevel,
+    documents,
+    setDocuments,
+    termsAccepted,
+    setTermsAccepted,
+    loading,
+    handleAuth
+  } = useAuthForm();
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -125,31 +43,9 @@ export default function AuthPage() {
         <AuthHeader />
         
         <div className="max-w-md w-full space-y-8 bg-white p-6 rounded-xl shadow-sm">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">
-              {isSignUp ? "Créer un compte" : "Se connecter"}
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              {isSignUp ? "Déjà un compte ?" : "Pas encore de compte ?"}{" "}
-              <button
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="text-blue-600 hover:text-blue-500"
-              >
-                {isSignUp ? "Se connecter" : "S'inscrire"}
-              </button>
-            </p>
-          </div>
-
+          <AuthFormHeader isSignUp={isSignUp} setIsSignUp={setIsSignUp} />
           <GoogleAuth />
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">Ou</span>
-            </div>
-          </div>
+          <AuthDivider />
 
           <form onSubmit={handleAuth} className="mt-8 space-y-6">
             {isSignUp && (
