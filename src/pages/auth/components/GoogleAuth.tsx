@@ -9,7 +9,8 @@ export function GoogleAuth() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      console.log("Starting Google sign in process...");
+      const { error, data } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}`,
@@ -19,12 +20,19 @@ export function GoogleAuth() {
           },
         },
       });
-      if (error) throw error;
+      
+      console.log("Sign in response:", { error, data });
+      
+      if (error) {
+        console.error("Google sign in error:", error);
+        throw error;
+      }
     } catch (error: any) {
+      console.error("Caught error during Google sign in:", error);
       toast({
         variant: "destructive",
-        title: "Erreur",
-        description: error.message,
+        title: "Erreur de connexion",
+        description: "Une erreur est survenue lors de la connexion avec Google. Veuillez réessayer.",
       });
     }
   };
