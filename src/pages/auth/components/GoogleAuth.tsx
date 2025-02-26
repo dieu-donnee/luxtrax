@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Icons } from "@/components/icons";
 
 export function GoogleAuth() {
   const { toast } = useToast();
@@ -10,10 +9,13 @@ export function GoogleAuth() {
   const handleGoogleSignIn = async () => {
     try {
       console.log("Starting Google sign in process...");
+      const redirectURL = `${window.location.origin}`;
+      console.log("Redirect URL:", redirectURL);
+      
       const { error, data } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}`,
+          redirectTo: redirectURL,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
