@@ -2,14 +2,16 @@
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export function GoogleAuth() {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleGoogleSignIn = async () => {
     try {
       console.log("Starting Google sign in process...");
-      const redirectURL = `${window.location.origin}`;
+      const redirectURL = `${window.location.origin}/auth/callback`;
       console.log("Redirect URL:", redirectURL);
       
       const { error, data } = await supabase.auth.signInWithOAuth({
@@ -29,12 +31,14 @@ export function GoogleAuth() {
         console.error("Google sign in error:", error);
         throw error;
       }
+
+      // Si la connexion réussit, l'utilisateur sera redirigé automatiquement
     } catch (error: any) {
       console.error("Caught error during Google sign in:", error);
       toast({
         variant: "destructive",
         title: "Erreur de connexion",
-        description: "Une erreur est survenue lors de la connexion avec Google. Veuillez réessayer.",
+        description: error?.message || "Une erreur est survenue lors de la connexion avec Google. Veuillez réessayer.",
       });
     }
   };
