@@ -3,10 +3,26 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export function GoogleAuth() {
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", { event, session });
+      
+      if (event === 'SIGNED_IN') {
+        console.log("User signed in successfully");
+        navigate('/');
+      }
+    });
+
+    // Cleanup subscription
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -32,7 +48,7 @@ export function GoogleAuth() {
         throw error;
       }
 
-      // Si la connexion réussit, l'utilisateur sera redirigé automatiquement
+      // L'utilisateur sera redirigé vers Google automatiquement
     } catch (error: any) {
       console.error("Caught error during Google sign in:", error);
       toast({
