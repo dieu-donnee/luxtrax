@@ -12,6 +12,7 @@ import PrivacyPolicy from "./pages/privacy";
 import TermsOfService from "./pages/terms";
 import NotFound from "./pages/NotFound";
 import { useAuth } from "./contexts/AuthContext";
+import { Suspense, lazy } from "react";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +20,14 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!user) {
@@ -31,28 +39,37 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 const AppRoutes = () => {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Index />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/booking"
-        element={
-          <ProtectedRoute>
-            <BookingPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="/auth" element={<AuthPage />} />
-      <Route path="/privacy" element={<PrivacyPolicy />} />
-      <Route path="/terms" element={<TermsOfService />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    }>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Index />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/booking"
+          element={
+            <ProtectedRoute>
+              <BookingPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 };
 
@@ -61,9 +78,11 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <AppRoutes />
+          <div className="app-container">
+            <Toaster />
+            <Sonner />
+            <AppRoutes />
+          </div>
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
