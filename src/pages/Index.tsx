@@ -1,13 +1,14 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { CalendarDays, Car, Bell, Settings, Users, Sun, Cloud, Plus, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [weatherData, setWeatherData] = useState({ temp: 22, condition: "Ensoleillé" });
   const [notifications, setNotifications] = useState([
@@ -17,7 +18,6 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Simuler un chargement de 2 secondes
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 2000);
@@ -56,14 +56,10 @@ const Index = () => {
     }
   ];
 
-  const handleAddService = () => {
-    toast({
-      title: "Nouveau service",
-      description: "Redirection vers la page des services...",
-      duration: 3000,
-    });
+  const handleBooking = () => {
+    navigate('/booking');
   };
-  
+
   const dismissNotification = (id) => {
     setNotifications(notifications.filter(notif => notif.id !== id));
     toast({
@@ -73,10 +69,10 @@ const Index = () => {
     });
   };
 
-  const handleBooking = () => {
+  const handleAddService = () => {
     toast({
-      title: "Réservation",
-      description: "Redirection vers la page de réservation...",
+      title: "Nouveau service",
+      description: "Redirection vers la page des services...",
       duration: 3000,
     });
   };
@@ -94,9 +90,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      {/* Section héro avec image de voiture premium */}
       <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-blue-800">
-        {/* Overlay avec effets lumineux et gouttelettes */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxyYWRpYWxHcmFkaWVudCBpZD0iZ2xvdzEiIGN4PSIyMCUiIGN5PSIzMCUiIHI9IjMwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzRmYjRmZiIgc3RvcC1vcGFjaXR5PSIwLjQiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMDAiIHN0b3Atb3BhY2l0eT0iMCIvPjwvcmFkaWFsR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJnbG93MiIgY3g9IjgwJSIgY3k9IjcwJSIgcj0iMjUlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNjJkZWZmIiBzdG9wLW9wYWNpdHk9IjAuMyIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzAwMDAwMCIgc3RvcC1vcGFjaXR5PSIwIi8+PC9yYWRpYWxHcmFkaWVudD48L2RlZnM+PHJlY3QgZmlsbD0idXJsKCNnbG93MSkiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiLz48cmVjdCBmaWxsPSJ1cmwoI2dsb3cyKSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIvPjwvc3ZnPg==')] opacity-90 mix-blend-overlay"></div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20 relative z-10">
@@ -119,7 +113,6 @@ const Index = () => {
             </div>
             
             <div className="md:w-1/2 flex justify-center">
-              {/* Image de voiture premium avec effet brillant */}
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-cyan-300/20 rounded-full blur-3xl transform -translate-y-4"></div>
                 <img 
@@ -131,7 +124,6 @@ const Index = () => {
             </div>
           </div>
           
-          {/* Widget météo intégré en position plus stratégique */}
           <div className="absolute top-4 right-4 md:top-8 md:right-8 bg-white/20 backdrop-blur-md p-3 rounded-lg text-white flex items-center gap-2 shadow-lg">
             {weatherData.condition === "Ensoleillé" ? (
               <Sun className="h-5 w-5 text-yellow-300" />
@@ -146,11 +138,8 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Contenu principal avec plus d'espace et un meilleur contraste */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 -mt-10 relative z-20">
-        {/* Carte principale contenant les statistiques */}
         <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0 p-2">
-          {/* Bouton d'action rapide */}
           <div className="px-6 pt-6 flex justify-end">
             <Button 
               onClick={handleAddService}
@@ -161,7 +150,6 @@ const Index = () => {
             </Button>
           </div>
           
-          {/* Grille de statistiques avec des couleurs distinctes */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 p-6">
             {stats.map((stat) => (
               <Card key={stat.title} className="hover:shadow-lg transition-shadow border-0">
@@ -184,9 +172,7 @@ const Index = () => {
           </div>
         </Card>
 
-        {/* Section principale avec un meilleur espacement */}
         <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Notifications */}
           <Card className="col-span-1 border-0 shadow-lg">
             <CardHeader className="border-b flex flex-row items-center justify-between">
               <CardTitle className="text-xl flex items-center gap-2">
@@ -208,7 +194,7 @@ const Index = () => {
                         </div>
                         <div>
                           <p className="text-sm font-medium">{notif.message}</p>
-                          <p className="text-xs text-gray-500">{notif.time}</p>
+                          <p className="text-sm text-gray-500">{notif.time}</p>
                         </div>
                       </div>
                       <button 
@@ -229,14 +215,12 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* Activités récentes avec une meilleure présentation */}
           <Card className="col-span-1 border-0 shadow-lg">
             <CardHeader className="border-b">
               <CardTitle className="text-xl">Activités récentes</CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-6">
-                {/* Liste des activités avec plus de détails visuels */}
                 <div className="flex items-start space-x-4">
                   <div className="bg-blue-100 p-2 rounded-full">
                     <CalendarDays className="h-4 w-4 text-blue-600" />
@@ -259,14 +243,12 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          {/* Prochains rendez-vous avec une meilleure présentation */}
           <Card className="col-span-1 border-0 shadow-lg">
             <CardHeader className="border-b">
               <CardTitle className="text-xl">Prochains rendez-vous</CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-6">
-                {/* Liste des rendez-vous avec plus de détails visuels */}
                 <div className="flex items-start space-x-4">
                   <div className="bg-purple-100 p-2 rounded-full">
                     <Car className="h-4 w-4 text-purple-600" />

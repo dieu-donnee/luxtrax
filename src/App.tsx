@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import AuthPage from "./pages/auth";
+import BookingPage from "./pages/booking";
 import PrivacyPolicy from "./pages/privacy";
 import TermsOfService from "./pages/terms";
 import NotFound from "./pages/NotFound";
@@ -36,6 +37,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Index />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/booking"
+        element={
+          <ProtectedRoute>
+            <BookingPage />
           </ProtectedRoute>
         }
       />
