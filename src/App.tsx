@@ -14,8 +14,17 @@ import NotFound from "./pages/NotFound";
 import { useAuth } from "./contexts/AuthContext";
 import { Suspense, lazy } from "react";
 
-const queryClient = new QueryClient();
+// Create a new QueryClient instance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
+// Component to handle protected routes
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
@@ -37,6 +46,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// Main routes component with Suspense for lazy loading
 const AppRoutes = () => {
   return (
     <Suspense fallback={
@@ -73,6 +83,7 @@ const AppRoutes = () => {
   );
 };
 
+// Main App component
 const App = () => (
   <BrowserRouter>
     <QueryClientProvider client={queryClient}>
