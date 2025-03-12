@@ -13,14 +13,14 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   profile: null,
-  loading: true,
+  loading: false,
   signOut: async () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const fetchProfile = async (userId: string) => {
     const { data, error } = await supabase
@@ -41,7 +41,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         fetchProfile(session.user.id);
       }
-      setLoading(false);
     });
 
     // Listen for auth changes
@@ -52,7 +51,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setProfile(null);
       }
-      setLoading(false);
     });
 
     return () => {

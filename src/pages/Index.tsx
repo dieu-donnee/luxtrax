@@ -1,29 +1,21 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { CalendarDays, Car, Bell, Settings, Users, Sun, Cloud, Plus, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
   const [weatherData, setWeatherData] = useState({ temp: 22, condition: "Ensoleillé" });
   const [notifications, setNotifications] = useState([
     { id: 1, message: "Nouveau rendez-vous confirmé", time: "Il y a 1 heure" },
     { id: 2, message: "Service terminé", time: "Il y a 3 heures" },
   ]);
   const { toast } = useToast();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const stats = [
     {
@@ -76,17 +68,6 @@ const Index = () => {
       duration: 3000,
     });
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="mt-4 text-gray-600">Chargement...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
