@@ -9,7 +9,11 @@ import { Car, Sparkles, Leaf, SprayCan } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
 
-type Service = Database["public"]["Tables"]["services"]["Row"];
+type Service = Database["public"]["Tables"]["services"]["Row"] & {
+  is_popular?: boolean;
+  category?: string;
+  estimated_duration?: number;
+};
 
 interface ServiceSelectionProps {
   selectedService: Service | null;
@@ -40,7 +44,7 @@ const ServiceSelection = ({ selectedService, onSelectService }: ServiceSelection
           .select('*');
           
         if (categoryFilter) {
-          query = query.eq('category', categoryFilter);
+          query = query.eq('type', categoryFilter);
         }
         
         const { data, error } = await query.order('price', { ascending: true });
@@ -49,11 +53,19 @@ const ServiceSelection = ({ selectedService, onSelectService }: ServiceSelection
           throw error;
         }
 
-        setServices(data);
+        // Enhance services with additional properties
+        const enhancedServices = data.map(service => ({
+          ...service,
+          category: service.type === 'carwash' ? 'standard' : 'premium',
+          is_popular: service.is_vip || service.discount_percentage > 0,
+          estimated_duration: service.type === 'carwash' ? 30 : 60
+        }));
+
+        setServices(enhancedServices);
         
-        // Simulate recently used services - in a real app, this would come from the user's history
-        if (data.length > 0) {
-          const recent = data.filter(service => service.is_popular).slice(0, 2);
+        // Set recently used services
+        if (enhancedServices.length > 0) {
+          const recent = enhancedServices.filter(service => service.is_popular).slice(0, 2);
           setRecentServices(recent);
         }
       } catch (error) {
