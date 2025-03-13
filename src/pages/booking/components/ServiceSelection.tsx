@@ -1,13 +1,13 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { Car, Sparkles, Leaf, SprayCan } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
+
+// Define the correct type for service_type
+type ServiceType = Database["public"]["Enums"]["service_type"];
 
 type Service = Database["public"]["Tables"]["services"]["Row"] & {
   is_popular?: boolean;
@@ -44,7 +44,18 @@ const ServiceSelection = ({ selectedService, onSelectService }: ServiceSelection
           .select('*');
           
         if (categoryFilter) {
-          query = query.eq('type', categoryFilter);
+          // Map UI category to database service type
+          let serviceType: ServiceType | null = null;
+          
+          if (categoryFilter === 'standard') {
+            serviceType = 'carwash';
+          } else if (categoryFilter === 'premium') {
+            serviceType = 'laundry';
+          }
+          
+          if (serviceType) {
+            query = query.eq('type', serviceType);
+          }
         }
         
         const { data, error } = await query.order('price', { ascending: true });
@@ -57,7 +68,7 @@ const ServiceSelection = ({ selectedService, onSelectService }: ServiceSelection
         const enhancedServices = data.map(service => ({
           ...service,
           category: service.type === 'carwash' ? 'standard' : 'premium',
-          is_popular: service.is_vip || service.discount_percentage > 0,
+          is_popular: service.is_vip || (service.discount_percentage || 0) > 0,
           estimated_duration: service.type === 'carwash' ? 30 : 60
         }));
 
@@ -101,21 +112,11 @@ const ServiceSelection = ({ selectedService, onSelectService }: ServiceSelection
 
   if (loading) {
     return (
-      <div className="space-y-4">
-        {[1, 2, 3].map((i) => (
-          <Card key={i} className="relative cursor-not-allowed overflow-hidden">
-            <CardHeader className="space-y-2">
-              <Skeleton className="h-5 w-1/3" />
-              <Skeleton className="h-4 w-2/3" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-4 w-full mb-2" />
-              <Skeleton className="h-4 w-5/6" />
-            </CardContent>
-            <CardFooter>
-              <Skeleton className="h-6 w-24" />
-            </CardFooter>
-          </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="relative cursor-not-allowed overflow-hidden">
+            <Skeleton className="h-36 w-full rounded-lg" />
+          </div>
         ))}
       </div>
     );
@@ -189,57 +190,37 @@ const ServiceSelection = ({ selectedService, onSelectService }: ServiceSelection
       )}
       
       {/* All services */}
-      <div className="space-y-4">
-        {services.map((service) => (
-          <Card 
-            key={service.id} 
-            className={`relative cursor-pointer transition-all hover:border-blue-400 ${
-              selectedService?.id === service.id 
-                ? 'border-2 border-blue-600 shadow-md' 
-                : 'border-gray-200'
-            }`}
-            onClick={() => onSelectService(service)}
-          >
-            {service.is_vip && (
-              <div className="absolute top-0 right-0 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs px-2 py-1 rounded-bl-md rounded-tr-md font-medium">
-                VIP
-              </div>
-            )}
-            
-            <CardHeader>
-              <CardTitle className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <div className="mr-3 bg-gray-100 p-2 rounded-full">
-                    {getServiceIcon(service)}
-                  </div>
-                  <span>{service.name}</span>
+      <div>
+        <h3 className="text-sm font-medium text-gray-700 mb-3">Tous les services</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {services.map((service) => (
+            <div 
+              key={service.id} 
+              className={`relative cursor-pointer transition-all hover:border-blue-400 rounded-lg border p-4 ${
+                selectedService?.id === service.id 
+                  ? 'border-2 border-blue-600 shadow-md' 
+                  : 'border-gray-200'
+              }`}
+              onClick={() => onSelectService(service)}
+            >
+              {service.is_vip && (
+                <div className="absolute top-0 right-0 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs px-2 py-1 rounded-bl-md rounded-tr-md font-medium">
+                  VIP
                 </div>
-                <span className="text-lg font-bold text-blue-600">
-                  {service.discount_percentage ? (
-                    <div className="flex flex-col items-end">
-                      <span className="text-sm line-through text-gray-400">
-                        {service.price.toFixed(2)}€
-                      </span>
-                      <span>
-                        {(calculateEstimatedPrice(service.price * (1 - service.discount_percentage / 100))).toFixed(2)}€
-                      </span>
-                    </div>
-                  ) : (
-                    `${calculateEstimatedPrice(service.price).toFixed(2)}€`
-                  )}
-                </span>
-              </CardTitle>
-              <CardDescription>
+              )}
+              
+              <div className="flex items-center mb-2">
+                <div className="mr-3 bg-blue-100 p-2 rounded-full">
+                  {getServiceIcon(service)}
+                </div>
+                <h3 className="font-semibold">{service.name}</h3>
+              </div>
+              
+              <p className="text-sm text-gray-500 mb-3">
                 {service.description || "Description non disponible"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                {service.details || "Pas de détails additionnels"}
               </p>
-            </CardContent>
-            <CardFooter className="border-t pt-4 mt-2">
-              <div className="flex gap-2 flex-wrap">
+              
+              <div className="flex gap-2 flex-wrap mb-3">
                 <div className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium ${
                   service.type === 'carwash' 
                     ? 'bg-blue-100 text-blue-800' 
@@ -260,13 +241,38 @@ const ServiceSelection = ({ selectedService, onSelectService }: ServiceSelection
                   </div>
                 )}
               </div>
-            </CardFooter>
-            
-            {selectedService?.id === service.id && (
-              <div className="absolute inset-0 border-2 border-blue-600 rounded-lg pointer-events-none"></div>
-            )}
-          </Card>
-        ))}
+              
+              <div className="flex justify-between items-center pt-2 border-t">
+                <span className="font-bold text-blue-600">
+                  {service.discount_percentage ? (
+                    <div className="flex flex-col">
+                      <span className="text-xs line-through text-gray-400">
+                        {service.price.toFixed(2)}€
+                      </span>
+                      <span>
+                        {(calculateEstimatedPrice(service.price * (1 - service.discount_percentage / 100))).toFixed(2)}€
+                      </span>
+                    </div>
+                  ) : (
+                    `${calculateEstimatedPrice(service.price).toFixed(2)}€`
+                  )}
+                </span>
+                
+                <div className={`w-5 h-5 rounded-full border-2 ${
+                  selectedService?.id === service.id 
+                    ? 'border-blue-600 bg-blue-600' 
+                    : 'border-gray-300'
+                }`}>
+                  {selectedService?.id === service.id && (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="w-2 h-2 rounded-full bg-white"></div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
