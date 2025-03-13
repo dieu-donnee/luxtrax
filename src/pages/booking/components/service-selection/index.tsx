@@ -24,7 +24,13 @@ const ServiceSelection = ({ selectedService, onSelectService }: ServiceSelection
           .select('*');
           
         if (categoryFilter) {
-          query = query.eq('type', categoryFilter === 'standard' ? 'carwash' : 'laundry');
+          // Map UI category to database service type
+          const serviceType = categoryFilter === 'standard' ? 'carwash' : 
+                              categoryFilter === 'premium' ? 'laundry' : null;
+          
+          if (serviceType) {
+            query = query.eq('type', serviceType);
+          }
         }
         
         const { data, error } = await query.order('price', { ascending: true });
