@@ -7,6 +7,10 @@ import RecentServices from "./RecentServices";
 import ServicesList from "./ServicesList";
 import { getServiceIcon, calculateEstimatedPrice, enhanceServices } from "./utils";
 import type { Service, ServiceSelectionProps } from "./types";
+import type { Database } from "@/integrations/supabase/types";
+
+// Define the correct type for service_type
+type ServiceType = Database["public"]["Enums"]["service_type"];
 
 const ServiceSelection = ({ selectedService, onSelectService }: ServiceSelectionProps) => {
   const { profile } = useAuth();
@@ -25,8 +29,13 @@ const ServiceSelection = ({ selectedService, onSelectService }: ServiceSelection
           
         if (categoryFilter) {
           // Map UI category to database service type
-          const serviceType = categoryFilter === 'standard' ? 'carwash' : 
-                              categoryFilter === 'premium' ? 'laundry' : null;
+          let serviceType: ServiceType | null = null;
+          
+          if (categoryFilter === 'standard') {
+            serviceType = 'carwash';
+          } else if (categoryFilter === 'premium') {
+            serviceType = 'laundry';
+          }
           
           if (serviceType) {
             query = query.eq('type', serviceType);
