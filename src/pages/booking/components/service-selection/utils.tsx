@@ -1,5 +1,5 @@
 
-import { ReactElement } from "react";
+import React, { ReactElement } from "react";
 import { categories } from "./ServiceCategories";
 import type { Database } from "@/integrations/supabase/types";
 
