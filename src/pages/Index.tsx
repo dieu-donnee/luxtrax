@@ -6,37 +6,43 @@ import { CalendarDays, Car, Bell, Settings, Users, Sun, Cloud, Plus, ChevronRigh
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useDashboardData } from "@/hooks/useDashboardData";
 
 const Index = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const [weatherData, setWeatherData] = useState({ temp: 22, condition: "Ensoleillé" });
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: "Nouveau rendez-vous confirmé", time: "Il y a 1 heure" },
-    { id: 2, message: "Service terminé", time: "Il y a 3 heures" },
-  ]);
   const { toast } = useToast();
+  const [weatherData, setWeatherData] = useState({ temp: 22, condition: "Ensoleillé" });
+  
+  // Utiliser notre nouveau hook pour récupérer les données
+  const { data: dashboardData, isLoading, isError } = useDashboardData();
 
   const stats = [
     {
       title: "Services en cours",
-      value: "3",
+      value: dashboardData ? `${dashboardData.services.total}` : "...",
       icon: Car,
-      description: "2 en attente, 1 en cours",
+      description: dashboardData 
+        ? `${dashboardData.services.pending} en attente, ${dashboardData.services.ongoing} en cours`
+        : "Chargement...",
       color: "bg-blue-100 text-blue-600"
     },
     {
       title: "Rendez-vous",
-      value: "12",
+      value: dashboardData ? `${dashboardData.appointments.total}` : "...",
       icon: CalendarDays,
-      description: "Prochain: 15 Mars",
+      description: dashboardData?.appointments.next.date 
+        ? `Prochain: ${dashboardData.appointments.next.date}`
+        : "Aucun rendez-vous prévu",
       color: "bg-green-100 text-green-600"
     },
     {
       title: "Prestataires",
-      value: "8",
+      value: dashboardData ? `${dashboardData.providers.total}` : "...",
       icon: Users,
-      description: "5 disponibles",
+      description: dashboardData 
+        ? `${dashboardData.providers.available} disponibles`
+        : "Chargement...",
       color: "bg-purple-100 text-purple-600"
     },
     {
@@ -53,7 +59,7 @@ const Index = () => {
   };
 
   const dismissNotification = (id) => {
-    setNotifications(notifications.filter(notif => notif.id !== id));
+    // Ici, on pourrait mettre à jour la base de données pour marquer la notification comme lue
     toast({
       title: "Notification supprimée",
       variant: "default",
@@ -161,13 +167,17 @@ const Index = () => {
                 Notifications
               </CardTitle>
               <span className="bg-blue-100 text-blue-600 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                {notifications.length}
+                {dashboardData?.notifications.length || 0}
               </span>
             </CardHeader>
             <CardContent className="pt-6">
-              {notifications.length > 0 ? (
+              {isLoading ? (
+                <div className="text-center py-4 text-gray-500">
+                  <p>Chargement des notifications...</p>
+                </div>
+              ) : dashboardData?.notifications.length ? (
                 <div className="space-y-4">
-                  {notifications.map((notif) => (
+                  {dashboardData.notifications.map((notif) => (
                     <div key={notif.id} className="flex items-start justify-between space-x-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                       <div className="flex items-start space-x-4">
                         <div className="bg-blue-100 p-2 rounded-full">
@@ -201,26 +211,32 @@ const Index = () => {
               <CardTitle className="text-xl">Activités récentes</CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <CalendarDays className="h-4 w-4 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Nouveau rendez-vous</p>
-                    <p className="text-sm text-gray-500">Il y a 2 heures</p>
-                  </div>
+              {isLoading ? (
+                <div className="text-center py-4 text-gray-500">
+                  <p>Chargement des activités...</p>
                 </div>
-                <div className="flex items-start space-x-4">
-                  <div className="bg-green-100 p-2 rounded-full">
-                    <Car className="h-4 w-4 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Service terminé</p>
-                    <p className="text-sm text-gray-500">Il y a 4 heures</p>
-                  </div>
+              ) : dashboardData?.activities.length ? (
+                <div className="space-y-6">
+                  {dashboardData.activities.map((activity) => (
+                    <div key={activity.id} className="flex items-start space-x-4">
+                      <div className={`bg-${activity.type === 'appointment' ? 'blue' : 'green'}-100 p-2 rounded-full`}>
+                        {activity.icon === 'calendar' ? 
+                          <CalendarDays className={`h-4 w-4 text-${activity.type === 'appointment' ? 'blue' : 'green'}-600`} /> :
+                          <Car className={`h-4 w-4 text-${activity.type === 'appointment' ? 'blue' : 'green'}-600`} />
+                        }
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{activity.message}</p>
+                        <p className="text-sm text-gray-500">{activity.time}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              ) : (
+                <div className="text-center py-4 text-gray-500">
+                  <p>Aucune activité récente</p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -229,26 +245,29 @@ const Index = () => {
               <CardTitle className="text-xl">Prochains rendez-vous</CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <div className="bg-purple-100 p-2 rounded-full">
-                    <Car className="h-4 w-4 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Lavage complet</p>
-                    <p className="text-sm text-gray-500">15 Mars, 14:00</p>
-                  </div>
+              {isLoading ? (
+                <div className="text-center py-4 text-gray-500">
+                  <p>Chargement des rendez-vous...</p>
                 </div>
-                <div className="flex items-start space-x-4">
-                  <div className="bg-orange-100 p-2 rounded-full">
-                    <Car className="h-4 w-4 text-orange-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Nettoyage intérieur</p>
-                    <p className="text-sm text-gray-500">18 Mars, 10:00</p>
-                  </div>
+              ) : dashboardData?.upcomingAppointments.length ? (
+                <div className="space-y-6">
+                  {dashboardData.upcomingAppointments.map((appointment) => (
+                    <div key={appointment.id} className="flex items-start space-x-4">
+                      <div className={`bg-${appointment.color}-100 p-2 rounded-full`}>
+                        <Car className={`h-4 w-4 text-${appointment.color}-600`} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{appointment.service}</p>
+                        <p className="text-sm text-gray-500">{appointment.date}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              ) : (
+                <div className="text-center py-4 text-gray-500">
+                  <p>Aucun rendez-vous prévu</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
