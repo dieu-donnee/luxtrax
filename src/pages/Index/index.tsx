@@ -2,10 +2,11 @@
 import { useEffect, useState } from "react";
 import DashboardHeader from "./components/DashboardHeader";
 import StatCards from "./components/StatCards";
-import NotificationsCard from "./components/NotificationsCard";
-import RecentActivitiesCard from "./components/RecentActivitiesCard";
-import UpcomingAppointmentsCard from "./components/UpcomingAppointmentsCard";
 import LoadingScreen from "./components/LoadingScreen";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import SidebarContent from "./components/SidebarContent";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -28,12 +29,24 @@ const Index = () => {
       <DashboardHeader weatherData={weatherData} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 -mt-10 relative z-20">
+        <div className="flex justify-end mb-6">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="overflow-y-auto">
+              <SidebarContent />
+            </SheetContent>
+          </Sheet>
+        </div>
+        
         <StatCards />
 
-        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <NotificationsCard />
-          <RecentActivitiesCard />
-          <UpcomingAppointmentsCard />
+        <div className="mt-8 hidden md:grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <SidebarContent />
         </div>
       </main>
     </div>
