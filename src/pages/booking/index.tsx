@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, ArrowRight, Calendar, Car, Check, MapPin } from "lucide-react";
-import ServiceSelection from "./components/ServiceSelection";
+import ServiceSelection from "./components/service-selection";
 import DateTimeSelection from "./components/DateTimeSelection";
 import AddressSelection from "./components/AddressSelection";
 import BookingSummary from "./components/BookingSummary";
