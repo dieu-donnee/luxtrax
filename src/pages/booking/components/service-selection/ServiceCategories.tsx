@@ -1,19 +1,23 @@
 
-import { Car, Sparkles, Leaf, SprayCan } from "lucide-react";
+import { Car, Sparkles, Leaf, Spray } from "lucide-react";
 
-interface ServiceCategoryProps {
-  categoryFilter: string | null;
-  setCategoryFilter: (category: string | null) => void;
-}
-
+// Define service categories with icons
 export const categories = [
   { id: 'standard', name: 'Standard', icon: Car },
   { id: 'premium', name: 'Premium', icon: Sparkles },
   { id: 'eco', name: 'Écologique', icon: Leaf },
-  { id: 'special', name: 'Spécial', icon: SprayCan },
+  { id: 'special', name: 'Spécial', icon: Spray },
 ];
 
-const ServiceCategories = ({ categoryFilter, setCategoryFilter }: ServiceCategoryProps) => {
+interface ServiceCategoriesProps {
+  categoryFilter: string | null;
+  setCategoryFilter: (category: string | null) => void;
+}
+
+const ServiceCategories = ({ 
+  categoryFilter, 
+  setCategoryFilter 
+}: ServiceCategoriesProps) => {
   return (
     <div className="flex overflow-x-auto gap-3 pb-2">
       <button

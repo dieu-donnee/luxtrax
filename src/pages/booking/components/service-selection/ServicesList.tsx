@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Check } from "lucide-react";
 import type { Service } from "./types";
 
 interface ServicesListProps {
@@ -56,8 +57,62 @@ const ServicesList = ({
     );
   }
 
+  // Helper function to render feature list
+  const renderFeatures = (service: Service) => {
+    if (!service.details) return null;
+    
+    try {
+      const features = JSON.parse(service.details);
+      if (Array.isArray(features)) {
+        return (
+          <ul className="space-y-1 mt-2">
+            {features.map((feature, index) => (
+              <li key={index} className="flex items-start">
+                <Check className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-gray-700">{feature}</span>
+              </li>
+            ))}
+          </ul>
+        );
+      }
+    } catch (e) {
+      // If not JSON, display as regular text
+      return <p className="text-sm text-gray-600 mt-2">{service.details}</p>;
+    }
+    
+    // Fallback if details is not an array or parse fails
+    return <p className="text-sm text-gray-600 mt-2">{service.details}</p>;
+  };
+
+  // Helper function to render monthly subscription if available
+  const renderMonthlySubscription = (service: Service) => {
+    if (!service.details) return null;
+    
+    try {
+      const details = JSON.parse(service.details);
+      if (details.monthlyPrice) {
+        return (
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <p className="text-sm font-medium text-blue-800">Forfait mensuel:</p>
+            <p className="text-sm font-bold text-blue-600">
+              {details.monthlyPrice.toLocaleString()} FCFA 
+              <span className="text-xs ml-1 text-gray-600">
+                ({details.monthlyDetails})
+              </span>
+            </p>
+          </div>
+        );
+      }
+    } catch (e) {
+      // Silently fail if not JSON or doesn't have monthly price
+      return null;
+    }
+    
+    return null;
+  };
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
       {services.map((service) => (
         <Card 
           key={service.id} 
@@ -70,7 +125,7 @@ const ServicesList = ({
         >
           {service.is_vip && (
             <div className="absolute top-0 right-0 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs px-2 py-1 rounded-bl-md rounded-tr-md font-medium">
-              VIP
+              PREMIUM
             </div>
           )}
           
@@ -79,19 +134,18 @@ const ServicesList = ({
               <div className="mr-3 bg-blue-100 p-2 rounded-full">
                 {getServiceIcon(service)}
               </div>
-              <CardTitle className="text-lg">{service.name}</CardTitle>
+              <CardTitle className="text-xl">{service.name}</CardTitle>
             </div>
             <CardDescription>
               {service.description || "Description non disponible"}
             </CardDescription>
           </CardHeader>
           
-          <CardContent className="pt-0">
-            <p className="text-sm text-gray-600 mb-4">
-              {service.details || "Pas de détails additionnels"}
-            </p>
+          <CardContent>
+            {renderFeatures(service)}
+            {renderMonthlySubscription(service)}
             
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap mt-4">
               <div className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium ${
                 service.type === 'carwash' 
                   ? 'bg-blue-100 text-blue-800' 
@@ -119,14 +173,14 @@ const ServicesList = ({
               {service.discount_percentage ? (
                 <div className="flex flex-col">
                   <span className="text-sm line-through text-gray-400">
-                    {service.price.toFixed(2)}€
+                    {parseInt(service.price.toString()).toLocaleString()} FCFA
                   </span>
                   <span>
-                    {(calculateEstimatedPrice(service.price * (1 - service.discount_percentage / 100))).toFixed(2)}€
+                    {parseInt((calculateEstimatedPrice(service.price * (1 - service.discount_percentage / 100))).toString()).toLocaleString()} FCFA
                   </span>
                 </div>
               ) : (
-                `${calculateEstimatedPrice(service.price).toFixed(2)}€`
+                `${parseInt(calculateEstimatedPrice(service.price).toString()).toLocaleString()} FCFA`
               )}
             </span>
             
