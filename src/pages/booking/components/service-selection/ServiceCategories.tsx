@@ -1,12 +1,12 @@
 
-import { Car, Sparkles, Leaf, Spray } from "lucide-react";
+import { Car, Sparkles, Leaf, SprayCan } from "lucide-react";
 
 // Define service categories with icons
 export const categories = [
   { id: 'standard', name: 'Standard', icon: Car },
   { id: 'premium', name: 'Premium', icon: Sparkles },
   { id: 'eco', name: 'Écologique', icon: Leaf },
-  { id: 'special', name: 'Spécial', icon: Spray },
+  { id: 'special', name: 'Spécial', icon: SprayCan },
 ];
 
 interface ServiceCategoriesProps {

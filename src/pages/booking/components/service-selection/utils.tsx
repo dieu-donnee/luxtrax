@@ -1,7 +1,6 @@
-
 import React, { ReactElement } from "react";
 import { categories } from "./ServiceCategories";
-import { Car, Sparkles, Leaf, Spray } from "lucide-react";
+import { Car, Sparkles, Leaf, SprayCan } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type Service = Database["public"]["Tables"]["services"]["Row"] & {
@@ -17,7 +16,7 @@ export const serviceCategories = [
   { id: 'standard', name: 'Standard', icon: Car },
   { id: 'premium', name: 'Premium', icon: Sparkles },
   { id: 'eco', name: 'Écologique', icon: Leaf },
-  { id: 'special', name: 'Spécial', icon: Spray },
+  { id: 'special', name: 'Spécial', icon: SprayCan },
 ];
 
 export const getServiceIcon = (service: Service): ReactElement => {
@@ -35,7 +34,7 @@ export const getServiceIcon = (service: Service): ReactElement => {
   if (serviceName.includes('standard')) return <Car className="h-5 w-5" />;
   if (serviceName.includes('premium')) return <Sparkles className="h-5 w-5" />;
   if (serviceName.includes('écologique') || serviceName.includes('ecologique')) return <Leaf className="h-5 w-5" />;
-  if (serviceName.includes('spécial') || serviceName.includes('special')) return <Spray className="h-5 w-5" />;
+  if (serviceName.includes('spécial') || serviceName.includes('special')) return <SprayCan className="h-5 w-5" />;
   
   // Default icon based on service type
   const category = categories.find(c => c.id === service.category) || categories[0];
