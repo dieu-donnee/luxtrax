@@ -48,6 +48,14 @@ const ServicesList = ({
     return <div className="text-red-500 p-4 text-center">{error}</div>;
   }
 
+  if (services.length === 0) {
+    return (
+      <div className="text-gray-500 p-4 text-center">
+        Aucun service disponible dans cette catégorie
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       {services.map((service) => (
