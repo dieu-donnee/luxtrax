@@ -2,19 +2,33 @@
 import { Check } from "lucide-react";
 import { ReactNode } from "react";
 import type { Service } from "../types";
+import ServiceTable from "./ServiceTable";
 
 interface ServiceFeaturesProps {
   service: Service;
+  onSelectService?: (service: Service) => void;
+  currentService?: Service;
 }
 
-const ServiceFeatures = ({ service }: ServiceFeaturesProps) => {
+const ServiceFeatures = ({ service, onSelectService, currentService }: ServiceFeaturesProps) => {
   if (!service.details) return null;
   
   try {
-    // Essayons de parser les détails comme JSON
+    // Try to parse the details as JSON
     const details = JSON.parse(service.details);
     
-    // Si details est un tableau, c'est une liste de caractéristiques
+    // Check if this is a comparison table format
+    if (details.tableView && Array.isArray(details.services)) {
+      return (
+        <ServiceTable 
+          services={details.services} 
+          onSelectService={onSelectService}
+          currentService={currentService}
+        />
+      );
+    }
+    
+    // If details is an array, it's a list of features
     if (Array.isArray(details)) {
       return (
         <ul className="space-y-1 mt-2">
@@ -28,7 +42,7 @@ const ServiceFeatures = ({ service }: ServiceFeaturesProps) => {
       );
     }
     
-    // Si details a une propriété 'features', utilisons-la
+    // If details has a property 'features', use it
     if (details.features && Array.isArray(details.features)) {
       return (
         <div>
@@ -41,7 +55,7 @@ const ServiceFeatures = ({ service }: ServiceFeaturesProps) => {
             ))}
           </ul>
           
-          {/* Afficher les informations d'abonnement mensuel si disponibles */}
+          {/* Display monthly subscription information if available */}
           {details.monthlyPrice && (
             <div className="mt-3 pt-3 border-t border-gray-200">
               <p className="text-sm font-medium text-blue-800">Forfait mensuel:</p>
@@ -59,7 +73,7 @@ const ServiceFeatures = ({ service }: ServiceFeaturesProps) => {
       );
     }
     
-    // Si nous avons un autre format d'objet JSON, affichons-le comme texte formaté
+    // If we have another JSON object format, display it as formatted text
     return (
       <div className="mt-2">
         {Object.entries(details).map(([key, value], index) => (
@@ -72,7 +86,7 @@ const ServiceFeatures = ({ service }: ServiceFeaturesProps) => {
     );
     
   } catch (e) {
-    // Si le parsing JSON échoue, afficher comme texte ordinaire
+    // If JSON parsing fails, display as ordinary text
     return <p className="text-sm text-gray-600 mt-2">{service.details}</p>;
   }
 };

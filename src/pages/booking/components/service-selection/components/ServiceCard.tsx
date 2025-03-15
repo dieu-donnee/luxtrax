@@ -48,7 +48,17 @@ const ServiceCard = ({
       </CardHeader>
       
       <CardContent>
-        <ServiceFeatures service={service} />
+        <ServiceFeatures 
+          service={service} 
+          onSelectService={(selectedService) => {
+            // If the table inside has its own select function
+            if (selectedService && selectedService !== service) {
+              // Handle selection of a different service from the table
+              onSelect();
+            }
+          }}
+          currentService={service}
+        />
         <ServiceTags service={service} />
       </CardContent>
       
