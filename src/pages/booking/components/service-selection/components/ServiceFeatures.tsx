@@ -59,8 +59,17 @@ const ServiceFeatures = ({ service }: ServiceFeaturesProps) => {
       );
     }
     
-    // Si nous avons un autre format d'objet JSON, affichons-le comme texte
-    return <p className="text-sm text-gray-600 mt-2">{JSON.stringify(details)}</p>;
+    // Si nous avons un autre format d'objet JSON, affichons-le comme texte formaté
+    return (
+      <div className="mt-2">
+        {Object.entries(details).map(([key, value], index) => (
+          <div key={index} className="text-sm mb-1">
+            <span className="font-medium text-gray-700">{key}: </span>
+            <span className="text-gray-600">{typeof value === 'object' ? JSON.stringify(value) : value?.toString()}</span>
+          </div>
+        ))}
+      </div>
+    );
     
   } catch (e) {
     // Si le parsing JSON échoue, afficher comme texte ordinaire
