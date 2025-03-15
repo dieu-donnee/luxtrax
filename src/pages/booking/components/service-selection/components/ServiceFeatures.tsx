@@ -60,7 +60,7 @@ const ServiceFeatures = ({ service }: ServiceFeaturesProps) => {
     }
     
     // Si nous avons un autre format d'objet JSON, affichons-le comme texte
-    return <p className="text-sm text-gray-600 mt-2">{service.details}</p>;
+    return <p className="text-sm text-gray-600 mt-2">{JSON.stringify(details)}</p>;
     
   } catch (e) {
     // Si le parsing JSON échoue, afficher comme texte ordinaire
