@@ -1,11 +1,12 @@
 
 import React from "react";
-import ServiceCategories from "./ServiceCategories";
-import RecentServices from "./RecentServices";
-import ServicesList from "./ServicesList";
-import { getServiceIcon, calculateEstimatedPrice } from "./utils";
 import type { Service } from "./types";
 import { useAuth } from "@/contexts/AuthContext";
+import { getServiceIcon, calculateEstimatedPrice } from "./utils";
+import ServiceInstructions from "./components/ServiceInstructions";
+import CategoriesSection from "./components/CategoriesSection";
+import RecentServicesSection from "./components/RecentServicesSection";
+import AllServicesSection from "./components/AllServicesSection";
 
 interface ServiceSelectionViewProps {
   services: Service[];
@@ -41,18 +42,16 @@ const ServiceSelectionView: React.FC<ServiceSelectionViewProps> = ({
 
   return (
     <div className="space-y-6">
-      <p className="text-gray-600 mb-4">
-        Choisissez le service qui correspond le mieux à vos besoins :
-      </p>
+      <ServiceInstructions />
       
       {/* Quick selection categories */}
-      <ServiceCategories 
+      <CategoriesSection 
         categoryFilter={categoryFilter} 
         setCategoryFilter={setCategoryFilter}
       />
       
       {/* Recently used services */}
-      <RecentServices
+      <RecentServicesSection
         recentServices={recentServices}
         selectedService={selectedService}
         onSelectService={onSelectService}
@@ -61,18 +60,15 @@ const ServiceSelectionView: React.FC<ServiceSelectionViewProps> = ({
       />
       
       {/* All services */}
-      <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-3">Tous les services</h3>
-        <ServicesList
-          services={services}
-          selectedService={selectedService}
-          onSelectService={onSelectService}
-          loading={loading}
-          error={error}
-          getServiceIcon={getIconForService}
-          calculateEstimatedPrice={calculatePrice}
-        />
-      </div>
+      <AllServicesSection
+        services={services}
+        selectedService={selectedService}
+        onSelectService={onSelectService}
+        loading={loading}
+        error={error}
+        getServiceIcon={getIconForService}
+        calculateEstimatedPrice={calculatePrice}
+      />
     </div>
   );
 };
