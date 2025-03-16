@@ -1,11 +1,10 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MapPin } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import Map from "@/components/Map";
+import Map from "@/components/map";
 
 interface AddressSelectionProps {
   address: string;
@@ -23,19 +22,16 @@ const AddressSelection = ({
   const { profile } = useAuth();
   const [suggestions, setSuggestions] = useState<string[]>([]);
   
-  // Load saved addresses from profile
   const savedAddresses = [
     profile?.default_address,
     ...(profile?.additional_addresses || [])
   ].filter(Boolean) as string[];
 
-  // Handle suggestion click
   const handleSuggestionClick = (suggestion: string) => {
     onAddressChange(suggestion);
-    setSuggestions([]); // Clear suggestions after selection
+    setSuggestions([]);
   };
 
-  // Gérer la sélection de l'emplacement sur la carte
   const handleLocationSelect = (location: { lat: number; lng: number; address: string }) => {
     onAddressChange(location.address);
   };
@@ -59,7 +55,6 @@ const AddressSelection = ({
                 value={address}
                 onChange={(e) => {
                   onAddressChange(e.target.value);
-                  // Simple suggestion logic based on saved addresses
                   if (e.target.value && savedAddresses.length) {
                     setSuggestions(
                       savedAddresses.filter(saved => 
@@ -75,7 +70,6 @@ const AddressSelection = ({
               />
             </div>
             
-            {/* Address suggestions */}
             {suggestions.length > 0 && (
               <div className="absolute z-10 w-full bg-white shadow-lg rounded-md mt-1 border overflow-hidden max-h-48 overflow-y-auto">
                 {suggestions.map((suggestion, index) => (
@@ -91,7 +85,6 @@ const AddressSelection = ({
             )}
           </div>
 
-          {/* Previously saved addresses */}
           {savedAddresses.length > 0 && (
             <div className="mt-3">
               <p className="text-sm font-medium text-gray-700 mb-2">Adresses enregistrées</p>
@@ -111,7 +104,6 @@ const AddressSelection = ({
             </div>
           )}
 
-          {/* Google Maps pour sélection visuelle d'adresse */}
           <div className="mt-4">
             <p className="text-sm text-gray-700 mb-2">Sélectionnez sur la carte</p>
             <Map 
