@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import Map from "@/components/Map";
 
 interface AddressSelectionProps {
   address: string;
@@ -21,7 +21,6 @@ const AddressSelection = ({
   onNotesChange
 }: AddressSelectionProps) => {
   const { profile } = useAuth();
-  const [mapLoaded, setMapLoaded] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   
   // Load saved addresses from profile
@@ -30,19 +29,15 @@ const AddressSelection = ({
     ...(profile?.additional_addresses || [])
   ].filter(Boolean) as string[];
 
-  useEffect(() => {
-    // Initialize map (placeholder for now - would integrate with a real maps API)
-    const timer = setTimeout(() => {
-      setMapLoaded(true);
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
   // Handle suggestion click
   const handleSuggestionClick = (suggestion: string) => {
     onAddressChange(suggestion);
     setSuggestions([]); // Clear suggestions after selection
+  };
+
+  // Gérer la sélection de l'emplacement sur la carte
+  const handleLocationSelect = (location: { lat: number; lng: number; address: string }) => {
+    onAddressChange(location.address);
   };
 
   return (
@@ -116,44 +111,14 @@ const AddressSelection = ({
             </div>
           )}
 
-          {/* Map for visual address selection */}
-          <Card className="w-full h-56 bg-gray-100 rounded-md overflow-hidden relative mt-4">
-            {mapLoaded ? (
-              <div className="w-full h-full bg-blue-50 flex items-center justify-center">
-                <div className="text-center p-4">
-                  <p className="text-sm text-gray-600 mb-2">Carte interactive</p>
-                  <p className="text-xs text-gray-500">
-                    Cliquez sur la carte pour sélectionner votre emplacement exact
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <p className="text-sm text-gray-500">Chargement de la carte...</p>
-              </div>
-            )}
-            <div className="absolute bottom-2 right-2 bg-white rounded-full p-1 shadow-md">
-              <button 
-                type="button" 
-                className="p-1 text-blue-600 hover:text-blue-800"
-                onClick={() => {
-                  if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                      (position) => {
-                        // This would normally update the map and reverse geocode
-                        console.log("Location obtained:", position.coords);
-                      },
-                      (error) => {
-                        console.error("Error getting location:", error);
-                      }
-                    );
-                  }
-                }}
-              >
-                <MapPin className="h-5 w-5" />
-              </button>
-            </div>
-          </Card>
+          {/* Google Maps pour sélection visuelle d'adresse */}
+          <div className="mt-4">
+            <p className="text-sm text-gray-700 mb-2">Sélectionnez sur la carte</p>
+            <Map 
+              address={address} 
+              onLocationSelect={handleLocationSelect}
+            />
+          </div>
         </div>
       </div>
 
