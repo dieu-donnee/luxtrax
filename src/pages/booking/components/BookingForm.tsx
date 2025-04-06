@@ -4,17 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
-import ServiceSelection from "./service-selection";
 import DateTimeSelection from "./DateTimeSelection";
 import AddressSelection from "./AddressSelection";
 import BookingSummary from "./BookingSummary";
-import type { Service } from "./service-selection/types";
 import type { BookingStep } from "../types";
 
 interface BookingFormProps {
   currentStep: BookingStep;
-  selectedService: Service | null;
-  setSelectedService: (service: Service) => void;
   selectedDate: Date | undefined;
   setSelectedDate: (date: Date | undefined) => void;
   selectedTime: string;
@@ -32,8 +28,6 @@ interface BookingFormProps {
 
 const BookingForm = ({
   currentStep,
-  selectedService,
-  setSelectedService,
   selectedDate,
   setSelectedDate,
   selectedTime,
@@ -58,12 +52,6 @@ const BookingForm = ({
         </CardHeader>
         <CardContent className="p-6">
           <Tabs value={currentStep} className="w-full">
-            <TabsContent value="service" className="mt-0">
-              <ServiceSelection
-                selectedService={selectedService}
-                onSelectService={setSelectedService}
-              />
-            </TabsContent>
             <TabsContent value="datetime" className="mt-0">
               <DateTimeSelection
                 selectedDate={selectedDate}
@@ -82,7 +70,6 @@ const BookingForm = ({
             </TabsContent>
             <TabsContent value="summary" className="mt-0">
               <BookingSummary
-                service={selectedService}
                 date={selectedDate}
                 time={selectedTime}
                 address={selectedAddress}
@@ -96,7 +83,7 @@ const BookingForm = ({
       <div className="mt-8 flex justify-between">
         <Button 
           onClick={handlePrevious}
-          disabled={currentStep === "service"}
+          disabled={currentStep === "datetime"}
           variant="outline"
           className="flex items-center gap-2"
         >

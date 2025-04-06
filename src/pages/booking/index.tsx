@@ -12,11 +12,9 @@ import type { BookingStep } from "./types";
 const BookingPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState<BookingStep>("service");
+  const [currentStep, setCurrentStep] = useState<BookingStep>("datetime");
   
   const { 
-    selectedService, 
-    setSelectedService,
     selectedDate,
     setSelectedDate,
     selectedTime,
@@ -30,7 +28,6 @@ const BookingPage = () => {
   } = useBookingState(currentStep);
 
   const { handleSubmit, isSubmitting } = useBookingSubmit({
-    selectedService,
     selectedDate,
     selectedTime,
     selectedAddress,
@@ -62,8 +59,6 @@ const BookingPage = () => {
       
       <BookingForm
         currentStep={currentStep}
-        selectedService={selectedService}
-        setSelectedService={setSelectedService}
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}
         selectedTime={selectedTime}
