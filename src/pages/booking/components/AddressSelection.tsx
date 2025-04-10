@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,6 +39,11 @@ const AddressSelection = ({
 
   const handleLocationSelect = (location: { lat: number; lng: number; address: string }) => {
     onAddressChange(location.address);
+    toast({
+      title: "Localisation activée",
+      description: "Votre position actuelle a été définie comme lieu de rendez-vous.",
+      variant: "default"
+    });
   };
 
   const getCurrentLocation = () => {
@@ -52,29 +57,34 @@ const AddressSelection = ({
       
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const geocoder = new google.maps.Geocoder();
           const pos = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
           
-          geocoder.geocode({ location: pos }, (results, status) => {
-            if (status === "OK" && results && results[0]) {
-              onAddressChange(results[0].formatted_address);
+          // Utiliser l'API de géocodage inverse de Nominatim (OpenStreetMap)
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.lat}&lon=${pos.lng}`)
+            .then(response => response.json())
+            .then(data => {
+              onAddressChange(data.display_name || "Adresse actuelle");
               toast({
                 title: "Localisation activée",
                 description: "Votre position actuelle a été définie comme lieu de rendez-vous.",
                 variant: "default"
               });
-            } else {
+            })
+            .catch(error => {
+              console.error("Erreur de géocodage inverse:", error);
               toast({
-                title: "Erreur de localisation",
-                description: "Impossible de déterminer votre adresse actuelle.",
+                title: "Erreur de géocodage",
+                description: "Impossible de déterminer votre adresse actuelle avec précision.",
                 variant: "destructive"
               });
-            }
-            setIsGettingLocation(false);
-          });
+              onAddressChange(`Latitude: ${pos.lat}, Longitude: ${pos.lng}`);
+            })
+            .finally(() => {
+              setIsGettingLocation(false);
+            });
         },
         (error) => {
           console.error("Erreur de géolocalisation:", error);
@@ -192,19 +202,7 @@ const AddressSelection = ({
           )}
 
           <div className="mt-4">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm text-gray-700">Sélectionnez sur la carte</p>
-              <p className="text-xs text-blue-600">
-                Vous pouvez également cliquer sur la carte pour sélectionner un emplacement
-              </p>
-            </div>
-            <Map 
-              address={address} 
-              onLocationSelect={handleLocationSelect}
-            />
-            <p className="text-xs text-gray-500 mt-1 text-center">
-              Cliquez sur l'icône <MapPin className="h-3 w-3 inline" /> en bas à droite de la carte pour utiliser votre position actuelle
-            </p>
+            <Map onLocationSelect={handleLocationSelect} />
           </div>
         </div>
       </div>
