@@ -11,7 +11,6 @@ import BookingPage from "./pages/booking";
 import PrivacyPolicy from "./pages/privacy";
 import TermsOfService from "./pages/terms";
 import NotFound from "./pages/NotFound";
-import { useAuth } from "./contexts/AuthContext";
 
 // Create a new QueryClient instance
 const queryClient = new QueryClient({
@@ -23,7 +22,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// Component to handle protected routes
+// Move the useAuth hook inside a component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
 
@@ -34,7 +33,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// Main routes component without loading states
+// Main routes component
 const AppRoutes = () => {
   return (
     <Routes>
@@ -62,10 +61,13 @@ const AppRoutes = () => {
   );
 };
 
+// Make sure to import useAuth after we use AppRoutes
+import { useAuth } from "./contexts/AuthContext";
+
 // Main App component
 const App = () => (
-  <BrowserRouter>
-    <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
       <AuthProvider>
         <TooltipProvider>
           <div className="app-container">
@@ -75,8 +77,8 @@ const App = () => (
           </div>
         </TooltipProvider>
       </AuthProvider>
-    </QueryClientProvider>
-  </BrowserRouter>
+    </BrowserRouter>
+  </QueryClientProvider>
 );
 
 export default App;
