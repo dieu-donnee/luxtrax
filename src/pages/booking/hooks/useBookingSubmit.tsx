@@ -9,6 +9,7 @@ interface BookingSubmitProps {
   selectedTime: string;
   selectedAddress: string;
   notes: string;
+  selectedServiceId: string;
   toast: any;
   navigate: NavigateFunction;
 }
@@ -18,6 +19,7 @@ export const useBookingSubmit = ({
   selectedTime,
   selectedAddress,
   notes,
+  selectedServiceId,
   toast,
   navigate
 }: BookingSubmitProps) => {
@@ -25,7 +27,7 @@ export const useBookingSubmit = ({
   const { user } = useAuth();
 
   const handleSubmit = async () => {
-    if (!selectedDate || !selectedTime || !selectedAddress || !user) {
+    if (!selectedDate || !selectedTime || !selectedAddress || !selectedServiceId || !user) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -49,7 +51,7 @@ export const useBookingSubmit = ({
           scheduled_date: scheduledDate.toISOString(),
           address: selectedAddress,
           notes: notes || null,
-          service_id: '00000000-0000-0000-0000-000000000000' // Placeholder ID
+          service_id: selectedServiceId // Using the selected service ID
         });
 
       if (error) throw error;

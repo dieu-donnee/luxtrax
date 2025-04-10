@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import DateTimeSelection from "./DateTimeSelection";
+import ServiceSelection from "./ServiceSelection";
 import AddressSelection from "./AddressSelection";
 import BookingSummary from "./BookingSummary";
-import type { BookingStep } from "../types";
+import type { BookingStep, ServicePlan } from "../types";
 
 interface BookingFormProps {
   currentStep: BookingStep;
@@ -19,6 +20,10 @@ interface BookingFormProps {
   setSelectedAddress: (address: string) => void;
   notes: string;
   setNotes: (notes: string) => void;
+  selectedServiceId: string;
+  setSelectedServiceId: (serviceId: string) => void;
+  services: ServicePlan[];
+  selectedService: ServicePlan | undefined;
   handlePrevious: () => void;
   handleNext: () => void;
   handleSubmit: () => Promise<void>;
@@ -36,6 +41,10 @@ const BookingForm = ({
   setSelectedAddress,
   notes,
   setNotes,
+  selectedServiceId,
+  setSelectedServiceId,
+  services,
+  selectedService,
   handlePrevious,
   handleNext,
   handleSubmit,
@@ -47,7 +56,10 @@ const BookingForm = ({
       <Card className="shadow-xl border-0">
         <CardHeader className="border-b">
           <CardTitle>
-            {currentStep.charAt(0).toUpperCase() + currentStep.slice(1)}
+            {currentStep === "datetime" ? "Date et heure" :
+             currentStep === "service" ? "Service" :
+             currentStep === "address" ? "Adresse" :
+             "Récapitulatif"}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
@@ -58,6 +70,13 @@ const BookingForm = ({
                 selectedTime={selectedTime}
                 onSelectDate={setSelectedDate}
                 onSelectTime={setSelectedTime}
+              />
+            </TabsContent>
+            <TabsContent value="service" className="mt-0">
+              <ServiceSelection
+                services={services}
+                selectedServiceId={selectedServiceId}
+                onSelectService={setSelectedServiceId}
               />
             </TabsContent>
             <TabsContent value="address" className="mt-0">
@@ -74,6 +93,7 @@ const BookingForm = ({
                 time={selectedTime}
                 address={selectedAddress}
                 notes={notes}
+                selectedService={selectedService}
               />
             </TabsContent>
           </Tabs>

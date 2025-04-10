@@ -1,10 +1,17 @@
 
 import { ElementType } from "react";
 
-export type BookingStep = "datetime" | "address" | "summary";
+export type BookingStep = "datetime" | "service" | "address" | "summary";
 
 export interface StepInfo {
   id: BookingStep;
   label: string;
   icon: ElementType;
+}
+
+export interface ServicePlan {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
 }

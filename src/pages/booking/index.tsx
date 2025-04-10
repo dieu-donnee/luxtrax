@@ -23,6 +23,10 @@ const BookingPage = () => {
     setSelectedAddress,
     notes,
     setNotes,
+    selectedServiceId,
+    setSelectedServiceId,
+    services,
+    selectedService,
     steps,
     canProceed
   } = useBookingState(currentStep);
@@ -32,6 +36,7 @@ const BookingPage = () => {
     selectedTime,
     selectedAddress,
     notes,
+    selectedServiceId,
     toast,
     navigate
   });
@@ -67,6 +72,10 @@ const BookingPage = () => {
         setSelectedAddress={setSelectedAddress}
         notes={notes}
         setNotes={setNotes}
+        selectedServiceId={selectedServiceId}
+        setSelectedServiceId={setSelectedServiceId}
+        services={services}
+        selectedService={selectedService}
         handlePrevious={handlePrevious}
         handleNext={handleNext}
         handleSubmit={handleSubmit}

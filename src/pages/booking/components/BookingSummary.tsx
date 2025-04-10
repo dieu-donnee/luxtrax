@@ -3,17 +3,19 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, Clock, MapPin, PenLine, Car } from "lucide-react";
+import { Calendar, Clock, MapPin, PenLine, Car, CircleDollarSign } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import type { ServicePlan } from "../types";
 
 interface BookingSummaryProps {
   date: Date | undefined;
   time: string;
   address: string;
   notes: string;
+  selectedService: ServicePlan | undefined;
 }
 
-const BookingSummary = ({ date, time, address, notes }: BookingSummaryProps) => {
+const BookingSummary = ({ date, time, address, notes, selectedService }: BookingSummaryProps) => {
   const { profile } = useAuth();
   
   if (!date) {
@@ -47,6 +49,19 @@ const BookingSummary = ({ date, time, address, notes }: BookingSummaryProps) => 
                 <p className="text-gray-900">{time}</p>
               </div>
             </div>
+
+            {selectedService && (
+              <div className="flex items-start space-x-3">
+                <CircleDollarSign className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div>
+                  <p className="font-medium text-gray-700">Service</p>
+                  <div>
+                    <p className="text-gray-900">{selectedService.name}</p>
+                    <p className="text-sm text-gray-600">{selectedService.price.toLocaleString('fr-FR')}F</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-start space-x-3">
               <MapPin className="w-5 h-5 text-blue-600 mt-0.5" />
