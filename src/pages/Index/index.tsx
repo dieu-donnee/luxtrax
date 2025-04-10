@@ -1,25 +1,31 @@
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardHeader from "./components/DashboardHeader";
-import StatCards from "./components/StatCards";
 import LoadingScreen from "./components/LoadingScreen";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SidebarContent from "./components/SidebarContent";
+import DashboardCards from "./components/DashboardCards";
+import { useDashboardData } from "@/hooks/useDashboardData";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [weatherData, setWeatherData] = useState({ temp: 22, condition: "Ensoleillé" });
+  
+  // Use the optimized hook
+  const { data: dashboardData, isLoading: isDataLoading, isError } = useDashboardData();
 
   useEffect(() => {
+    // Reduce initial loading time
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, []);
 
+  // Show loading screen only initially
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -43,7 +49,11 @@ const Index = () => {
           </Sheet>
         </div>
         
-        <StatCards />
+        <DashboardCards 
+          dashboardData={dashboardData}
+          isLoading={isDataLoading}
+          isError={isError}
+        />
 
         <div className="mt-8 hidden md:grid grid-cols-1 gap-6 lg:grid-cols-3">
           <SidebarContent />

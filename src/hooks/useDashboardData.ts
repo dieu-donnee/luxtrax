@@ -49,32 +49,37 @@ export const useDashboardData = () => {
       throw new Error("User not authenticated");
     }
 
-    // Récupérer les réservations de l'utilisateur
-    const { data: bookings, error: bookingsError } = await supabase
-      .from("bookings")
-      .select("*, services(name)")
-      .eq("user_id", user.id);
+    // Use Promise.all to parallelize data fetching
+    const [bookingsResult, providersResult] = await Promise.all([
+      supabase
+        .from("bookings")
+        .select("*, services(name)")
+        .eq("user_id", user.id),
+      supabase
+        .from("profiles")
+        .select("*")
+        .eq("role", "provider")
+    ]);
 
-    if (bookingsError) {
-      console.error("Error fetching bookings:", bookingsError);
+    const bookings = bookingsResult.data || [];
+    const providers = providersResult.data || [];
+    
+    if (bookingsResult.error) {
+      console.error("Error fetching bookings:", bookingsResult.error);
+    }
+    
+    if (providersResult.error) {
+      console.error("Error fetching providers:", providersResult.error);
     }
 
-    // Récupérer les prestataires disponibles
-    const { data: providers, error: providersError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("role", "provider");
+    // Pre-compute values to avoid redundant calculations
+    const ongoingServices = bookings.filter(b => b.status === "ongoing").length;
+    const pendingServices = bookings.filter(b => b.status === "pending").length;
+    const totalServices = bookings.length;
+    const availableProviders = providers.filter(p => true).length;
 
-    if (providersError) {
-      console.error("Error fetching providers:", providersError);
-    }
-
-    // Calculer les statistiques
-    const ongoingServices = bookings?.filter(b => b.status === "ongoing").length || 0;
-    const pendingServices = bookings?.filter(b => b.status === "pending").length || 0;
-
-    // Trier les réservations par date pour trouver la prochaine
-    const sortedBookings = [...(bookings || [])].sort(
+    // Sort only once
+    const sortedBookings = [...bookings].sort(
       (a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime()
     );
 
@@ -82,15 +87,31 @@ export const useDashboardData = () => {
       b => new Date(b.scheduled_date).getTime() > Date.now()
     );
 
-    // Formater les données pour l'affichage
-    const formattedData: DashboardData = {
+    const upcomingAppointments = sortedBookings
+      .filter(b => new Date(b.scheduled_date).getTime() > Date.now())
+      .slice(0, 2)
+      .map((booking, index) => ({
+        id: index + 1,
+        service: booking.services?.name || "Service",
+        date: new Date(booking.scheduled_date).toLocaleDateString('fr-FR', { 
+          day: 'numeric', 
+          month: 'long',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        icon: "car",
+        color: index === 0 ? "purple" : "orange"
+      }));
+
+    // Return optimized data
+    return {
       services: {
         ongoing: ongoingServices,
         pending: pendingServices,
-        total: bookings?.length || 0,
+        total: totalServices,
       },
       appointments: {
-        total: bookings?.length || 0,
+        total: totalServices,
         next: {
           date: nextAppointment?.scheduled_date 
             ? new Date(nextAppointment.scheduled_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
@@ -99,8 +120,8 @@ export const useDashboardData = () => {
         },
       },
       providers: {
-        total: providers?.length || 0,
-        available: providers?.filter(p => true).length || 0, // Idéalement, ajoutez une logique de disponibilité
+        total: providers.length,
+        available: availableProviders,
       },
       notifications: [
         { id: 1, message: "Nouveau rendez-vous confirmé", time: "Il y a 1 heure" },
@@ -122,24 +143,8 @@ export const useDashboardData = () => {
           icon: "car" 
         },
       ],
-      upcomingAppointments: sortedBookings
-        .filter(b => new Date(b.scheduled_date).getTime() > Date.now())
-        .slice(0, 2)
-        .map((booking, index) => ({
-          id: index + 1,
-          service: booking.services?.name || "Service",
-          date: new Date(booking.scheduled_date).toLocaleDateString('fr-FR', { 
-            day: 'numeric', 
-            month: 'long',
-            hour: '2-digit',
-            minute: '2-digit'
-          }),
-          icon: "car",
-          color: index === 0 ? "purple" : "orange"
-        })),
+      upcomingAppointments,
     };
-
-    return formattedData;
   };
 
   return useQuery({
@@ -147,5 +152,7 @@ export const useDashboardData = () => {
     queryFn: fetchDashboardData,
     enabled: !!user,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    cacheTime: 1000 * 60 * 30, // 30 minutes
+    refetchOnWindowFocus: false,
   });
 };

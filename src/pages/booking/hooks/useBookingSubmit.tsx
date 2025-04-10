@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { NavigateFunction } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,7 +26,8 @@ export const useBookingSubmit = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
 
-  const handleSubmit = async () => {
+  // Use useCallback to memoize the submit function
+  const handleSubmit = useCallback(async () => {
     if (!selectedDate || !selectedTime || !selectedAddress || !selectedServiceId || !user) {
       toast({
         title: "Erreur",
@@ -39,7 +40,7 @@ export const useBookingSubmit = ({
     setIsSubmitting(true);
 
     try {
-      // Combine date and time into a single Date object
+      // Combine date and time into a single Date object efficiently
       const [hours, minutes] = selectedTime.split(':').map(Number);
       const scheduledDate = new Date(selectedDate);
       scheduledDate.setHours(hours, minutes);
@@ -51,7 +52,7 @@ export const useBookingSubmit = ({
           scheduled_date: scheduledDate.toISOString(),
           address: selectedAddress,
           notes: notes || null,
-          service_id: selectedServiceId // Using the selected service ID
+          service_id: selectedServiceId
         });
 
       if (error) throw error;
@@ -61,8 +62,8 @@ export const useBookingSubmit = ({
         description: "Votre réservation a été enregistrée avec succès",
       });
       
-      // Redirect to dashboard or confirmation page
-      navigate('/');
+      // Use replace to avoid adding to history stack for better navigation
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Error creating booking:', error);
       toast({
@@ -73,7 +74,7 @@ export const useBookingSubmit = ({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [selectedDate, selectedTime, selectedAddress, notes, selectedServiceId, user, toast, navigate]);
 
   return { handleSubmit, isSubmitting };
 };
