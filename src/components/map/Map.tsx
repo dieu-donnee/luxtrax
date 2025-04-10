@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from "react";
-import { MapPin } from "lucide-react";
+import { MapPin, Navigation } from "lucide-react";
 import useGoogleMapsLoader from "./hooks/useGoogleMapsLoader";
 import useMapInstance from "./hooks/useMapInstance";
 import ApiKeyForm from "./components/ApiKeyForm";
@@ -71,13 +71,15 @@ const Map = ({ address, onLocationSelect }: MapProps) => {
   return (
     <div className="relative w-full h-56 rounded-md overflow-hidden">
       <div ref={mapRef} className="w-full h-full" />
-      <div className="absolute bottom-2 right-2 bg-white rounded-full p-1 shadow-md">
+      <div className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-md flex items-center">
         <button
           type="button"
-          className="p-1 text-blue-600 hover:text-blue-800"
+          className="p-1 text-blue-600 hover:text-blue-800 flex items-center gap-1"
           onClick={handleGetCurrentLocation}
+          title="Utiliser ma position actuelle"
         >
-          <MapPin className="h-5 w-5" />
+          <Navigation className="h-5 w-5" />
+          <span className="text-xs font-medium hidden sm:inline">Ma position</span>
         </button>
       </div>
     </div>

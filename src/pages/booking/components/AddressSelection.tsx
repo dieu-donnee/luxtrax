@@ -1,9 +1,12 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MapPin } from "lucide-react";
+import { MapPin, Navigation } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import Map from "@/components/map";
 
 interface AddressSelectionProps {
@@ -20,7 +23,9 @@ const AddressSelection = ({
   onNotesChange
 }: AddressSelectionProps) => {
   const { profile } = useAuth();
+  const { toast } = useToast();
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   
   const savedAddresses = [
     profile?.default_address,
@@ -36,6 +41,75 @@ const AddressSelection = ({
     onAddressChange(location.address);
   };
 
+  const getCurrentLocation = () => {
+    setIsGettingLocation(true);
+    
+    if (navigator.geolocation) {
+      toast({
+        title: "Localisation",
+        description: "Récupération de votre position actuelle..."
+      });
+      
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const geocoder = new google.maps.Geocoder();
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
+          
+          geocoder.geocode({ location: pos }, (results, status) => {
+            if (status === "OK" && results && results[0]) {
+              onAddressChange(results[0].formatted_address);
+              toast({
+                title: "Localisation activée",
+                description: "Votre position actuelle a été définie comme lieu de rendez-vous.",
+                variant: "default"
+              });
+            } else {
+              toast({
+                title: "Erreur de localisation",
+                description: "Impossible de déterminer votre adresse actuelle.",
+                variant: "destructive"
+              });
+            }
+            setIsGettingLocation(false);
+          });
+        },
+        (error) => {
+          console.error("Erreur de géolocalisation:", error);
+          let errorMessage = "Une erreur est survenue lors de la récupération de votre position.";
+          
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Vous avez refusé l'accès à votre position. Veuillez autoriser l'accès dans les paramètres de votre navigateur.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Les informations de localisation sont indisponibles.";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "La demande pour obtenir votre position a expiré.";
+              break;
+          }
+          
+          toast({
+            title: "Erreur de localisation",
+            description: errorMessage,
+            variant: "destructive"
+          });
+          setIsGettingLocation(false);
+        }
+      );
+    } else {
+      toast({
+        title: "Localisation non supportée",
+        description: "Votre navigateur ne supporte pas la géolocalisation.",
+        variant: "destructive"
+      });
+      setIsGettingLocation(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -45,8 +119,21 @@ const AddressSelection = ({
         </p>
         
         <div className="space-y-4">
-          <div className="space-y-2 relative">
-            <Label htmlFor="address">Adresse complète</Label>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="address">Adresse complète</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1 text-blue-600"
+                onClick={getCurrentLocation}
+                disabled={isGettingLocation}
+              >
+                <Navigation className="h-4 w-4" />
+                {isGettingLocation ? "Localisation en cours..." : "Utiliser ma position actuelle"}
+              </Button>
+            </div>
             <div className="relative">
               <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
               <Input
@@ -105,11 +192,19 @@ const AddressSelection = ({
           )}
 
           <div className="mt-4">
-            <p className="text-sm text-gray-700 mb-2">Sélectionnez sur la carte</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-gray-700">Sélectionnez sur la carte</p>
+              <p className="text-xs text-blue-600">
+                Vous pouvez également cliquer sur la carte pour sélectionner un emplacement
+              </p>
+            </div>
             <Map 
               address={address} 
               onLocationSelect={handleLocationSelect}
             />
+            <p className="text-xs text-gray-500 mt-1 text-center">
+              Cliquez sur l'icône <MapPin className="h-3 w-3 inline" /> en bas à droite de la carte pour utiliser votre position actuelle
+            </p>
           </div>
         </div>
       </div>
