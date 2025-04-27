@@ -1,103 +1,37 @@
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Database } from "@/integrations/supabase/types";
-
-type Service = Database["public"]["Tables"]["services"]["Row"] & {
-  is_popular?: boolean;
-  category?: string;
-  estimated_duration?: number;
-};
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { ServicePlan } from "../../types";
 
 interface ServiceCardProps {
-  service: Service;
+  service: ServicePlan;
   isSelected: boolean;
-  onSelect: (service: Service) => void;
-  calculateEstimatedPrice: (basePrice: number) => number;
-  getServiceIcon: (service: Service) => JSX.Element;
+  onSelect: () => void;
 }
 
-const ServiceCard = ({ 
-  service, 
-  isSelected, 
-  onSelect, 
-  calculateEstimatedPrice, 
-  getServiceIcon 
-}: ServiceCardProps) => {
+const ServiceCard = ({ service, isSelected, onSelect }: ServiceCardProps) => {
   return (
     <Card 
-      key={service.id} 
-      className={`relative cursor-pointer transition-all hover:border-blue-400 ${
+      className={`border-2 cursor-pointer transition-all ${
         isSelected 
-          ? 'border-2 border-blue-600 shadow-md' 
-          : 'border-gray-200'
+          ? "border-blue-500 bg-blue-50" 
+          : "border-gray-200 hover:border-blue-200"
       }`}
-      onClick={() => onSelect(service)}
+      onClick={onSelect}
     >
-      {service.is_vip && (
-        <div className="absolute top-0 right-0 bg-gradient-to-r from-amber-500 to-yellow-500 text-white text-xs px-2 py-1 rounded-bl-md rounded-tr-md font-medium">
-          VIP
-        </div>
-      )}
-      
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          <div className="flex items-center">
-            <div className="mr-3 bg-gray-100 p-2 rounded-full">
-              {getServiceIcon(service)}
+      <CardContent className="p-4">
+        <div className="flex justify-between items-center">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <h4 className="font-medium text-lg">{service.name}</h4>
+              <Badge className="bg-blue-600">
+                {service.price.toLocaleString('fr-FR')}F
+              </Badge>
             </div>
-            <span>{service.name}</span>
+            <p className="text-gray-600 text-sm">{service.description}</p>
           </div>
-          <span className="text-lg font-bold text-blue-600">
-            {service.discount_percentage ? (
-              <div className="flex flex-col items-end">
-                <span className="text-sm line-through text-gray-400">
-                  {service.price.toFixed(2)}€
-                </span>
-                <span>
-                  {(calculateEstimatedPrice(service.price * (1 - service.discount_percentage / 100))).toFixed(2)}€
-                </span>
-              </div>
-            ) : (
-              `${calculateEstimatedPrice(service.price).toFixed(2)}€`
-            )}
-          </span>
-        </CardTitle>
-        <CardDescription>
-          {service.description || "Description non disponible"}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-gray-600">
-          {service.details || "Pas de détails additionnels"}
-        </p>
+        </div>
       </CardContent>
-      <CardFooter className="border-t pt-4 mt-2">
-        <div className="flex gap-2 flex-wrap">
-          <div className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium ${
-            service.type === 'carwash' 
-              ? 'bg-blue-100 text-blue-800' 
-              : 'bg-purple-100 text-purple-800'
-          }`}>
-            {service.type === 'carwash' ? 'Lavage Auto' : 'Nettoyage Intérieur'}
-          </div>
-          
-          {service.is_popular && (
-            <div className="inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium bg-green-100 text-green-800">
-              Populaire
-            </div>
-          )}
-          
-          {service.estimated_duration && (
-            <div className="inline-flex items-center justify-center rounded-full px-3 py-1 text-xs font-medium bg-gray-100 text-gray-800">
-              {service.estimated_duration} min
-            </div>
-          )}
-        </div>
-      </CardFooter>
-      
-      {isSelected && (
-        <div className="absolute inset-0 border-2 border-blue-600 rounded-lg pointer-events-none"></div>
-      )}
     </Card>
   );
 };

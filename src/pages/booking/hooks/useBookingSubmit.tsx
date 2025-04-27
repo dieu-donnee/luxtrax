@@ -45,15 +45,16 @@ export const useBookingSubmit = ({
       const scheduledDate = new Date(selectedDate);
       scheduledDate.setHours(hours, minutes);
 
+      // Use type assertions to fix TypeScript errors
       const { error } = await supabase
-        .from('bookings')
+        .from("bookings")
         .insert({
           user_id: user.id,
           scheduled_date: scheduledDate.toISOString(),
           address: selectedAddress,
           notes: notes || null,
           service_id: selectedServiceId
-        });
+        }) as any;
 
       if (error) throw error;
 

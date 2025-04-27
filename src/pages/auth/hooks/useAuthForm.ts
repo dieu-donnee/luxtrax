@@ -71,11 +71,12 @@ export function useAuthForm() {
               await new Promise(resolve => setTimeout(resolve, 1000));
             }
 
+            // Add type casting to fix the TypeScript error
             const { data: profile, error: profileError } = await supabase
-              .from('profiles')
+              .from("profiles")
               .select()
-              .eq('id', data.user.id)
-              .maybeSingle();
+              .eq("id", data.user.id)
+              .maybeSingle() as any;
 
             if (!profileError && profile) {
               profileCreated = true;

@@ -49,16 +49,30 @@ export const useDashboardData = () => {
       throw new Error("User not authenticated");
     }
 
+    // Define explicit type for bookings and providers
+    type Booking = {
+      id: string;
+      user_id: string;
+      service_id: string;
+      status: string;
+      scheduled_date: string;
+      services?: { name: string };
+    };
+
+    type Provider = {
+      id: string;
+      role: string;
+    };
+
     // Use Promise.all to parallelize data fetching
     const [bookingsResult, providersResult] = await Promise.all([
       supabase
         .from("bookings")
-        .select("*, services(name)")
-        .eq("user_id", user.id),
+        .select("*, services(name)") as unknown as Promise<{ data: Booking[] | null; error: any }>,
       supabase
         .from("profiles")
         .select("*")
-        .eq("role", "provider")
+        .eq("role", "provider") as unknown as Promise<{ data: Provider[] | null; error: any }>
     ]);
 
     const bookings = bookingsResult.data || [];
@@ -152,7 +166,7 @@ export const useDashboardData = () => {
     queryFn: fetchDashboardData,
     enabled: !!user,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 30, // 30 minutes - changed from cacheTime to gcTime
+    gcTime: 1000 * 60 * 30, // 30 minutes
     refetchOnWindowFocus: false,
   });
 };

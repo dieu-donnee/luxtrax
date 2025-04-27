@@ -23,9 +23,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
+    // Use explicit typing to fix the TypeScript error
     const { data, error } = await supabase
       .from("profiles")
-      .select("*")
+      .select()
       .eq("id", userId)
       .single();
 

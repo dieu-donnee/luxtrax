@@ -17,6 +17,12 @@ interface UpcomingAppointmentsCardProps {
 }
 
 const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsCardProps> = ({ appointments, isLoading }) => {
+  // Function to get dynamic class names safely
+  const getColorClass = (type: string, prefix: string) => {
+    const validColors = ['purple', 'orange', 'blue', 'green', 'red', 'yellow'];
+    return validColors.includes(type) ? `${prefix}-${type}` : `${prefix}-blue`;
+  };
+
   return (
     <Card className="col-span-1 border-0 shadow-lg">
       <CardHeader className="border-b">
@@ -31,8 +37,8 @@ const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsCardProps> = ({ app
           <div className="space-y-6">
             {appointments.map((appointment) => (
               <div key={appointment.id} className="flex items-start space-x-4">
-                <div className={`bg-${appointment.color}-100 p-2 rounded-full`}>
-                  <Car className={`h-4 w-4 text-${appointment.color}-600`} />
+                <div className={`${getColorClass(appointment.color, 'bg')}-100 p-2 rounded-full`}>
+                  <Car className={`h-4 w-4 ${getColorClass(appointment.color, 'text')}-600`} />
                 </div>
                 <div>
                   <p className="text-sm font-medium">{appointment.service}</p>

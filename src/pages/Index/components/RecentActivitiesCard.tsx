@@ -17,6 +17,13 @@ interface RecentActivitiesCardProps {
 }
 
 const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({ activities, isLoading }) => {
+  // Helper function to safely get dynamic class names
+  const getColorClass = (type: string, prefix: string) => {
+    const validTypes = ['appointment', 'service'];
+    const color = validTypes.includes(type) ? (type === 'appointment' ? 'blue' : 'green') : 'blue';
+    return `${prefix}-${color}`;
+  };
+  
   return (
     <Card className="col-span-1 border-0 shadow-lg">
       <CardHeader className="border-b">
@@ -31,10 +38,10 @@ const RecentActivitiesCard: React.FC<RecentActivitiesCardProps> = ({ activities,
           <div className="space-y-6">
             {activities.map((activity) => (
               <div key={activity.id} className="flex items-start space-x-4">
-                <div className={`bg-${activity.type === 'appointment' ? 'blue' : 'green'}-100 p-2 rounded-full`}>
+                <div className={`${getColorClass(activity.type, 'bg')}-100 p-2 rounded-full`}>
                   {activity.icon === 'calendar' ? 
-                    <CalendarDays className={`h-4 w-4 text-${activity.type === 'appointment' ? 'blue' : 'green'}-600`} /> :
-                    <Car className={`h-4 w-4 text-${activity.type === 'appointment' ? 'blue' : 'green'}-600`} />
+                    <CalendarDays className={`h-4 w-4 ${getColorClass(activity.type, 'text')}-600`} /> :
+                    <Car className={`h-4 w-4 ${getColorClass(activity.type, 'text')}-600`} />
                   }
                 </div>
                 <div>
