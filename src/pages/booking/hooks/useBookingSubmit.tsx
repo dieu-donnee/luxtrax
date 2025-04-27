@@ -45,7 +45,18 @@ export const useBookingSubmit = ({
       const scheduledDate = new Date(selectedDate);
       scheduledDate.setHours(hours, minutes);
 
-      // Use type assertions to fix TypeScript errors
+      // Fetch the actual UUID for the selected service plan
+      const { data: serviceData, error: serviceError } = await supabase
+        .from("services")
+        .select("id")
+        .eq("name", selectedServiceId === "plan-complet" ? "Plan Complet" : "Plan Mensuel")
+        .single();
+
+      if (serviceError || !serviceData) {
+        throw new Error("Service non trouvé");
+      }
+
+      // Use the actual UUID from the services table
       const { error } = await supabase
         .from("bookings")
         .insert({
@@ -53,7 +64,7 @@ export const useBookingSubmit = ({
           scheduled_date: scheduledDate.toISOString(),
           address: selectedAddress,
           notes: notes || null,
-          service_id: selectedServiceId
+          service_id: serviceData.id
         }) as any;
 
       if (error) throw error;
