@@ -1,34 +1,51 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Car } from "lucide-react";
 
-const UpcomingAppointmentsCard = () => {
+interface Appointment {
+  id: number;
+  service: string;
+  date: string;
+  icon: string;
+  color: string;
+}
+
+interface UpcomingAppointmentsCardProps {
+  appointments: Appointment[];
+  isLoading: boolean;
+}
+
+const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsCardProps> = ({ appointments, isLoading }) => {
   return (
     <Card className="col-span-1 border-0 shadow-lg">
       <CardHeader className="border-b">
         <CardTitle className="text-xl">Prochains rendez-vous</CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
-        <div className="space-y-6">
-          <div className="flex items-start space-x-4">
-            <div className="bg-purple-100 p-2 rounded-full">
-              <Car className="h-4 w-4 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium">Lavage complet</p>
-              <p className="text-sm text-gray-500">15 Mars, 14:00</p>
-            </div>
+        {isLoading ? (
+          <div className="text-center py-4 text-gray-500">
+            <p>Chargement des rendez-vous...</p>
           </div>
-          <div className="flex items-start space-x-4">
-            <div className="bg-orange-100 p-2 rounded-full">
-              <Car className="h-4 w-4 text-orange-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium">Nettoyage intérieur</p>
-              <p className="text-sm text-gray-500">18 Mars, 10:00</p>
-            </div>
+        ) : appointments.length ? (
+          <div className="space-y-6">
+            {appointments.map((appointment) => (
+              <div key={appointment.id} className="flex items-start space-x-4">
+                <div className={`bg-${appointment.color}-100 p-2 rounded-full`}>
+                  <Car className={`h-4 w-4 text-${appointment.color}-600`} />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">{appointment.service}</p>
+                  <p className="text-sm text-gray-500">{appointment.date}</p>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        ) : (
+          <div className="text-center py-4 text-gray-500">
+            <p>Aucun rendez-vous prévu</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

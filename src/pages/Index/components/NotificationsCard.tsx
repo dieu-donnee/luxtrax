@@ -1,8 +1,8 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Bell } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
 
 interface Notification {
   id: number;
@@ -10,15 +10,15 @@ interface Notification {
   time: string;
 }
 
-const NotificationsCard = () => {
+interface NotificationsCardProps {
+  notifications: Notification[];
+  isLoading: boolean;
+}
+
+const NotificationsCard: React.FC<NotificationsCardProps> = ({ notifications, isLoading }) => {
   const { toast } = useToast();
-  const [notifications, setNotifications] = useState<Notification[]>([
-    { id: 1, message: "Nouveau rendez-vous confirmé", time: "Il y a 1 heure" },
-    { id: 2, message: "Service terminé", time: "Il y a 3 heures" },
-  ]);
 
   const dismissNotification = (id: number) => {
-    setNotifications(notifications.filter(notif => notif.id !== id));
     toast({
       title: "Notification supprimée",
       variant: "default",
@@ -38,7 +38,11 @@ const NotificationsCard = () => {
         </span>
       </CardHeader>
       <CardContent className="pt-6">
-        {notifications.length > 0 ? (
+        {isLoading ? (
+          <div className="text-center py-4 text-gray-500">
+            <p>Chargement des notifications...</p>
+          </div>
+        ) : notifications.length ? (
           <div className="space-y-4">
             {notifications.map((notif) => (
               <div key={notif.id} className="flex items-start justify-between space-x-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">

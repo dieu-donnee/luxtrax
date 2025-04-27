@@ -49,15 +49,15 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <NotificationsCard 
-          notifications={dashboardData?.notifications} 
+          notifications={dashboardData?.notifications || []} 
           isLoading={isLoading} 
         />
         <RecentActivitiesCard 
-          activities={dashboardData?.activities} 
+          activities={dashboardData?.activities || []} 
           isLoading={isLoading} 
         />
         <UpcomingAppointmentsCard 
-          appointments={dashboardData?.upcomingAppointments} 
+          appointments={dashboardData?.upcomingAppointments || []} 
           isLoading={isLoading} 
         />
       </div>

@@ -4,13 +4,13 @@ import { Car, CalendarDays, Users, Settings } from "lucide-react";
 import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-type StatCardProps = {
+interface StatCardProps {
   title: string;
   value: string;
   icon: React.ElementType;
   description: string;
   color: string;
-};
+}
 
 interface StatCardsProps {
   data?: {
