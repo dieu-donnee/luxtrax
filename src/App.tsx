@@ -13,6 +13,7 @@ import LoadingScreen from "./pages/Index/components/LoadingScreen";
 const Index = lazy(() => import("./pages/Index"));
 const AuthPage = lazy(() => import("./pages/auth"));
 const BookingPage = lazy(() => import("./pages/booking"));
+const AdminPage = lazy(() => import("./pages/admin"));
 const PrivacyPolicy = lazy(() => import("./pages/privacy"));
 const TermsOfService = lazy(() => import("./pages/terms"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -58,6 +59,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <BookingPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminPage />
             </ProtectedRoute>
           }
         />

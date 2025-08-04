@@ -1,12 +1,15 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, CalendarDays, Car } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Bell, CalendarDays, Car, Settings } from "lucide-react";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useToast } from "@/components/ui/use-toast";
+import { Link } from "react-router-dom";
 
 const SidebarContent = () => {
   const { toast } = useToast();
+  const { profile } = useAuth();
   const { data: dashboardData, isLoading, isError } = useDashboardData();
 
   const dismissNotification = (id: number) => {
@@ -19,6 +22,23 @@ const SidebarContent = () => {
 
   return (
     <>
+      {profile?.role === 'admin' && (
+        <Card className="col-span-1 border-0 shadow-lg mb-6">
+          <CardHeader className="border-b">
+            <CardTitle className="text-xl flex items-center gap-2">
+              <Settings className="h-5 w-5 text-primary" />
+              Administration
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <Link to="/admin">
+              <Button className="w-full" variant="default">
+                Accéder à l'interface admin
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
       <Card className="col-span-1 border-0 shadow-lg">
         <CardHeader className="border-b flex flex-row items-center justify-between">
           <CardTitle className="text-xl flex items-center gap-2">
