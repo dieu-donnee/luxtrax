@@ -45,18 +45,25 @@ export const useBookingSubmit = ({
       const scheduledDate = new Date(selectedDate);
       scheduledDate.setHours(hours, minutes);
 
-      // Fetch the actual UUID for the selected service plan
-      const { data: serviceData, error: serviceError } = await supabase
-        .from("services")
-        .select("id")
-        .eq("name", selectedServiceId === "plan-complet" ? "Plan Complet" : "Plan Mensuel")
-        .single();
+      // Get the service UUID directly - no need to search by name since selectedServiceId is already a proper service ID
+      let serviceUuid = selectedServiceId;
+      
+      // If selectedServiceId is still using the old plan names, map them to actual service IDs
+      if (selectedServiceId === "plan-complet" || selectedServiceId === "plan-mensuel") {
+        const { data: serviceData, error: serviceError } = await supabase
+          .from("services")
+          .select("id, name")
+          .limit(1);
 
-      if (serviceError || !serviceData) {
-        throw new Error("Service non trouvé");
+        if (serviceError || !serviceData || serviceData.length === 0) {
+          throw new Error("Aucun service disponible");
+        }
+        
+        // Use the first available service as fallback
+        serviceUuid = serviceData[0].id;
       }
 
-      // Use the actual UUID from the services table
+      // Create the booking
       const { error } = await supabase
         .from("bookings")
         .insert({
@@ -64,7 +71,7 @@ export const useBookingSubmit = ({
           scheduled_date: scheduledDate.toISOString(),
           address: selectedAddress,
           notes: notes || null,
-          service_id: serviceData.id
+          service_id: serviceUuid
         }) as any;
 
       if (error) throw error;

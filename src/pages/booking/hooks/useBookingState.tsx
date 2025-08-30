@@ -1,6 +1,7 @@
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { Clock, CircleDollarSign, MapPin, ReceiptText } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import type { BookingStep, StepInfo, ServicePlan } from "../types";
 
 export const useBookingState = (currentStep: BookingStep) => {
@@ -8,23 +9,39 @@ export const useBookingState = (currentStep: BookingStep) => {
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
-  const [selectedServiceId, setSelectedServiceId] = useState<string>("plan-complet");
+  const [selectedServiceId, setSelectedServiceId] = useState<string>("");
+  const [services, setServices] = useState<ServicePlan[]>([]);
 
-  // Define service plans
-  const services: ServicePlan[] = useMemo(() => [
-    {
-      id: "plan-complet",
-      name: "Plan Complet",
-      price: 2000,
-      description: "Forfait complet pour un service unique."
-    },
-    {
-      id: "plan-mensuel",
-      name: "Plan Mensuel",
-      price: 7000,
-      description: "Forfait mensuel avec services illimités pendant 30 jours."
-    }
-  ], []);
+  // Fetch services from database
+  useEffect(() => {
+    const fetchServices = async () => {
+      const { data: servicesData, error } = await supabase
+        .from("services")
+        .select("id, name, price, description");
+
+      if (error) {
+        console.error("Error fetching services:", error);
+        return;
+      }
+
+      if (servicesData && servicesData.length > 0) {
+        const mappedServices: ServicePlan[] = servicesData.map(service => ({
+          id: service.id,
+          name: service.name,
+          price: Number(service.price),
+          description: service.description || ""
+        }));
+        
+        setServices(mappedServices);
+        // Set first service as default if none selected
+        if (!selectedServiceId) {
+          setSelectedServiceId(mappedServices[0].id);
+        }
+      }
+    };
+
+    fetchServices();
+  }, [selectedServiceId]);
 
   // Get the selected service
   const selectedService = useMemo(() => {
