@@ -9,9 +9,9 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { useAuth } from "./contexts/AuthContext";
 import LoadingScreen from "./pages/Index/components/LoadingScreen";
 
-// Lazy load pages for better performance
-const Index = lazy(() => import("./pages/Index"));
-const AuthPage = lazy(() => import("./pages/auth"));
+// Import pages directly to debug the auth import issue
+import Index from "./pages/Index";
+import AuthPage from "./pages/auth";
 const BookingPage = lazy(() => import("./pages/booking"));
 const AdminPage = lazy(() => import("./pages/admin"));
 const PrivacyPolicy = lazy(() => import("./pages/privacy"));
