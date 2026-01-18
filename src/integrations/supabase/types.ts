@@ -7,166 +7,14 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.1"
+  }
   public: {
     Tables: {
-      bookings: {
-        Row: {
-          address: string
-          created_at: string
-          current_step: number | null
-          id: string
-          notes: string | null
-          scheduled_date: string
-          service_id: string
-          status: Database["public"]["Enums"]["booking_status"]
-          total_steps: number | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          address: string
-          created_at?: string
-          current_step?: number | null
-          id?: string
-          notes?: string | null
-          scheduled_date: string
-          service_id: string
-          status?: Database["public"]["Enums"]["booking_status"]
-          total_steps?: number | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          address?: string
-          created_at?: string
-          current_step?: number | null
-          id?: string
-          notes?: string | null
-          scheduled_date?: string
-          service_id?: string
-          status?: Database["public"]["Enums"]["booking_status"]
-          total_steps?: number | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "bookings_service_id_fkey"
-            columns: ["service_id"]
-            isOneToOne: false
-            referencedRelation: "services"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      profiles: {
-        Row: {
-          address: string | null
-          avatar_url: string | null
-          car_model: string | null
-          country: string | null
-          created_at: string
-          default_address: string | null
-          documents: Json | null
-          email_verified: boolean | null
-          experience_level:
-            | Database["public"]["Enums"]["experience_level"]
-            | null
-          full_name: string | null
-          gender: string | null
-          id: string
-          phone_number: string | null
-          phone_verified: boolean | null
-          role: Database["public"]["Enums"]["user_role"]
-          terms_accepted: boolean | null
-          updated_at: string
-          vehicle_type: Database["public"]["Enums"]["vehicle_type"] | null
-        }
-        Insert: {
-          address?: string | null
-          avatar_url?: string | null
-          car_model?: string | null
-          country?: string | null
-          created_at?: string
-          default_address?: string | null
-          documents?: Json | null
-          email_verified?: boolean | null
-          experience_level?:
-            | Database["public"]["Enums"]["experience_level"]
-            | null
-          full_name?: string | null
-          gender?: string | null
-          id: string
-          phone_number?: string | null
-          phone_verified?: boolean | null
-          role?: Database["public"]["Enums"]["user_role"]
-          terms_accepted?: boolean | null
-          updated_at?: string
-          vehicle_type?: Database["public"]["Enums"]["vehicle_type"] | null
-        }
-        Update: {
-          address?: string | null
-          avatar_url?: string | null
-          car_model?: string | null
-          country?: string | null
-          created_at?: string
-          default_address?: string | null
-          documents?: Json | null
-          email_verified?: boolean | null
-          experience_level?:
-            | Database["public"]["Enums"]["experience_level"]
-            | null
-          full_name?: string | null
-          gender?: string | null
-          id?: string
-          phone_number?: string | null
-          phone_verified?: boolean | null
-          role?: Database["public"]["Enums"]["user_role"]
-          terms_accepted?: boolean | null
-          updated_at?: string
-          vehicle_type?: Database["public"]["Enums"]["vehicle_type"] | null
-        }
-        Relationships: []
-      }
-      services: {
-        Row: {
-          created_at: string
-          description: string | null
-          details: string | null
-          discount_percentage: number | null
-          id: string
-          is_vip: boolean | null
-          name: string
-          price: number
-          type: Database["public"]["Enums"]["service_type"]
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          details?: string | null
-          discount_percentage?: number | null
-          id?: string
-          is_vip?: boolean | null
-          name: string
-          price: number
-          type: Database["public"]["Enums"]["service_type"]
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          details?: string | null
-          discount_percentage?: number | null
-          id?: string
-          is_vip?: boolean | null
-          name?: string
-          price?: number
-          type?: Database["public"]["Enums"]["service_type"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
@@ -175,11 +23,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      booking_status: "pending" | "ongoing" | "completed" | "cancelled"
-      experience_level: "debutant" | "intermediaire" | "expert"
-      service_type: "carwash" | "laundry"
-      user_role: "client" | "provider"
-      vehicle_type: "berline" | "suv" | "citadine" | "utilitaire" | "autre"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -187,21 +31,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -219,14 +67,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -242,14 +92,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -265,14 +117,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -280,26 +134,22 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
   public: {
-    Enums: {
-      booking_status: ["pending", "ongoing", "completed", "cancelled"],
-      experience_level: ["debutant", "intermediaire", "expert"],
-      service_type: ["carwash", "laundry"],
-      user_role: ["client", "provider"],
-      vehicle_type: ["berline", "suv", "citadine", "utilitaire", "autre"],
-    },
+    Enums: {},
   },
 } as const
