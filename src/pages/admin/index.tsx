@@ -8,6 +8,7 @@ import UsersManagement from "./components/UsersManagement";
 import BookingsManagement from "./components/BookingsManagement";
 import ServicesManagement from "./components/ServicesManagement";
 import AdminDashboard from "./components/AdminDashboard";
+import ProviderVerification from "./components/ProviderVerification";
 
 const AdminPage = () => {
   const { user, profile } = useAuth();
@@ -31,7 +32,7 @@ const AdminPage = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Tableau de bord
@@ -47,6 +48,10 @@ const AdminPage = () => {
             <TabsTrigger value="services" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Services
+            </TabsTrigger>
+            <TabsTrigger value="providers" className="flex items-center gap-2">
+              <UserCheck className="h-4 w-4" />
+              Prestataires
             </TabsTrigger>
           </TabsList>
 
@@ -64,6 +69,9 @@ const AdminPage = () => {
 
           <TabsContent value="services">
             <ServicesManagement />
+          </TabsContent>
+          <TabsContent value="providers">
+            <ProviderVerification />
           </TabsContent>
         </Tabs>
       </div>
