@@ -45,8 +45,8 @@ const ServicesManagement = () => {
 
   const fetchServices = async () => {
     try {
-      const { data, error } = await supabase
-        .from("services")
+      const { data, error } = await (supabase
+        .from("services") as any)
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -67,8 +67,8 @@ const ServicesManagement = () => {
   const handleSaveService = async (service: Partial<Service>) => {
     try {
       if (isAddMode) {
-        const { error } = await supabase
-          .from("services")
+        const { error } = await (supabase
+          .from("services") as any)
           .insert({
             name: service.name!,
             description: service.description,
@@ -86,8 +86,8 @@ const ServicesManagement = () => {
           description: "Service créé avec succès",
         });
       } else {
-        const { error } = await supabase
-          .from("services")
+        const { error } = await (supabase
+          .from("services") as any)
           .update({
             name: service.name,
             description: service.description,
@@ -127,8 +127,8 @@ const ServicesManagement = () => {
     }
 
     try {
-      const { error } = await supabase
-        .from("services")
+      const { error } = await (supabase
+        .from("services") as any)
         .delete()
         .eq("id", serviceId);
 
