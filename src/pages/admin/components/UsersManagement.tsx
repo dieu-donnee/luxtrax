@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -23,16 +23,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Database } from "@/integrations/supabase/types";
 
-interface Profile {
-  id: string;
-  full_name: string;
-  phone_number: string;
-  role: "client" | "provider" | "admin";
-  created_at: string;
-  address: string;
-  email_verified: boolean;
-}
+type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 const UsersManagement = () => {
   const [users, setUsers] = useState<Profile[]>([]);
@@ -41,14 +34,10 @@ const UsersManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const fetchUsers = async () => {
     try {
-      const { data, error } = await (supabase
-        .from("profiles") as any)
+      const { data, error } = await supabase
+        .from("profiles")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -66,10 +55,14 @@ const UsersManagement = () => {
     }
   };
 
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
   const handleUpdateUser = async (updatedUser: Profile) => {
     try {
-      const { error } = await (supabase
-        .from("profiles") as any)
+      const { error } = await supabase
+        .from("profiles")
         .update({
           full_name: updatedUser.full_name,
           phone_number: updatedUser.phone_number,
@@ -104,8 +97,8 @@ const UsersManagement = () => {
     }
 
     try {
-      const { error } = await (supabase
-        .from("profiles") as any)
+      const { error } = await supabase
+        .from("profiles")
         .delete()
         .eq("id", userId);
 
@@ -238,7 +231,7 @@ const UsersManagement = () => {
                                 onValueChange={(value) =>
                                   setEditingUser({
                                     ...editingUser,
-                                    role: value as "client" | "provider" | "admin",
+                                    role: value as Database["public"]["Enums"]["user_role"],
                                   })
                                 }
                               >

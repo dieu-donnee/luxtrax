@@ -15,8 +15,8 @@ export const useBookingState = (currentStep: BookingStep) => {
   // Fetch services from database
   useEffect(() => {
     const fetchServices = async () => {
-      const { data: servicesData, error } = await (supabase
-        .from("services") as any)
+      const { data: servicesData, error } = await supabase
+        .from("services")
         .select("id, name, price, description");
 
       if (error) {
@@ -31,7 +31,7 @@ export const useBookingState = (currentStep: BookingStep) => {
           price: Number(service.price),
           description: service.description || ""
         }));
-        
+
         setServices(mappedServices);
         // Set first service as default if none selected
         if (!selectedServiceId) {

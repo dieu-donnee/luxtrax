@@ -26,22 +26,22 @@ const AdminDashboard = () => {
   const fetchStats = async () => {
     try {
       // Fetch users count
-      const { count: usersCount } = await (supabase
-        .from("profiles") as any)
+      const { count: usersCount } = await supabase
+        .from("profiles")
         .select("*", { count: "exact", head: true });
 
-      const { count: bookingsCount } = await (supabase
-        .from("bookings") as any)
+      const { count: bookingsCount } = await supabase
+        .from("bookings")
         .select("*", { count: "exact", head: true });
 
-      const { count: pendingCount } = await (supabase
-        .from("bookings") as any)
+      const { count: pendingCount } = await supabase
+        .from("bookings")
         .select("*", { count: "exact", head: true })
         .eq("status", "pending");
 
-      const { data: services } = await (supabase
-        .from("services") as any)
-        .select("price") as { data: { price: number }[] | null };
+      const { data: services } = await supabase
+        .from("services")
+        .select("price");
 
       const totalRevenue = services?.reduce((sum, service) => sum + Number(service.price), 0) || 0;
 

@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -21,24 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Database } from "@/integrations/supabase/types";
 
-interface Booking {
-  id: string;
-  user_id: string;
-  service_id: string;
-  status: "pending" | "ongoing" | "completed" | "cancelled";
-  scheduled_date: string;
-  address: string;
-  notes: string;
-  created_at: string;
-  profiles: {
-    full_name: string;
-  } | null;
-  services: {
-    name: string;
-    price: number;
-  } | null;
-}
+type Booking = Database["public"]["Tables"]["bookings"]["Row"] & {
+  profiles: { full_name: string | null } | null;
+  services: { name: string; price: number } | null;
+};
 
 const BookingsManagement = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -47,14 +35,10 @@ const BookingsManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchBookings();
-  }, []);
-
   const fetchBookings = async () => {
     try {
-      const { data, error } = await (supabase
-        .from("bookings") as any)
+      const { data, error } = await supabase
+        .from("bookings")
         .select(`
           *,
           profiles(full_name),
@@ -76,11 +60,16 @@ const BookingsManagement = () => {
     }
   };
 
-  const handleUpdateBookingStatus = async (bookingId: string, newStatus: "pending" | "ongoing" | "completed" | "cancelled") => {
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
+
+  const handleUpdateBookingStatus = async (bookingId: string, newStatus: Database["public"]["Enums"]["booking_status"] | "confirmed") => {
     try {
-      const { error } = await (supabase
-        .from("bookings") as any)
-        .update({ status: newStatus })
+      // Note: "confirmed" might not be in the enum, checking if it needs a cast or if we should add it
+      const { error } = await supabase
+        .from("bookings")
+        .update({ status: newStatus as any }) // Still need a small cast if "confirmed" is not in enum, or fix the enum
         .eq("id", bookingId);
 
       if (error) throw error;
@@ -109,8 +98,8 @@ const BookingsManagement = () => {
     }
 
     try {
-      const { error } = await (supabase
-        .from("bookings") as any)
+      const { error } = await supabase
+        .from("bookings")
         .delete()
         .eq("id", bookingId);
 

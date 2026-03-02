@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 import { NavigateFunction } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 
 interface BookingSubmitProps {
   selectedDate: Date | undefined;
@@ -10,7 +11,7 @@ interface BookingSubmitProps {
   selectedAddress: string;
   notes: string;
   selectedServiceId: string;
-  toast: any;
+  toast: (options: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
   navigate: NavigateFunction;
 }
 
@@ -47,31 +48,32 @@ export const useBookingSubmit = ({
 
       // Get the service UUID directly - no need to search by name since selectedServiceId is already a proper service ID
       let serviceUuid = selectedServiceId;
-      
+
       // If selectedServiceId is still using the old plan names, map them to actual service IDs
       if (selectedServiceId === "plan-complet" || selectedServiceId === "plan-mensuel") {
-        const { data: serviceData, error: serviceError } = await (supabase
-          .from("services") as any)
+        const { data: serviceData, error: serviceError } = await supabase
+          .from("services")
           .select("id, name")
           .limit(1);
 
         if (serviceError || !serviceData || serviceData.length === 0) {
           throw new Error("Aucun service disponible");
         }
-        
+
         // Use the first available service as fallback
         serviceUuid = serviceData[0].id;
       }
 
       // Create the booking
-      const { error } = await (supabase
-        .from("bookings") as any)
+      const { error } = await supabase
+        .from("bookings")
         .insert({
           user_id: user.id,
           scheduled_date: scheduledDate.toISOString(),
           address: selectedAddress,
           notes: notes || null,
-          service_id: serviceUuid
+          service_id: serviceUuid,
+          status: "pending" as Database["public"]["Enums"]["booking_status"]
         });
 
       if (error) throw error;
@@ -80,7 +82,7 @@ export const useBookingSubmit = ({
         title: "Réservation confirmée",
         description: "Votre réservation a été enregistrée avec succès",
       });
-      
+
       // Use replace to avoid adding to history stack for better navigation
       navigate('/', { replace: true });
     } catch (error) {

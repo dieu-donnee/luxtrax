@@ -12,24 +12,14 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import type { Database } from "@/integrations/supabase/types";
 
-interface Service {
-  id: string;
-  name: string;
-  description: string;
-  details: string;
-  price: number;
-  is_vip: boolean;
-  discount_percentage: number;
-  type: "carwash" | "laundry";
-  created_at: string;
-}
+type Service = Database["public"]["Tables"]["services"]["Row"];
 
 const ServicesManagement = () => {
   const [services, setServices] = useState<Service[]>([]);
@@ -39,14 +29,10 @@ const ServicesManagement = () => {
   const [isAddMode, setIsAddMode] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    fetchServices();
-  }, []);
-
   const fetchServices = async () => {
     try {
-      const { data, error } = await (supabase
-        .from("services") as any)
+      const { data, error } = await supabase
+        .from("services")
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -63,6 +49,10 @@ const ServicesManagement = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
 
   const handleSaveService = async (service: Partial<Service>) => {
     try {
@@ -160,7 +150,8 @@ const ServicesManagement = () => {
       is_vip: false,
       discount_percentage: 0,
       type: "carwash" as "carwash" | "laundry",
-      created_at: ""
+      created_at: "",
+      updated_at: new Date().toISOString()
     });
     setIsAddMode(true);
     setIsDialogOpen(true);

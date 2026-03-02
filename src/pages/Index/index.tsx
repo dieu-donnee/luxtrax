@@ -10,31 +10,21 @@ import DashboardCards from "./components/DashboardCards";
 import { useDashboardData } from "@/hooks/useDashboardData";
 
 const Index = () => {
-  const [isLoading, setIsLoading] = useState(true);
   const [weatherData, setWeatherData] = useState({ temp: 22, condition: "Ensoleillé" });
-  
+
   // Use the optimized hook
   const { data: dashboardData, isLoading: isDataLoading, isError } = useDashboardData();
 
-  useEffect(() => {
-    // Reduce initial loading time
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Show loading screen only initially
-  if (isLoading) {
+  // Show loading screen only when data is actually loading
+  if (isDataLoading) {
     return <LoadingScreen />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="min-h-screen premium-gradient">
       <DashboardHeader weatherData={weatherData} />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 -mt-10 relative z-20">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 -mt-10 relative z-20 bounce-in">
         <div className="flex justify-end mb-6">
           <Sheet>
             <SheetTrigger asChild>
@@ -48,8 +38,8 @@ const Index = () => {
             </SheetContent>
           </Sheet>
         </div>
-        
-        <DashboardCards 
+
+        <DashboardCards
           dashboardData={dashboardData}
           isLoading={isDataLoading}
           isError={isError}

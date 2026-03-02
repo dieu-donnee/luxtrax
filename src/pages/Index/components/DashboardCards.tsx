@@ -16,10 +16,10 @@ interface DashboardCardsProps {
   isError: boolean;
 }
 
-const DashboardCards: React.FC<DashboardCardsProps> = ({ 
-  dashboardData, 
-  isLoading, 
-  isError 
+const DashboardCards: React.FC<DashboardCardsProps> = ({
+  dashboardData,
+  isLoading,
+  isError
 }) => {
   const { toast } = useToast();
 
@@ -33,32 +33,32 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
 
   return (
     <>
-      <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0 p-2">
+      <Card className="glass-card p-2 border-0">
         <div className="px-6 pt-6 flex justify-end">
-          <Button 
+          <Button
             onClick={handleAddService}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 gold-shimmer transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg"
           >
             <Plus className="h-4 w-4" />
             Nouveau service
           </Button>
         </div>
-        
+
         <StatCards data={dashboardData?.services} isLoading={isLoading} />
       </Card>
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <NotificationsCard 
-          notifications={dashboardData?.notifications || []} 
-          isLoading={isLoading} 
+        <NotificationsCard
+          notifications={dashboardData?.notifications || []}
+          isLoading={isLoading}
         />
-        <RecentActivitiesCard 
-          activities={dashboardData?.activities || []} 
-          isLoading={isLoading} 
+        <RecentActivitiesCard
+          activities={dashboardData?.activities || []}
+          isLoading={isLoading}
         />
-        <UpcomingAppointmentsCard 
-          appointments={dashboardData?.upcomingAppointments || []} 
-          isLoading={isLoading} 
+        <UpcomingAppointmentsCard
+          appointments={dashboardData?.upcomingAppointments || []}
+          isLoading={isLoading}
         />
       </div>
     </>

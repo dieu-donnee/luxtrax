@@ -27,13 +27,13 @@ const NotificationsCard: React.FC<NotificationsCardProps> = ({ notifications, is
   };
 
   return (
-    <Card className="col-span-1 border-0 shadow-lg">
-      <CardHeader className="border-b flex flex-row items-center justify-between">
-        <CardTitle className="text-xl flex items-center gap-2">
-          <Bell className="h-5 w-5 text-blue-500" />
+    <Card className="glass-card col-span-1 border-0 overflow-hidden transition-all duration-300 hover:shadow-2xl">
+      <CardHeader className="border-b border-white/10 flex flex-row items-center justify-between bg-primary/5">
+        <CardTitle className="text-xl flex items-center gap-2 font-semibold">
+          <Bell className="h-5 w-5 text-primary" />
           Notifications
         </CardTitle>
-        <span className="bg-blue-100 text-blue-600 text-xs font-medium px-2.5 py-0.5 rounded-full">
+        <span className="bg-primary/20 text-primary text-xs font-bold px-3 py-1 rounded-full border border-primary/20">
           {notifications.length}
         </span>
       </CardHeader>
@@ -45,17 +45,17 @@ const NotificationsCard: React.FC<NotificationsCardProps> = ({ notifications, is
         ) : notifications.length ? (
           <div className="space-y-4">
             {notifications.map((notif) => (
-              <div key={notif.id} className="flex items-start justify-between space-x-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <div key={notif.id} className="flex items-start justify-between space-x-4 p-4 bg-white/40 dark:bg-white/5 rounded-xl border border-white/20 hover:border-primary/30 hover:bg-white/60 dark:hover:bg-white/10 transition-all duration-200 group">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <Bell className="h-4 w-4 text-blue-600" />
+                  <div className="bg-primary/10 p-2.5 rounded-lg group-hover:scale-110 transition-transform">
+                    <Bell className="h-4 w-4 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">{notif.message}</p>
-                    <p className="text-sm text-gray-500">{notif.time}</p>
+                    <p className="text-sm font-semibold text-foreground/90">{notif.message}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{notif.time}</p>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => dismissNotification(notif.id)}
                   className="text-gray-400 hover:text-gray-600"
                 >

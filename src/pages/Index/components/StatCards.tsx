@@ -27,56 +27,53 @@ const StatCards: React.FC<StatCardsProps> = ({ data, isLoading }) => {
       title: "Services en cours",
       value: data ? `${data.total}` : "...",
       icon: Car,
-      description: data 
+      description: data
         ? `${data.pending} en attente, ${data.ongoing} en cours`
         : "Chargement...",
-      color: "bg-blue-100 text-blue-600"
     },
     {
       title: "Rendez-vous",
       value: "12",
       icon: CalendarDays,
       description: "Prochain: 15 Mars",
-      color: "bg-green-100 text-green-600"
     },
     {
       title: "Prestataires",
       value: "8",
       icon: Users,
       description: "5 disponibles",
-      color: "bg-purple-100 text-purple-600"
     },
     {
       title: "Paramètres",
       value: "4",
       icon: Settings,
       description: "2 notifications",
-      color: "bg-orange-100 text-orange-600"
     }
   ];
 
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 p-6">
       {stats.map((stat) => (
-        <Card key={stat.title} className="hover:shadow-lg transition-shadow border-0">
+        <Card key={stat.title} className="glass-card hover:shadow-2xl transition-all duration-300 border-0 group hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-primary transition-colors">
               {stat.title}
             </CardTitle>
-            <div className={`p-2 rounded-full ${stat.color}`}>
-              <stat.icon className="h-4 w-4" />
+            <div className="p-3 rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 shadow-inner">
+              <stat.icon className="h-5 w-5" />
             </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <>
-                <Skeleton className="h-8 w-16 my-1" />
-                <Skeleton className="h-4 w-32 mt-2" />
-              </>
+              <div className="space-y-2">
+                <Skeleton className="h-10 w-20" />
+                <Skeleton className="h-4 w-32" />
+              </div>
             ) : (
               <>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <div className="text-3xl font-bold tracking-tight text-foreground">{stat.value}</div>
+                <p className="text-xs font-medium text-muted-foreground mt-2 flex items-center gap-1">
+                  <span className="w-1 h-1 rounded-full bg-primary" />
                   {stat.description}
                 </p>
               </>
