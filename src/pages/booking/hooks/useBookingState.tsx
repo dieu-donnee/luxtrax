@@ -15,8 +15,8 @@ export const useBookingState = (currentStep: BookingStep) => {
   // Fetch services from database
   useEffect(() => {
     const fetchServices = async () => {
-      const { data: servicesData, error } = await supabase
-        .from("services")
+      const { data: servicesData, error } = await (supabase
+        .from("services") as any)
         .select("id, name, price, description");
 
       if (error) {

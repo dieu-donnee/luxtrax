@@ -50,8 +50,8 @@ export const useBookingSubmit = ({
       
       // If selectedServiceId is still using the old plan names, map them to actual service IDs
       if (selectedServiceId === "plan-complet" || selectedServiceId === "plan-mensuel") {
-        const { data: serviceData, error: serviceError } = await supabase
-          .from("services")
+        const { data: serviceData, error: serviceError } = await (supabase
+          .from("services") as any)
           .select("id, name")
           .limit(1);
 
@@ -64,15 +64,15 @@ export const useBookingSubmit = ({
       }
 
       // Create the booking
-      const { error } = await supabase
-        .from("bookings")
+      const { error } = await (supabase
+        .from("bookings") as any)
         .insert({
           user_id: user.id,
           scheduled_date: scheduledDate.toISOString(),
           address: selectedAddress,
           notes: notes || null,
           service_id: serviceUuid
-        }) as any;
+        });
 
       if (error) throw error;
 

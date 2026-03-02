@@ -47,8 +47,8 @@ const UsersManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from("profiles")
+      const { data, error } = await (supabase
+        .from("profiles") as any)
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -68,12 +68,12 @@ const UsersManagement = () => {
 
   const handleUpdateUser = async (updatedUser: Profile) => {
     try {
-      const { error } = await supabase
-        .from("profiles")
+      const { error } = await (supabase
+        .from("profiles") as any)
         .update({
           full_name: updatedUser.full_name,
           phone_number: updatedUser.phone_number,
-          role: updatedUser.role as any,
+          role: updatedUser.role,
           address: updatedUser.address,
         })
         .eq("id", updatedUser.id);
@@ -104,8 +104,8 @@ const UsersManagement = () => {
     }
 
     try {
-      const { error } = await supabase
-        .from("profiles")
+      const { error } = await (supabase
+        .from("profiles") as any)
         .delete()
         .eq("id", userId);
 

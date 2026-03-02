@@ -53,8 +53,8 @@ const BookingsManagement = () => {
 
   const fetchBookings = async () => {
     try {
-      const { data, error } = await supabase
-        .from("bookings")
+      const { data, error } = await (supabase
+        .from("bookings") as any)
         .select(`
           *,
           profiles(full_name),
@@ -78,8 +78,8 @@ const BookingsManagement = () => {
 
   const handleUpdateBookingStatus = async (bookingId: string, newStatus: "pending" | "ongoing" | "completed" | "cancelled") => {
     try {
-      const { error } = await supabase
-        .from("bookings")
+      const { error } = await (supabase
+        .from("bookings") as any)
         .update({ status: newStatus })
         .eq("id", bookingId);
 
@@ -109,8 +109,8 @@ const BookingsManagement = () => {
     }
 
     try {
-      const { error } = await supabase
-        .from("bookings")
+      const { error } = await (supabase
+        .from("bookings") as any)
         .delete()
         .eq("id", bookingId);
 

@@ -66,13 +66,13 @@ export const useDashboardData = () => {
 
     // Use Promise.all to parallelize data fetching
     const [bookingsResult, providersResult] = await Promise.all([
-      supabase
-        .from("bookings")
-        .select("*, services(name)") as unknown as Promise<{ data: Booking[] | null; error: any }>,
-      supabase
-        .from("profiles")
+      (supabase
+        .from("bookings") as any)
+        .select("*, services(name)") as Promise<{ data: Booking[] | null; error: any }>,
+      (supabase
+        .from("profiles") as any)
         .select("*")
-        .eq("role", "provider") as unknown as Promise<{ data: Provider[] | null; error: any }>
+        .eq("role", "provider") as Promise<{ data: Provider[] | null; error: any }>
     ]);
 
     const bookings = bookingsResult.data || [];
