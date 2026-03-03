@@ -6,6 +6,7 @@ import { Bell, CalendarDays, Car, Settings } from "lucide-react";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
+import { Wallet, GraduationCap, LayoutDashboard } from "lucide-react";
 
 const SidebarContent = () => {
   const { toast } = useToast();
@@ -33,7 +34,32 @@ const SidebarContent = () => {
           <CardContent className="pt-6">
             <Link to="/admin">
               <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg transform hover:scale-[1.02] active:scale-95 transition-all">
-                Accéder à l'interface admin
+                Interface Admin
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+
+      {(profile?.role === 'provider' || profile?.role === 'admin') && (
+        <Card className="glass-card border-0 overflow-hidden group hover:shadow-2xl transition-all duration-300">
+          <CardHeader className="border-b border-white/10 bg-primary/5">
+            <CardTitle className="text-xl flex items-center gap-2 font-bold">
+              <LayoutDashboard className="h-5 w-5 text-primary" />
+              Espace Prestataire
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-3">
+            <Link to="/provider/wallet">
+              <Button variant="outline" className="w-full border-primary/20 hover:bg-primary/10 text-primary flex items-center justify-between group/btn">
+                <span>Mon Portefeuille</span>
+                <Wallet className="h-4 w-4 group-hover/btn:scale-110 transition-transform" />
+              </Button>
+            </Link>
+            <Link to="/provider/academy">
+              <Button variant="outline" className="w-full border-primary/20 hover:bg-primary/10 text-primary flex items-center justify-between group/btn">
+                <span>Formation Academy</span>
+                <GraduationCap className="h-4 w-4 group-hover/btn:scale-110 transition-transform" />
               </Button>
             </Link>
           </CardContent>

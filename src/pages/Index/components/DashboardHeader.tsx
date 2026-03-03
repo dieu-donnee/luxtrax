@@ -34,14 +34,16 @@ const DashboardHeader = ({ weatherData }: DashboardHeaderProps) => {
               Bonjour, <span className="text-primary">{profile?.full_name || user?.email}</span>
             </h1>
             <p className="text-neutral-300 text-xl mb-10 font-light max-w-md leading-relaxed">
-              L'excellence à votre service. Offrez à votre véhicule le traitement qu'il mérite.
+              {profile?.role === 'provider'
+                ? "Prêt pour vos prochaines missions ? Votre expertise fait rayonner LuxtraX."
+                : "L'excellence à votre service. Offrez à votre véhicule le traitement qu'il mérite."}
             </p>
             <Button
-              onClick={handleBooking}
+              onClick={profile?.role === 'provider' ? () => navigate('/provider/wallet') : handleBooking}
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 py-6 rounded-full text-lg shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all duration-300 flex items-center gold-shimmer transform hover:scale-105"
               size="lg"
             >
-              Réserver un lavage
+              {profile?.role === 'provider' ? "Voir mes revenus" : "Réserver un lavage"}
               <ChevronRight className="ml-2 h-6 w-6" />
             </Button>
           </div>

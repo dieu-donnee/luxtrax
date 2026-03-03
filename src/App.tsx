@@ -17,6 +17,8 @@ const AdminPage = lazy(() => import("./pages/admin"));
 const PrivacyPolicy = lazy(() => import("./pages/privacy"));
 const TermsOfService = lazy(() => import("./pages/terms"));
 const ProviderOnboarding = lazy(() => import("./pages/auth/ProviderOnboarding"));
+const ProviderWallet = lazy(() => import("./pages/provider/ProviderWallet"));
+const Academy = lazy(() => import("./pages/provider/Academy"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Create a new QueryClient instance with optimized settings
@@ -84,6 +86,22 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <ProviderOnboarding />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/provider/wallet"
+          element={
+            <ProtectedRoute>
+              <ProviderWallet />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/provider/academy"
+          element={
+            <ProtectedRoute>
+              <Academy />
             </ProtectedRoute>
           }
         />
