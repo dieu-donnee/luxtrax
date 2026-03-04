@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Calendar, Settings, BarChart3 } from "lucide-react";
+import { Users, Calendar, Settings, BarChart3, UserCheck, ShieldCheck } from "lucide-react";
 import UsersManagement from "./components/UsersManagement";
 import BookingsManagement from "./components/BookingsManagement";
 import ServicesManagement from "./components/ServicesManagement";
@@ -20,61 +19,66 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="border-b bg-card">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <h1 className="text-3xl font-bold text-foreground">Interface Admin</h1>
-            <p className="text-muted-foreground">Gestion complète de la plateforme</p>
+    <div className="min-h-screen bg-[#FDFDFD] font-sans animate-in fade-in duration-700">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-gray-100/50">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex justify-between items-center">
+            <div className="space-y-1">
+              <h1 className="text-3xl font-black text-[#1A1A1A] tracking-tighter uppercase italic">Control Center</h1>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Platform Authority • Admin Panel</p>
+            </div>
+            <div className="flex items-center gap-3 bg-primary/5 px-4 py-2 rounded-2xl border border-primary/10">
+              <ShieldCheck className="text-primary w-5 h-5" />
+              <span className="text-[10px] font-black text-primary uppercase tracking-widest italic">Authorized Session</span>
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Tableau de bord
-            </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Utilisateurs
-            </TabsTrigger>
-            <TabsTrigger value="bookings" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Réservations
-            </TabsTrigger>
-            <TabsTrigger value="services" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Services
-            </TabsTrigger>
-            <TabsTrigger value="providers" className="flex items-center gap-2">
-              <UserCheck className="h-4 w-4" />
-              Prestataires
-            </TabsTrigger>
-          </TabsList>
+      <main className="max-w-7xl mx-auto px-6 py-12">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-12">
+          <div className="overflow-x-auto pb-4 -mx-6 px-6">
+            <TabsList className="bg-gray-100/50 p-1.5 rounded-[2rem] gap-2 h-auto w-fit flex">
+              {[
+                { id: "dashboard", label: "Overview", icon: BarChart3 },
+                { id: "users", label: "Customers", icon: Users },
+                { id: "bookings", label: "Operations", icon: Calendar },
+                { id: "services", label: "Catalog", icon: Settings },
+                { id: "providers", label: "Experts", icon: UserCheck },
+              ].map((tab) => (
+                <TabsTrigger
+                  key={tab.id}
+                  value={tab.id}
+                  className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-lg rounded-[1.5rem] px-6 py-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all"
+                >
+                  <tab.icon className="w-4 h-4" />
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
 
-          <TabsContent value="dashboard">
+          <TabsContent value="dashboard" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
             <AdminDashboard />
           </TabsContent>
 
-          <TabsContent value="users">
+          <TabsContent value="users" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
             <UsersManagement />
           </TabsContent>
 
-          <TabsContent value="bookings">
+          <TabsContent value="bookings" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
             <BookingsManagement />
           </TabsContent>
 
-          <TabsContent value="services">
+          <TabsContent value="services" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
             <ServicesManagement />
           </TabsContent>
-          <TabsContent value="providers">
+
+          <TabsContent value="providers" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
             <ProviderVerification />
           </TabsContent>
         </Tabs>
-      </div>
+      </main>
     </div>
   );
 };

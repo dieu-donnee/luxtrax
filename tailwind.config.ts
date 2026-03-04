@@ -26,7 +26,7 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: 'hsl(37 92% 50%)',
+					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
 				secondary: {
@@ -102,7 +102,7 @@ export default {
 			},
 			fontFamily: {
 				sans: [
-					'Inter',
+					'Manrope',
 					'ui-sans-serif',
 					'system-ui',
 					'-apple-system',

@@ -8,17 +8,22 @@ import { lazy, Suspense } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useAuth } from "./contexts/AuthContext";
 import LoadingScreen from "./pages/Index/components/LoadingScreen";
+import BottomNav from "./components/layout/BottomNav";
 
 // Import pages directly to debug the auth import issue
 import Index from "./pages/Index";
 import AuthPage from "./pages/auth";
-const BookingPage = lazy(() => import("./pages/booking"));
+const BookingPage = lazy(() => import("./pages/booking/BookingPageV2"));
 const AdminPage = lazy(() => import("./pages/admin"));
 const PrivacyPolicy = lazy(() => import("./pages/privacy"));
 const TermsOfService = lazy(() => import("./pages/terms"));
 const ProviderOnboarding = lazy(() => import("./pages/auth/ProviderOnboarding"));
 const ProviderWallet = lazy(() => import("./pages/provider/ProviderWallet"));
 const Academy = lazy(() => import("./pages/provider/Academy"));
+const ProviderMissions = lazy(() => import("./pages/provider/ProviderMissions"));
+const Bookings = lazy(() => import("./pages/bookings"));
+const Profile = lazy(() => import("./pages/profile"));
+const Support = lazy(() => import("./pages/support"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Create a new QueryClient instance with optimized settings
@@ -105,6 +110,38 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/provider/missions"
+          element={
+            <ProtectedRoute>
+              <ProviderMissions />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/bookings"
+          element={
+            <ProtectedRoute>
+              <Bookings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/support"
+          element={
+            <ProtectedRoute>
+              <Support />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="*" element={<NotFound />} />
@@ -113,16 +150,22 @@ const AppRoutes = () => {
   );
 };
 
+import Sidebar from "./components/layout/Sidebar";
+
 // Main App component with proper nesting order
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <AuthProvider>
         <TooltipProvider>
-          <div className="app-container">
-            <Toaster />
-            <Sonner />
-            <AppRoutes />
+          <div className="app-container min-h-screen">
+            <Sidebar />
+            <div className="lg:pl-72 pt-16 lg:pt-0">
+              <Toaster />
+              <Sonner />
+              <AppRoutes />
+            </div>
+            <BottomNav />
           </div>
         </TooltipProvider>
       </AuthProvider>

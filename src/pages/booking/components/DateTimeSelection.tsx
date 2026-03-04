@@ -18,98 +18,56 @@ const DateTimeSelection = ({
   onSelectDate,
   onSelectTime
 }: DateTimeSelectionProps) => {
-  const today = new Date();
-  const maxDate = addDays(today, 30);
-
-  // Générer les tranches horaires disponibles
-  const generateTimeSlots = (date: Date | undefined) => {
-    if (!date) return [];
-
-    const timeSlots = [];
-    const isToday = date.toDateString() === today.toDateString();
-    const currentHour = today.getHours();
-    const startHour = isToday ? Math.max(9, currentHour + 1) : 9; // Commence à 9h ou l'heure actuelle + 1 si c'est aujourd'hui
-
-    for (let hour = startHour; hour <= 19; hour++) {
-      for (let minute of [0, 30]) {
-        // N'ajoute pas les créneaux déjà passés pour aujourd'hui
-        if (isToday && hour === currentHour && minute <= today.getMinutes()) continue;
-
-        const formattedHour = hour.toString().padStart(2, '0');
-        const formattedMinute = minute.toString().padStart(2, '0');
-        timeSlots.push(`${formattedHour}:${formattedMinute}`);
-      }
-    }
-
-    return timeSlots;
-  };
-
-  const timeSlots = generateTimeSlots(selectedDate);
-
-  useEffect(() => {
-    if (selectedDate && timeSlots.length > 0 && !timeSlots.includes(selectedTime)) {
-      onSelectTime(timeSlots[0]);
-    }
-  }, [selectedDate, selectedTime, timeSlots, onSelectTime]);
+  const timeSlots = [
+    "09:00", "10:00", "11:00", "12:00",
+    "14:00", "15:00", "16:00", "17:00", "18:00"
+  ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium mb-2">Date</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Sélectionnez la date souhaitée pour votre service :
-        </p>
-        <div className="border rounded-md p-4 max-w-sm mx-auto">
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <div className="space-y-4">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">
+          Select Date
+        </label>
+        <div className="p-4 bg-gray-50/50 rounded-[2rem] border border-gray-100/50 shadow-inner">
           <Calendar
             mode="single"
             selected={selectedDate}
             onSelect={onSelectDate}
-            disabled={(date) =>
-              isBefore(date, today) ||
-              isAfter(date, maxDate) ||
-              date.getDay() === 0 // Désactive les dimanches
-            }
-            locale={fr}
-            className="mx-auto"
+            className="rounded-3xl border-none bg-transparent"
+            disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
           />
         </div>
       </div>
 
-      <div>
-        <h3 className="text-lg font-medium mb-2">Heure</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Choisissez l'horaire qui vous convient le mieux :
-        </p>
-
-        {selectedDate ? (
-          timeSlots.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <Select value={selectedTime} onValueChange={onSelectTime}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sélectionner une heure" />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeSlots.map((time) => (
-                    <SelectItem key={time} value={time}>
-                      {time}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          ) : (
-            <p className="text-amber-600">
-              Aucun créneau disponible pour cette date. Veuillez sélectionner une autre date.
-            </p>
-          )
-        ) : (
-          <p className="text-amber-600">
-            Veuillez d'abord sélectionner une date.
-          </p>
-        )}
+      <div className="space-y-4">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">
+          Select Time
+        </label>
+        <div className="grid grid-cols-3 gap-3">
+          {timeSlots.map((time) => {
+            const isSelected = selectedTime === time;
+            return (
+              <button
+                key={time}
+                onClick={() => onSelectTime(time)}
+                className={cn(
+                  "h-12 rounded-2xl font-bold text-sm transition-all border-2",
+                  isSelected
+                    ? "bg-primary border-primary text-white shadow-lg shadow-primary/30"
+                    : "bg-white border-gray-100 text-gray-600 hover:border-primary/20"
+                )}
+              >
+                {time}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
 };
+
+import { cn } from "@/lib/utils";
 
 export default DateTimeSelection;

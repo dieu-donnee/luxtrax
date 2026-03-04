@@ -1,7 +1,7 @@
 
 import { ElementType } from "react";
 
-export type BookingStep = "datetime" | "service" | "address" | "summary";
+export type BookingStep = "datetime" | "service" | "address" | "summary" | "payment";
 
 export interface StepInfo {
   id: BookingStep;
@@ -14,4 +14,5 @@ export interface ServicePlan {
   name: string;
   price: number;
   description: string;
+  duration?: string;
 }

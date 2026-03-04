@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { Clock, CircleDollarSign, MapPin, ReceiptText } from "lucide-react";
+import { Clock, CircleDollarSign, MapPin, ReceiptText, CreditCard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { BookingStep, StepInfo, ServicePlan } from "../types";
 
@@ -10,6 +10,7 @@ export const useBookingState = (currentStep: BookingStep) => {
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
   const [selectedServiceId, setSelectedServiceId] = useState<string>("");
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("momo_mtn");
   const [services, setServices] = useState<ServicePlan[]>([]);
 
   // Fetch services from database
@@ -53,7 +54,8 @@ export const useBookingState = (currentStep: BookingStep) => {
     { id: "datetime", label: "Date et heure", icon: Clock },
     { id: "service", label: "Service", icon: CircleDollarSign },
     { id: "address", label: "Adresse", icon: MapPin },
-    { id: "summary", label: "Récapitulatif", icon: ReceiptText }
+    { id: "summary", label: "Récapitulatif", icon: ReceiptText },
+    { id: "payment", label: "Paiement", icon: CreditCard }
   ], []);
 
   // Check if user can proceed to next step
@@ -67,6 +69,8 @@ export const useBookingState = (currentStep: BookingStep) => {
         return !!selectedAddress;
       case "summary":
         return true;
+      case "payment":
+        return !!selectedPaymentMethod;
       default:
         return false;
     }
@@ -85,6 +89,8 @@ export const useBookingState = (currentStep: BookingStep) => {
     setSelectedServiceId,
     services,
     selectedService,
+    selectedPaymentMethod,
+    setSelectedPaymentMethod,
     steps,
     canProceed
   };

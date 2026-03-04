@@ -17,84 +17,76 @@ interface BookingSummaryProps {
 
 const BookingSummary = ({ date, time, address, notes, selectedService }: BookingSummaryProps) => {
   const { profile } = useAuth();
-  
+
   if (!date) {
-    return <div>Informations incomplètes. Veuillez revenir aux étapes précédentes.</div>;
+    return (
+      <div className="text-center py-10 space-y-4">
+        <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto">
+          <PenLine className="text-gray-200 h-8 w-8" />
+        </div>
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-loose">
+          Incomplete Booking Info
+        </p>
+      </div>
+    );
   }
 
+  const items = [
+    { icon: <Calendar size={14} />, label: "Service Date", value: format(date, "EEEE, MMMM d, yyyy") },
+    { icon: <Clock size={14} />, label: "Arrival Time", value: time },
+    { icon: <MapPin size={14} />, label: "Location", value: address },
+    { icon: <Car size={14} />, label: "Vehicle Type", value: profile?.vehicle_type || "Standard" },
+  ];
+
   return (
-    <div className="space-y-6">
-      <h3 className="text-lg font-medium">Récapitulatif de votre réservation</h3>
-      <p className="text-sm text-gray-600">
-        Vérifiez les détails de votre réservation avant de confirmer:
-      </p>
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <div className="space-y-4">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">
+          Review Details
+        </label>
 
-      <Card className="border bg-blue-50/50">
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <Calendar className="w-5 h-5 text-blue-600 mt-0.5" />
+        <div className="space-y-3">
+          {items.map((item, i) => (
+            <div key={i} className="flex items-center gap-4 p-5 bg-gray-50/50 rounded-2xl border border-gray-100/50 group hover:bg-white hover:shadow-lg hover:shadow-gray-200/20 transition-all duration-300">
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-primary shadow-sm group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                {item.icon}
+              </div>
               <div>
-                <p className="font-medium text-gray-700">Date</p>
-                <p className="text-gray-900">
-                  {format(date, "EEEE d MMMM yyyy", { locale: fr })}
-                </p>
+                <p className="text-[9px] uppercase font-black text-gray-400 tracking-[0.15em] mb-1">{item.label}</p>
+                <p className="text-xs font-black text-[#1A1A1A] tracking-tight">{item.value}</p>
               </div>
             </div>
+          ))}
 
-            <div className="flex items-start space-x-3">
-              <Clock className="w-5 h-5 text-blue-600 mt-0.5" />
-              <div>
-                <p className="font-medium text-gray-700">Heure</p>
-                <p className="text-gray-900">{time}</p>
-              </div>
+          {notes && (
+            <div className="p-5 bg-gray-50/50 rounded-2xl border border-gray-100/50">
+              <p className="text-[9px] uppercase font-black text-gray-400 tracking-[0.15em] mb-2">Instructions</p>
+              <p className="text-xs font-bold text-gray-600 leading-relaxed">"{notes}"</p>
             </div>
+          )}
+        </div>
+      </div>
 
-            {selectedService && (
-              <div className="flex items-start space-x-3">
-                <CircleDollarSign className="w-5 h-5 text-blue-600 mt-0.5" />
-                <div>
-                  <p className="font-medium text-gray-700">Service</p>
-                  <div>
-                    <p className="text-gray-900">{selectedService.name}</p>
-                    <p className="text-sm text-gray-600">{selectedService.price.toLocaleString('fr-FR')}F</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-start space-x-3">
-              <MapPin className="w-5 h-5 text-blue-600 mt-0.5" />
-              <div>
-                <p className="font-medium text-gray-700">Adresse</p>
-                <p className="text-gray-900">{address}</p>
-              </div>
-            </div>
-
-            {notes && (
-              <div className="flex items-start space-x-3">
-                <PenLine className="w-5 h-5 text-blue-600 mt-0.5" />
-                <div>
-                  <p className="font-medium text-gray-700">Instructions spéciales</p>
-                  <p className="text-gray-900">{notes}</p>
-                </div>
-              </div>
-            )}
-            
-            {profile?.vehicle_type && (
-              <div className="flex items-start space-x-3">
-                <Car className="w-5 h-5 text-blue-600 mt-0.5" />
-                <div>
-                  <p className="font-medium text-gray-700">Type de véhicule</p>
-                  <p className="text-gray-900 capitalize">{profile.vehicle_type}</p>
-                </div>
-              </div>
-            )}
+      <div className="p-7 bg-primary rounded-[2.5rem] shadow-2xl shadow-primary/20 text-white flex items-center justify-between group hover:scale-[1.02] transition-transform duration-500">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-white border border-white/20">
+            <CircleDollarSign size={20} />
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Total Amount</p>
+            <p className="text-2xl font-black tracking-tighter">
+              {selectedService ? selectedService.price.toLocaleString('fr-FR') : "0"} FCFA
+            </p>
+          </div>
+        </div>
+        <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <ArrowRight className="h-5 w-5" />
+        </div>
+      </div>
     </div>
   );
 };
+
+import { ArrowRight } from "lucide-react";
 
 export default BookingSummary;

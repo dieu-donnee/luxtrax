@@ -1,4 +1,3 @@
-
 import React from "react";
 
 interface BookingLayoutProps {
@@ -7,9 +6,8 @@ interface BookingLayoutProps {
 
 const BookingLayout = ({ children }: BookingLayoutProps) => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Réserver un service</h1>
+    <div className="min-h-screen bg-[#FDFDFD] pb-32 pt-8 px-4 font-sans animate-fade-in">
+      <div className="max-w-[440px] mx-auto space-y-10">
         {children}
       </div>
     </div>

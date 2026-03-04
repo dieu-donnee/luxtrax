@@ -1,52 +1,32 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import DashboardHeader from "./components/DashboardHeader";
 import LoadingScreen from "./components/LoadingScreen";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import SidebarContent from "./components/SidebarContent";
 import DashboardCards from "./components/DashboardCards";
 import { useDashboardData } from "@/hooks/useDashboardData";
 
 const Index = () => {
-  const [weatherData, setWeatherData] = useState({ temp: 22, condition: "Ensoleillé" });
-
-  // Use the optimized hook
+  const [weatherData] = useState({ temp: 22, condition: "Ensoleillé" });
   const { data: dashboardData, isLoading: isDataLoading, isError } = useDashboardData();
 
-  // Show loading screen only when data is actually loading
   if (isDataLoading) {
     return <LoadingScreen />;
   }
 
   return (
-    <div className="min-h-screen premium-gradient">
+    <div className="min-h-screen bg-[#FDFDFD] font-sans pb-20 lg:pb-0">
       <DashboardHeader weatherData={weatherData} />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 -mt-10 relative z-20 bounce-in">
-        <div className="flex justify-end mb-6">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="overflow-y-auto">
-              <SidebarContent />
-            </SheetContent>
-          </Sheet>
-        </div>
-
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-20 animate-fade-in">
         <DashboardCards
           dashboardData={dashboardData}
           isLoading={isDataLoading}
           isError={isError}
         />
 
-        <div className="mt-8 hidden md:grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <SidebarContent />
+        {/* Desktop Sidebar view if needed or other sections */}
+        <div className="mt-12 hidden lg:grid grid-cols-1 gap-8">
+          {/* Additional sections can go here for desktop */}
         </div>
       </main>
     </div>

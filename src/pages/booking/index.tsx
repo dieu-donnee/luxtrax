@@ -13,8 +13,8 @@ const BookingPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<BookingStep>("datetime");
-  
-  const { 
+
+  const {
     selectedDate,
     setSelectedDate,
     selectedTime,
@@ -27,6 +27,8 @@ const BookingPage = () => {
     setSelectedServiceId,
     services,
     selectedService,
+    selectedPaymentMethod,
+    setSelectedPaymentMethod,
     steps,
     canProceed
   } = useBookingState(currentStep);
@@ -37,6 +39,8 @@ const BookingPage = () => {
     selectedAddress,
     notes,
     selectedServiceId,
+    selectedServicePrice: selectedService?.price || 0,
+    selectedPaymentMethod,
     toast,
     navigate
   });
@@ -57,11 +61,11 @@ const BookingPage = () => {
 
   return (
     <BookingLayout>
-      <BookingSteps 
-        steps={steps} 
-        currentStep={currentStep} 
+      <BookingSteps
+        steps={steps}
+        currentStep={currentStep}
       />
-      
+
       <BookingForm
         currentStep={currentStep}
         selectedDate={selectedDate}
@@ -76,6 +80,8 @@ const BookingPage = () => {
         setSelectedServiceId={setSelectedServiceId}
         services={services}
         selectedService={selectedService}
+        selectedPaymentMethod={selectedPaymentMethod}
+        setSelectedPaymentMethod={setSelectedPaymentMethod}
         handlePrevious={handlePrevious}
         handleNext={handleNext}
         handleSubmit={handleSubmit}

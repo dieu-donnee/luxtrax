@@ -11,6 +11,8 @@ interface BookingSubmitProps {
   selectedAddress: string;
   notes: string;
   selectedServiceId: string;
+  selectedServicePrice: number;
+  selectedPaymentMethod: string;
   toast: (options: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
   navigate: NavigateFunction;
 }
@@ -21,6 +23,8 @@ export const useBookingSubmit = ({
   selectedAddress,
   notes,
   selectedServiceId,
+  selectedServicePrice,
+  selectedPaymentMethod,
   toast,
   navigate
 }: BookingSubmitProps) => {
@@ -29,7 +33,7 @@ export const useBookingSubmit = ({
 
   // Use useCallback to memoize the submit function
   const handleSubmit = useCallback(async () => {
-    if (!selectedDate || !selectedTime || !selectedAddress || !selectedServiceId || !user) {
+    if (!selectedDate || !selectedTime || !selectedAddress || !selectedServiceId || !selectedPaymentMethod || !user) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -78,6 +82,27 @@ export const useBookingSubmit = ({
 
       if (error) throw error;
 
+      // Create the payment record
+      // We need the booking ID, which we should get from the insert response
+      const { data: bookingData, error: bookingFetchError } = await supabase
+        .from("bookings")
+        .select("id")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (!bookingFetchError && bookingData) {
+        await (supabase
+          .from("payments") as any)
+          .insert({
+            booking_id: bookingData.id,
+            amount: selectedServicePrice || 0,
+            status: "pending",
+            method: selectedPaymentMethod as any,
+          });
+      }
+
       toast({
         title: "Réservation confirmée",
         description: "Votre réservation a été enregistrée avec succès",
@@ -95,7 +120,7 @@ export const useBookingSubmit = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedDate, selectedTime, selectedAddress, notes, selectedServiceId, user, toast, navigate]);
+  }, [selectedDate, selectedTime, selectedAddress, notes, selectedServiceId, selectedServicePrice, selectedPaymentMethod, user, toast, navigate]);
 
   return { handleSubmit, isSubmitting };
 };

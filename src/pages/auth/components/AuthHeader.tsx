@@ -1,14 +1,12 @@
 
+import { Layers } from "lucide-react";
+
 export function AuthHeader() {
   return (
-    <div className="mb-8">
-      <a href="https://lustrax.fr" target="_blank" rel="noopener noreferrer">
-        <img 
-          src="/lovable-uploads/9cae551b-8e39-46f1-90a4-f09b982484e0.png" 
-          alt="LustraX Logo" 
-          className="h-24 object-contain dark:brightness-110"
-        />
-      </a>
+    <div className="mb-6 flex flex-col items-center">
+      <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20 animate-bounce-in">
+        <Layers className="text-white w-8 h-8" />
+      </div>
     </div>
   );
 }
