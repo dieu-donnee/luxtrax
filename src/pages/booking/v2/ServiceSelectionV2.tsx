@@ -2,7 +2,7 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Users, Briefcase, Info } from "lucide-react";
+import { Check, Sparkles, Droplets, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Service {
@@ -18,34 +18,34 @@ interface Service {
 
 const services: Service[] = [
     {
-        id: "luxury-sedan",
-        name: "Berline de Luxe",
-        description: "Le choix parfait pour vos déplacements professionnels et personnels.",
+        id: "standard-wash",
+        name: "Lavage Standard",
+        description: "Un nettoyage complet extérieur et intérieur pour redonner de l'éclat à votre véhicule.",
+        price: 15000,
+        image: "https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?auto=format&fit=crop&q=80",
+        capacity: 1,
+        luggage: 0,
+        features: ["Lavage extérieur à la main", "Aspiration intérieure", "Nettoyage des vitres", "Brillant pneus"],
+    },
+    {
+        id: "premium-wash",
+        name: "Lavage Premium",
+        description: "Le soin ultime pour votre voiture, incluant un shampouinage complet et une protection cire.",
+        price: 25000,
+        image: "https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&q=80",
+        capacity: 1,
+        luggage: 0,
+        features: ["Tout du pack Standard", "Shampouinage des sièges", "Nettoyage moteur", "Cire de protection"],
+    },
+    {
+        id: "vip-detailing",
+        name: "Detailing VIP",
+        description: "Une rénovation complète de votre véhicule avec des produits de haute précision.",
         price: 45000,
-        image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80",
-        capacity: 3,
-        luggage: 2,
-        features: ["Wi-Fi", "Bouteilles d'eau", "Climatisation"],
-    },
-    {
-        id: "executive-suv",
-        name: "SUV Exécutif",
-        description: "Idéal pour les groupes ou les voyageurs avec beaucoup de bagages.",
-        price: 65000,
-        image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80",
-        capacity: 6,
-        luggage: 4,
-        features: ["Sièges cuir", "Chargeurs USB", "Espace généreux"],
-    },
-    {
-        id: "vip-van",
-        name: "Van VIP",
-        description: "Le summum du confort pour les groupes et les événements spéciaux.",
-        price: 95000,
-        image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80",
-        capacity: 8,
-        luggage: 8,
-        features: ["Mini-bar", "Système Son Premium", "Vitre de séparation"],
+        image: "https://images.unsplash.com/photo-1552933071-e4040bd06f2e?auto=format&fit=crop&q=80",
+        capacity: 1,
+        luggage: 0,
+        features: ["Tout du pack Premium", "Polissage carrosserie", "Traitement cuir", "Désinfection habitacle"],
     },
 ];
 
@@ -58,8 +58,8 @@ const ServiceSelectionV2 = ({ onSelect, selectedId }: ServiceSelectionProps) => 
     return (
         <div className="space-y-8 animate-fade-in p-6">
             <div className="text-center space-y-2">
-                <h2 className="text-3xl font-black italic tracking-tighter uppercase text-slate-900">Choisissez votre Service</h2>
-                <p className="text-slate-500">Sélectionnez la catégorie de véhicule qui correspond le mieux à vos besoins.</p>
+                <h2 className="text-3xl font-black italic tracking-tighter uppercase text-slate-900">Service de Lavage</h2>
+                <p className="text-slate-500">Sélectionnez le forfait de nettoyage qui correspond à vos exigences de prestige.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -85,8 +85,8 @@ const ServiceSelectionV2 = ({ onSelect, selectedId }: ServiceSelectionProps) => 
                             <div className="absolute bottom-4 left-4 text-white">
                                 <p className="font-black italic uppercase tracking-tighter text-xl">{service.name}</p>
                                 <div className="flex items-center gap-3 text-sm text-slate-200 mt-1">
-                                    <span className="flex items-center gap-1"><Users size={14} /> {service.capacity}</span>
-                                    <span className="flex items-center gap-1"><Briefcase size={14} /> {service.luggage}</span>
+                                    <span className="flex items-center gap-1"><Sparkles size={14} /> Haute Qualité</span>
+                                    <span className="flex items-center gap-1"><Droplets size={14} /> Produit Élite</span>
                                 </div>
                             </div>
                         </div>
