@@ -13,7 +13,12 @@ import {
     ShieldAlert,
     Wallet,
     GraduationCap,
-    Compass
+    Compass,
+    MapPin,
+    Car,
+    Clock,
+    FileText,
+    PlusCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -52,9 +57,13 @@ const Sidebar = () => {
 
         return [
             { label: "Accueil", icon: Home, path: "/" },
-            { label: "Réservation", icon: Calendar, path: "/booking" },
-            { label: "Activité", icon: Activity, path: "/bookings" },
-            { label: "Profil", icon: User, path: "/profile" },
+            { label: "Nouvelle Réservation", icon: PlusCircle, path: "/booking" },
+            { label: "Sélection de Service", icon: Car, path: "/booking?step=service" },
+            { label: "Localisation", icon: MapPin, path: "/booking?step=location" },
+            { label: "Planification", icon: Clock, path: "/booking?step=schedule" },
+            { label: "Résumé", icon: FileText, path: "/booking?step=summary" },
+            { label: "Mes Activités", icon: Activity, path: "/bookings" },
+            { label: "Mon Profil", icon: User, path: "/profile" },
         ];
     };
 

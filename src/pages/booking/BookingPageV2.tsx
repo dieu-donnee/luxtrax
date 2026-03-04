@@ -1,6 +1,7 @@
 
-import React from "react";
-import { useBookingFlow } from "./hooks/useBookingFlow";
+import React, { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useBookingFlow, BookingStep } from "./hooks/useBookingFlow";
 import HomeHero from "./v2/HomeHero";
 import LocationSelectionV2 from "./v2/LocationSelectionV2";
 import ServiceSelectionV2 from "./v2/ServiceSelectionV2";
@@ -17,8 +18,17 @@ const BookingPageV2 = () => {
         selection,
         updateSelection,
         submitBooking,
-        isSubmitting
+        isSubmitting,
+        setCurrentStep
     } = useBookingFlow();
+    const [searchParams] = useSearchParams();
+
+    useEffect(() => {
+        const step = searchParams.get('step') as BookingStep;
+        if (step && ['welcome', 'location', 'service', 'schedule', 'summary'].includes(step)) {
+            setCurrentStep(step);
+        }
+    }, [searchParams, setCurrentStep]);
 
     const renderStep = () => {
         switch (currentStep) {
@@ -85,8 +95,8 @@ const BookingPageV2 = () => {
                             <div
                                 key={step}
                                 className={`h-1.5 w-12 rounded-full transition-all duration-500 ${['location', 'service', 'schedule', 'summary'].indexOf(currentStep) >= idx
-                                        ? "bg-primary"
-                                        : "bg-slate-200"
+                                    ? "bg-primary"
+                                    : "bg-slate-200"
                                     }`}
                             />
                         ))}
