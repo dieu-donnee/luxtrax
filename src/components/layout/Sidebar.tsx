@@ -60,6 +60,9 @@ const Sidebar = () => {
 
     const navItems = getNavItems();
 
+    // Hide sidebar on auth page
+    if (location.pathname === "/auth") return null;
+
     const SidebarContent = ({ className }: { className?: string }) => (
         <div className={cn("flex flex-col h-full bg-[#0F172A] text-white", className)}>
             <div className="p-6">

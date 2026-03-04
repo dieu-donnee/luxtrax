@@ -3,7 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
 import { lazy, Suspense } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useAuth } from "./contexts/AuthContext";
@@ -21,7 +22,7 @@ const ProviderOnboarding = lazy(() => import("./pages/auth/ProviderOnboarding"))
 const ProviderWallet = lazy(() => import("./pages/provider/ProviderWallet"));
 const Academy = lazy(() => import("./pages/provider/Academy"));
 const ProviderMissions = lazy(() => import("./pages/provider/ProviderMissions"));
-const Bookings = lazy(() => import("./pages/bookings"));
+const Bookings = lazy(() => import("./pages/bookings/v2/BookingHistoryV2"));
 const Profile = lazy(() => import("./pages/profile"));
 const Support = lazy(() => import("./pages/support"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -153,24 +154,40 @@ const AppRoutes = () => {
 import Sidebar from "./components/layout/Sidebar";
 
 // Main App component with proper nesting order
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AuthProvider>
-        <TooltipProvider>
-          <div className="app-container min-h-screen">
-            <Sidebar />
-            <div className="lg:pl-72 pt-16 lg:pt-0">
-              <Toaster />
-              <Sonner />
-              <AppRoutes />
-            </div>
-            <BottomNav />
-          </div>
-        </TooltipProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <TooltipProvider>
+            <AppLayout />
+          </TooltipProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
+
+const AppLayout = () => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === "/auth";
+
+  return (
+    <div className="app-container min-h-screen">
+      <Sidebar />
+      <div className={cn(
+        "min-h-screen flex flex-col",
+        !isAuthPage && "lg:pl-72 pt-16 lg:pt-0"
+      )}>
+        <Toaster />
+        <Sonner />
+        <main className="flex-1">
+          <AppRoutes />
+        </main>
+      </div>
+      <BottomNav />
+    </div>
+  );
+};
 
 export default App;
