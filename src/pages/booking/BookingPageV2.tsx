@@ -77,15 +77,15 @@ const BookingPageV2 = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC]">
+        <div className="min-h-screen bg-background">
             {/* Step Header / Progress */}
             {currentStep !== 'welcome' && (
-                <div className="sticky top-16 lg:top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+                <div className="sticky top-16 lg:top-0 z-30 bg-card/80 backdrop-blur-xl border-b border-border px-6 py-4 flex items-center justify-between">
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={prevStep}
-                        className="rounded-xl flex items-center gap-2 text-slate-600 font-bold uppercase tracking-widest text-[10px]"
+                        className="rounded-xl flex items-center gap-2 text-muted-foreground font-bold uppercase tracking-widest text-[10px]"
                     >
                         <ChevronLeft size={16} /> Retour
                     </Button>
@@ -96,7 +96,7 @@ const BookingPageV2 = () => {
                                 key={step}
                                 className={`h-1.5 w-12 rounded-full transition-all duration-500 ${['location', 'service', 'schedule', 'summary'].indexOf(currentStep) >= idx
                                     ? "bg-primary"
-                                    : "bg-slate-200"
+                                    : "bg-muted"
                                     }`}
                             />
                         ))}
