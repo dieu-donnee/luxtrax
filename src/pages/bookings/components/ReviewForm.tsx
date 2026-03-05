@@ -35,8 +35,8 @@ const ReviewForm = ({ bookingId, providerId, clientId, isOpen, onClose, onSucces
 
         setIsSubmitting(true);
         try {
-            const { error } = await (supabase
-                .from("reviews") as any)
+            const { error } = await (supabase as any)
+                .from("reviews")
                 .insert({
                     booking_id: bookingId,
                     provider_id: providerId,

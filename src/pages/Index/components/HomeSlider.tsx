@@ -30,7 +30,7 @@ const slides = [
 ];
 
 const HomeSlider = () => {
-    const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000 })]);
+    const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000 }) as any]);
     const [selectedIndex, setSelectedIndex] = useState(0);
     const navigate = useNavigate();
 
