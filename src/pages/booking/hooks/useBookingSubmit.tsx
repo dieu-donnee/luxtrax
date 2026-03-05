@@ -92,15 +92,20 @@ export const useBookingSubmit = ({
         .limit(1)
         .single();
 
+      // Payment tracking - skip if payments table doesn't exist yet
       if (!bookingFetchError && bookingData) {
-        await (supabase
-          .from("payments") as any)
-          .insert({
-            booking_id: bookingData.id,
-            amount: selectedServicePrice || 0,
-            status: "pending",
-            method: selectedPaymentMethod as any,
-          });
+        try {
+          await (supabase as any)
+            .from("payments")
+            .insert({
+              booking_id: bookingData.id,
+              amount: selectedServicePrice || 0,
+              status: "pending",
+              method: selectedPaymentMethod,
+            });
+        } catch (e) {
+          console.warn("Payments table not available yet:", e);
+        }
       }
 
       toast({

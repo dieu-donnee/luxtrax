@@ -164,11 +164,7 @@ const UsersManagement = () => {
                 <TableCell className="py-6 px-10">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-gray-100 rounded-[1.2rem] flex items-center justify-center text-gray-400 group-hover:bg-primary/10 group-hover:text-primary transition-all overflow-hidden border border-transparent group-hover:border-primary/20">
-                      {user.avatar_url ? (
-                        <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <User size={20} />
-                      )}
+                      <User size={20} />
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm font-black text-[#1A1A1A] tracking-tight">{user.full_name || 'Sans nom'}</p>

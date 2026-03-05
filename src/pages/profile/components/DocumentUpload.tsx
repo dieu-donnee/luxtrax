@@ -25,8 +25,8 @@ const DocumentUpload = () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
 
-            const { data, error } = await (supabase
-                .from("provider_docs") as any)
+            const { data, error } = await (supabase as any)
+                .from("provider_docs")
                 .select("*")
                 .eq("provider_id", user.id);
 
@@ -73,8 +73,8 @@ const DocumentUpload = () => {
             if (uploadError) throw uploadError;
 
             // 2. Insert record in provider_docs
-            const { error: dbError } = await (supabase
-                .from("provider_docs") as any)
+            const { error: dbError } = await (supabase as any)
+                .from("provider_docs")
                 .insert({
                     provider_id: user.id,
                     doc_type: "ID_CARD", // Simple default
