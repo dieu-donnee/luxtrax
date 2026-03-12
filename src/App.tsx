@@ -17,6 +17,7 @@ const AdminPage = lazy(() => import("./pages/admin"));
 const PrivacyPolicy = lazy(() => import("./pages/privacy"));
 const TermsOfService = lazy(() => import("./pages/terms"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const AuthCallback = lazy(() => import("./pages/auth/AuthCallback"));
 
 // Create a new QueryClient instance with optimized settings
 const queryClient = new QueryClient({
@@ -71,6 +72,7 @@ const AppRoutes = () => {
           }
         />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="*" element={<NotFound />} />

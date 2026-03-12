@@ -21,7 +21,7 @@ export function useAuthForm() {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (isSignUp && !termsAccepted) {
       toast({
         variant: "destructive",
@@ -60,29 +60,17 @@ export function useAuthForm() {
         if (error) throw error;
 
         if (data.user) {
-          let profileCreated = false;
-          let attempts = 0;
-          const maxAttempts = 3;
+          // Attendre un court instant que le trigger s'exécute
+          await new Promise(resolve => setTimeout(resolve, 500));
 
-          while (!profileCreated && attempts < maxAttempts) {
-            attempts++;
-            
-            if (attempts > 1) {
-              await new Promise(resolve => setTimeout(resolve, 1000));
-            }
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", data.user.id)
+            .maybeSingle();
 
-            // Add type casting to fix the TypeScript error
-            const { data: profile, error: profileError } = await supabase
-              .from("profiles")
-              .select()
-              .eq("id", data.user.id)
-              .maybeSingle() as any;
-
-            if (!profileError && profile) {
-              profileCreated = true;
-            } else if (attempts === maxAttempts) {
-              console.error("Erreur lors de la vérification du profil:", profileError);
-            }
+          if (profileError) {
+            console.error("Erreur lors de la récupération du profil:", profileError);
           }
         }
 
