@@ -37,9 +37,9 @@ export function LoginForm({
 
       <div className="space-y-2">
         <div className="flex justify-between items-center px-1">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Password</label>
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Mot de passe</label>
           <button type="button" className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary/80 transition-colors focus:outline-none">
-            Forgot?
+            Oublié ?
           </button>
         </div>
         <div className="relative group">

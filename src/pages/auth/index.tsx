@@ -125,13 +125,13 @@ export default function AuthPage() {
           </form>
 
           <div className="text-center pt-2">
-            <p className="text-sm text-gray-500 font-medium">
-              {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+            <p className="text-sm text-muted-foreground font-medium">
+              {isSignUp ? "Vous avez déjà un compte ?" : "Pas encore de compte ?"}{" "}
               <button
                 onClick={() => setIsSignUp(!isSignUp)}
                 className="text-primary font-extrabold hover:underline transition-colors px-1"
               >
-                {isSignUp ? "Sign in" : "Register now"}
+                {isSignUp ? "Se connecter" : "S'inscrire"}
               </button>
             </p>
           </div>
