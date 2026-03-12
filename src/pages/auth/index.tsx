@@ -69,6 +69,13 @@ export default function AuthPage() {
           <AuthDivider />
 
           <form onSubmit={handleAuth} className="mt-8 space-y-6">
+            <LoginForm
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+            />
+
             {isSignUp && (
               <div className="space-y-6">
                 <UserTypeSelector
@@ -105,15 +112,6 @@ export default function AuthPage() {
                   setTermsAccepted={setTermsAccepted}
                 />
               </div>
-            )}
-
-            {!isSignUp && (
-              <LoginForm
-                email={email}
-                setEmail={setEmail}
-                password={password}
-                setPassword={setPassword}
-              />
             )}
 
             <Button

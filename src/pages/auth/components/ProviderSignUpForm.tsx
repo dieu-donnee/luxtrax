@@ -74,8 +74,8 @@ export function ProviderSignUpForm({
             <SelectValue placeholder="Sélectionnez votre niveau d'expérience" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="debutant">Débutant</SelectItem>
-            <SelectItem value="intermediaire">Intermédiaire</SelectItem>
+            <SelectItem value="beginner">Débutant</SelectItem>
+            <SelectItem value="intermediate">Intermédiaire</SelectItem>
             <SelectItem value="expert">Expert</SelectItem>
           </SelectContent>
         </Select>
