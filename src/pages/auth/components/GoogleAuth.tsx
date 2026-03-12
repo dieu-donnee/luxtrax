@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { lovable } from "@/integrations/lovable/index";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
 export function GoogleAuth() {
@@ -7,8 +7,11 @@ export function GoogleAuth() {
 
   const handleGoogleSignIn = async () => {
     try {
-      const { error } = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+        },
       });
 
       if (error) {
