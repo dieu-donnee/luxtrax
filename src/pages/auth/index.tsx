@@ -69,6 +69,13 @@ export default function AuthPage() {
           <AuthDivider />
 
           <form onSubmit={handleAuth} className="mt-8 space-y-6">
+            <LoginForm
+              email={email}
+              setEmail={setEmail}
+              password={password}
+              setPassword={setPassword}
+            />
+
             {isSignUp && (
               <div className="space-y-6">
                 <UserTypeSelector
@@ -107,33 +114,24 @@ export default function AuthPage() {
               </div>
             )}
 
-            {!isSignUp && (
-              <LoginForm
-                email={email}
-                setEmail={setEmail}
-                password={password}
-                setPassword={setPassword}
-              />
-            )}
-
             <Button
               type="submit"
               className="w-full h-14 text-lg font-bold rounded-2xl bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20 transition-all transform hover:scale-[1.01] active:scale-[0.99] group mt-4"
               disabled={loading}
             >
-              {loading ? "Processing..." : isSignUp ? "Create Luxury Account" : "Secure Login"}
+              {loading ? "Chargement..." : isSignUp ? "Créer mon compte" : "Se connecter"}
               {!loading && <span className="inline-block ml-2 group-hover:translate-x-1 transition-transform">→</span>}
             </Button>
           </form>
 
           <div className="text-center pt-2">
-            <p className="text-sm text-gray-500 font-medium">
-              {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+            <p className="text-sm text-muted-foreground font-medium">
+              {isSignUp ? "Vous avez déjà un compte ?" : "Pas encore de compte ?"}{" "}
               <button
                 onClick={() => setIsSignUp(!isSignUp)}
                 className="text-primary font-extrabold hover:underline transition-colors px-1"
               >
-                {isSignUp ? "Sign in" : "Register now"}
+                {isSignUp ? "Se connecter" : "S'inscrire"}
               </button>
             </p>
           </div>

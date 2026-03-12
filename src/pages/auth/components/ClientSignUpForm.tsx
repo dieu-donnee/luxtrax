@@ -64,11 +64,17 @@ export function ClientSignUpForm({
             <SelectValue placeholder="Sélectionnez votre type de véhicule" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="berline">Berline</SelectItem>
+            <SelectItem value="sedan">Berline</SelectItem>
             <SelectItem value="suv">SUV</SelectItem>
-            <SelectItem value="citadine">Citadine</SelectItem>
-            <SelectItem value="utilitaire">Utilitaire</SelectItem>
-            <SelectItem value="autre">Autre</SelectItem>
+            <SelectItem value="compact">Citadine</SelectItem>
+            <SelectItem value="truck">Pick-up</SelectItem>
+            <SelectItem value="van">Utilitaire</SelectItem>
+            <SelectItem value="coupe">Coupé</SelectItem>
+            <SelectItem value="hatchback">Hatchback</SelectItem>
+            <SelectItem value="minivan">Monospace</SelectItem>
+            <SelectItem value="convertible">Cabriolet</SelectItem>
+            <SelectItem value="wagon">Break</SelectItem>
+            <SelectItem value="other">Autre</SelectItem>
           </SelectContent>
         </Select>
       </div>
