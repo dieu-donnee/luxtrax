@@ -20,54 +20,54 @@ const NotificationsCard: React.FC<NotificationsCardProps> = ({ notifications, is
 
   const dismissNotification = (id: number) => {
     toast({
-      title: "Notification supprimée",
+      title: "Notification dismissed",
       variant: "default",
       duration: 2000,
     });
   };
 
   return (
-    <Card className="col-span-1 border-0 shadow-lg">
-      <CardHeader className="border-b flex flex-row items-center justify-between">
-        <CardTitle className="text-xl flex items-center gap-2">
-          <Bell className="h-5 w-5 text-blue-500" />
+    <Card className="bg-white border-none rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.03)] overflow-hidden transition-all duration-500 hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)]">
+      <CardHeader className="flex flex-row items-center justify-between p-7 pb-4">
+        <CardTitle className="text-xl font-extrabold text-gray-900 flex items-center gap-3">
+          <div className="p-2.5 bg-primary/5 text-primary rounded-xl">
+            <Bell className="h-5 w-5" />
+          </div>
           Notifications
         </CardTitle>
-        <span className="bg-blue-100 text-blue-600 text-xs font-medium px-2.5 py-0.5 rounded-full">
+        <div className="bg-primary text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg shadow-primary/20">
           {notifications.length}
-        </span>
+        </div>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="px-7 pb-7">
         {isLoading ? (
-          <div className="text-center py-4 text-gray-500">
-            <p>Chargement des notifications...</p>
+          <div className="text-center py-8">
+            <p className="text-sm text-gray-400 animate-pulse font-medium">Refreshing...</p>
           </div>
         ) : notifications.length ? (
           <div className="space-y-4">
             {notifications.map((notif) => (
-              <div key={notif.id} className="flex items-start justify-between space-x-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <div key={notif.id} className="flex items-start justify-between space-x-4 p-4 rounded-2xl border border-gray-50 hover:border-primary/20 hover:bg-primary/5 transition-all duration-300 group">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <Bell className="h-4 w-4 text-blue-600" />
-                  </div>
+                  <div className="mt-1 w-2 h-2 bg-primary rounded-full group-hover:scale-125 transition-transform" />
                   <div>
-                    <p className="text-sm font-medium">{notif.message}</p>
-                    <p className="text-sm text-gray-500">{notif.time}</p>
+                    <p className="text-sm font-bold text-[#1A1A1A] leading-relaxed">{notif.message}</p>
+                    <p className="text-[10px] text-gray-400 mt-1 font-bold uppercase tracking-widest">{notif.time}</p>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => dismissNotification(notif.id)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-300 hover:text-gray-500 transition-colors p-1"
                 >
-                  <span className="sr-only">Ignorer</span>
-                  <span className="text-xs">×</span>
+                  <span className="sr-only">Dismiss</span>
+                  <span className="text-xl leading-none">×</span>
                 </button>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-4 text-gray-500">
-            <p>Aucune notification</p>
+          <div className="text-center py-8">
+            <p className="text-sm text-gray-400 font-medium italic">No new notifications</p>
           </div>
         )}
       </CardContent>

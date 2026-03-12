@@ -14,7 +14,140 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          address: string
+          created_at: string
+          id: string
+          notes: string | null
+          scheduled_date: string
+          service_id: string
+          status: Database["public"]["Enums"]["booking_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          scheduled_date: string
+          service_id: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          scheduled_date?: string
+          service_id?: string
+          status?: Database["public"]["Enums"]["booking_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          created_at: string
+          default_address: string | null
+          email_verified: boolean | null
+          experience_level:
+            | Database["public"]["Enums"]["experience_level"]
+            | null
+          full_name: string | null
+          id: string
+          phone_number: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          terms_accepted: boolean | null
+          updated_at: string
+          vehicle_type: Database["public"]["Enums"]["vehicle_type"] | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          default_address?: string | null
+          email_verified?: boolean | null
+          experience_level?:
+            | Database["public"]["Enums"]["experience_level"]
+            | null
+          full_name?: string | null
+          id: string
+          phone_number?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          terms_accepted?: boolean | null
+          updated_at?: string
+          vehicle_type?: Database["public"]["Enums"]["vehicle_type"] | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          default_address?: string | null
+          email_verified?: boolean | null
+          experience_level?:
+            | Database["public"]["Enums"]["experience_level"]
+            | null
+          full_name?: string | null
+          id?: string
+          phone_number?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          terms_accepted?: boolean | null
+          updated_at?: string
+          vehicle_type?: Database["public"]["Enums"]["vehicle_type"] | null
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string
+          description: string | null
+          details: string | null
+          discount_percentage: number | null
+          id: string
+          is_vip: boolean | null
+          name: string
+          price: number
+          type: Database["public"]["Enums"]["service_type"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          details?: string | null
+          discount_percentage?: number | null
+          id?: string
+          is_vip?: boolean | null
+          name: string
+          price?: number
+          type?: Database["public"]["Enums"]["service_type"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          details?: string | null
+          discount_percentage?: number | null
+          id?: string
+          is_vip?: boolean | null
+          name?: string
+          price?: number
+          type?: Database["public"]["Enums"]["service_type"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +156,22 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      booking_status: "pending" | "ongoing" | "completed" | "cancelled"
+      experience_level: "beginner" | "intermediate" | "expert"
+      service_type: "carwash" | "laundry"
+      user_role: "client" | "provider" | "admin"
+      vehicle_type:
+        | "sedan"
+        | "suv"
+        | "truck"
+        | "van"
+        | "compact"
+        | "coupe"
+        | "convertible"
+        | "wagon"
+        | "hatchback"
+        | "minivan"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +298,24 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      booking_status: ["pending", "ongoing", "completed", "cancelled"],
+      experience_level: ["beginner", "intermediate", "expert"],
+      service_type: ["carwash", "laundry"],
+      user_role: ["client", "provider", "admin"],
+      vehicle_type: [
+        "sedan",
+        "suv",
+        "truck",
+        "van",
+        "compact",
+        "coupe",
+        "convertible",
+        "wagon",
+        "hatchback",
+        "minivan",
+        "other",
+      ],
+    },
   },
 } as const

@@ -8,18 +8,12 @@ interface AuthFormHeaderProps {
 
 export function AuthFormHeader({ isSignUp, setIsSignUp }: AuthFormHeaderProps) {
   return (
-    <div className="text-center">
-      <h2 className="text-3xl font-bold text-gray-900">
-        {isSignUp ? "Créer un compte" : "Se connecter"}
+    <div className="text-center space-y-2 mb-8 animate-fade-in">
+      <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 font-sans">
+        {isSignUp ? "Join LuxtraX" : "Welcome back"}
       </h2>
-      <p className="mt-2 text-sm text-gray-600">
-        {isSignUp ? "Déjà un compte ?" : "Pas encore de compte ?"}{" "}
-        <button
-          onClick={() => setIsSignUp(!isSignUp)}
-          className="text-blue-600 hover:text-blue-500"
-        >
-          {isSignUp ? "Se connecter" : "S'inscrire"}
-        </button>
+      <p className="text-gray-500 font-medium">
+        {isSignUp ? "Experience premium services at your doorstep" : "Enter your credentials to access your luxury account"}
       </p>
     </div>
   );

@@ -1,107 +1,82 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { MoveLeft, ShieldCheck } from "lucide-react";
 
 export default function PrivacyPolicy() {
   const navigate = useNavigate();
-  
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Button 
-        variant="ghost" 
-        onClick={() => navigate(-1)}
-        className="mb-6"
-      >
-        ← Retour
-      </Button>
 
-      <div className="prose prose-sm sm:prose lg:prose-lg mx-auto dark:prose-invert">
-        <h1 className="text-3xl font-bold mb-8 text-center">RÈGLES DE CONFIDENTIALITÉ DE LUSTRAX</h1>
-        
-        <div className="text-sm text-muted-foreground mb-8 text-center">
-          Dernière mise à jour : {new Date().toLocaleDateString()}
+  return (
+    <div className="min-h-screen bg-[#FDFDFD] p-6 pb-28 animate-in fade-in duration-700">
+      <div className="max-w-2xl mx-auto space-y-12 pt-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="h-12 px-6 rounded-xl hover:bg-gray-50 text-[#1A1A1A] font-black text-[10px] uppercase tracking-widest flex items-center gap-2 transition-all group"
+        >
+          <MoveLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+          Go Back
+        </Button>
+
+        <div className="space-y-6 text-center">
+          <div className="inline-flex p-4 bg-primary/5 rounded-[2rem] text-primary mb-2">
+            <ShieldCheck size={32} />
+          </div>
+          <h1 className="text-4xl font-black text-[#1A1A1A] tracking-tighter uppercase italic">Privacy Policy</h1>
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">
+            Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          </p>
         </div>
 
-        <p className="mb-8">
-          Chez LustraX, nous attachons une grande importance à la protection de vos données personnelles. 
-          Cette politique de confidentialité décrit comment nous collectons, utilisons, protégeons et 
-          partageons vos informations lorsque vous utilisez notre application mobile.
-        </p>
+        <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-gray-50 shadow-2xl shadow-gray-200/20 space-y-10">
+          <section className="space-y-4">
+            <p className="text-sm font-bold text-gray-500 leading-relaxed italic border-l-2 border-primary/20 pl-6">
+              At Luxtrax, we prioritize the protection of your personal data.
+              This policy describes how we collect, use, and safeguard your information.
+            </p>
+          </section>
 
-        <h2 className="text-2xl font-semibold mt-8 mb-4">1. INFORMATIONS QUE NOUS COLLECTONS</h2>
+          <section className="space-y-6">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-[#1A1A1A] border-b border-gray-100 pb-2">1. Data Collection</h2>
+            <div className="space-y-4">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-primary">Provided by you</h3>
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {["Full name", "Email address", "Phone number", "Service address", "Secure payment info"].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-xs font-bold text-gray-600 bg-gray-50/50 p-3 rounded-xl">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary/30" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
 
-        <h3 className="text-xl font-semibold mt-6 mb-3">1.1 Informations fournies par l'utilisateur</h3>
-        <ul className="list-disc pl-6 mb-4">
-          <li>Nom, prénom</li>
-          <li>Adresse e-mail</li>
-          <li>Numéro de téléphone</li>
-          <li>Adresse de service (pour l'intervention à domicile)</li>
-          <li>Informations de paiement (cryptées et gérées par un prestataire sécurisé)</li>
-        </ul>
+          <section className="space-y-6">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-[#1A1A1A] border-b border-gray-100 pb-2">2. Usage of Data</h2>
+            <p className="text-xs font-bold text-gray-600 leading-relaxed">
+              We use your information to provide bespoke car care, manage your bookings securely,
+              and enhance your luxury experience through personalized offers and updates.
+            </p>
+          </section>
 
-        <h3 className="text-xl font-semibold mt-6 mb-3">1.2 Informations collectées automatiquement</h3>
-        <ul className="list-disc pl-6 mb-4">
-          <li>Données de navigation (adresse IP, type d'appareil, système d'exploitation)</li>
-          <li>Localisation (uniquement si l'utilisateur autorise le suivi pour l'optimisation du service)</li>
-          <li>Historique des réservations et préférences</li>
-        </ul>
+          <section className="space-y-6">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-[#1A1A1A] border-b border-gray-100 pb-2">3. Your Rights</h2>
+            <p className="text-xs font-bold text-gray-600 leading-relaxed">
+              You maintain full control over your data. Access, modify, or request deletion of your account
+              directly through your profile settings or by contacting our concierge.
+            </p>
+          </section>
 
-        <h2 className="text-2xl font-semibold mt-8 mb-4">2. UTILISATION DES DONNÉES</h2>
-        <p>Nous utilisons vos données personnelles pour :</p>
-        <ul className="list-disc pl-6 mb-4">
-          <li>Fournir, gérer et améliorer nos services de lavage à domicile</li>
-          <li>Traiter vos paiements et gérer vos réservations</li>
-          <li>Vous envoyer des notifications liées à votre réservation</li>
-          <li>Améliorer l'expérience utilisateur et proposer des offres personnalisées</li>
-          <li>Assurer la sécurité et prévenir les fraudes</li>
-          <li>Respecter nos obligations légales</li>
-        </ul>
+          <div className="pt-10 border-t border-gray-50 flex flex-col items-center gap-4">
+            <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">Direct Inquiry</p>
+            <a href="mailto:lustrax70@gmail.com" className="text-xs font-black text-primary hover:text-primary/80 transition-colors underline-offset-4 underline">
+              lustrax70@gmail.com
+            </a>
+          </div>
+        </div>
 
-        <h2 className="text-2xl font-semibold mt-8 mb-4">3. PARTAGE DES DONNÉES</h2>
-        <p>
-          Vos informations ne sont <strong>jamais</strong> vendues à des tiers. Nous pouvons partager 
-          certaines données uniquement avec :
-        </p>
-        <ul className="list-disc pl-6 mb-4">
-          <li><strong>Prestataires de services</strong> (paiement sécurisé, hébergement des données, support client)</li>
-          <li><strong>Autorités légales</strong> en cas d'obligation légale</li>
-        </ul>
-
-        <h2 className="text-2xl font-semibold mt-8 mb-4">4. SÉCURITÉ DES DONNÉES</h2>
-        <p>Nous mettons en place des mesures de sécurité avancées pour protéger vos données :</p>
-        <ul className="list-disc pl-6 mb-4">
-          <li>Cryptage des données sensibles</li>
-          <li>Protection contre les accès non autorisés</li>
-          <li>Stockage sécurisé sur des serveurs conformes aux normes de sécurité</li>
-        </ul>
-
-        <h2 className="text-2xl font-semibold mt-8 mb-4">5. VOS DROITS</h2>
-        <p>Conformément au RGPD et aux lois en vigueur, vous avez le droit de :</p>
-        <ul className="list-disc pl-6 mb-4">
-          <li>Accéder à vos données personnelles</li>
-          <li>Modifier ou corriger vos informations</li>
-          <li>Supprimer votre compte et vos données</li>
-          <li>Retirer votre consentement au traitement de certaines données</li>
-        </ul>
-
-        <h2 className="text-2xl font-semibold mt-8 mb-4">6. COOKIES ET TECHNOLOGIES SIMILAIRES</h2>
-        <p>
-          Notre application utilise des cookies et des technologies de suivi pour améliorer votre expérience. 
-          Vous pouvez gérer vos préférences depuis les paramètres de l'application.
-        </p>
-
-        <h2 className="text-2xl font-semibold mt-8 mb-4">7. MODIFICATIONS DES RÈGLES DE CONFIDENTIALITÉ</h2>
-        <p>
-          Nous pouvons mettre à jour cette politique à tout moment. En cas de modifications majeures, 
-          nous vous informerons par e-mail ou via l'application.
-        </p>
-
-        <h2 className="text-2xl font-semibold mt-8 mb-4">8. CONTACT</h2>
-        <p>
-          Pour toute question concernant cette politique de confidentialité, vous pouvez nous contacter à{" "}
-          <a href="mailto:lustrax70@gmail.com" className="text-primary hover:underline">
-            lustrax70@gmail.com
-          </a>
+        <p className="text-center text-[9px] font-black text-gray-300 uppercase tracking-[0.4em]">
+          Luxtrax &bull; Secure & Private
         </p>
       </div>
     </div>

@@ -1,87 +1,48 @@
-
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 export function GoogleAuth() {
   const { toast } = useToast();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed:", { event, session });
-      
-      if (event === 'SIGNED_IN') {
-        console.log("User signed in successfully");
-        navigate('/');
-      }
-    });
-
-    // Cleanup subscription
-    return () => subscription.unsubscribe();
-  }, [navigate]);
 
   const handleGoogleSignIn = async () => {
     try {
-      console.log("Starting Google sign in process...");
-      const redirectURL = `${window.location.origin}/auth/callback`;
-      console.log("Redirect URL:", redirectURL);
-      
-      const { error, data } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: redirectURL,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
+          redirectTo: window.location.origin,
         },
       });
-      
-      console.log("Sign in response:", { error, data });
-      
+
       if (error) {
-        console.error("Google sign in error:", error);
         throw error;
       }
-
-      // L'utilisateur sera redirigé vers Google automatiquement
     } catch (error: any) {
-      console.error("Caught error during Google sign in:", error);
       toast({
         variant: "destructive",
-        title: "Erreur de connexion",
-        description: error?.message || "Une erreur est survenue lors de la connexion avec Google. Veuillez réessayer.",
+        title: "Connection Error",
+        description: error?.message || "An error occurred with Google login. Please try again."
       });
     }
   };
-
   return (
     <Button
       type="button"
       variant="outline"
-      className="w-full flex items-center justify-center gap-2"
-      onClick={handleGoogleSignIn}
-    >
+      className="w-full h-14 flex items-center justify-center gap-4 bg-white border-gray-100 hover:border-primary/20 hover:bg-primary/5 transition-all duration-500 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-gray-200/20 group"
+      onClick={handleGoogleSignIn}>
+
       <svg
-        className="h-4 w-4"
+        className="h-5 w-5 group-hover:scale-110 transition-transform"
         aria-hidden="true"
         focusable="false"
-        data-prefix="fab"
-        data-icon="google"
-        role="img"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 488 512"
-      >
+        viewBox="0 0 488 512">
         <path
-          fill="currentColor"
-          d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
-        ></path>
+          fill="#4285F4"
+          d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z">
+        </path>
       </svg>
-      Continuer avec Google
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#1A1A1A]">Continue with Google</span>
     </Button>
   );
 }

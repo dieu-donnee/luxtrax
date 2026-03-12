@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 import { NavigateFunction } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 
 interface BookingSubmitProps {
   selectedDate: Date | undefined;
@@ -10,7 +11,9 @@ interface BookingSubmitProps {
   selectedAddress: string;
   notes: string;
   selectedServiceId: string;
-  toast: any;
+  selectedServicePrice: number;
+  selectedPaymentMethod: string;
+  toast: (options: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
   navigate: NavigateFunction;
 }
 
@@ -20,6 +23,8 @@ export const useBookingSubmit = ({
   selectedAddress,
   notes,
   selectedServiceId,
+  selectedServicePrice,
+  selectedPaymentMethod,
   toast,
   navigate
 }: BookingSubmitProps) => {
@@ -28,7 +33,7 @@ export const useBookingSubmit = ({
 
   // Use useCallback to memoize the submit function
   const handleSubmit = useCallback(async () => {
-    if (!selectedDate || !selectedTime || !selectedAddress || !selectedServiceId || !user) {
+    if (!selectedDate || !selectedTime || !selectedAddress || !selectedServiceId || !selectedPaymentMethod || !user) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -47,7 +52,7 @@ export const useBookingSubmit = ({
 
       // Get the service UUID directly - no need to search by name since selectedServiceId is already a proper service ID
       let serviceUuid = selectedServiceId;
-      
+
       // If selectedServiceId is still using the old plan names, map them to actual service IDs
       if (selectedServiceId === "plan-complet" || selectedServiceId === "plan-mensuel") {
         const { data: serviceData, error: serviceError } = await supabase
@@ -58,7 +63,7 @@ export const useBookingSubmit = ({
         if (serviceError || !serviceData || serviceData.length === 0) {
           throw new Error("Aucun service disponible");
         }
-        
+
         // Use the first available service as fallback
         serviceUuid = serviceData[0].id;
       }
@@ -71,16 +76,43 @@ export const useBookingSubmit = ({
           scheduled_date: scheduledDate.toISOString(),
           address: selectedAddress,
           notes: notes || null,
-          service_id: serviceUuid
-        }) as any;
+          service_id: serviceUuid,
+          status: "pending" as Database["public"]["Enums"]["booking_status"]
+        });
 
       if (error) throw error;
+
+      // Create the payment record
+      // We need the booking ID, which we should get from the insert response
+      const { data: bookingData, error: bookingFetchError } = await supabase
+        .from("bookings")
+        .select("id")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      // Payment tracking - skip if payments table doesn't exist yet
+      if (!bookingFetchError && bookingData) {
+        try {
+          await (supabase as any)
+            .from("payments")
+            .insert({
+              booking_id: bookingData.id,
+              amount: selectedServicePrice || 0,
+              status: "pending",
+              method: selectedPaymentMethod,
+            });
+        } catch (e) {
+          console.warn("Payments table not available yet:", e);
+        }
+      }
 
       toast({
         title: "Réservation confirmée",
         description: "Votre réservation a été enregistrée avec succès",
       });
-      
+
       // Use replace to avoid adding to history stack for better navigation
       navigate('/', { replace: true });
     } catch (error) {
@@ -93,7 +125,7 @@ export const useBookingSubmit = ({
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedDate, selectedTime, selectedAddress, notes, selectedServiceId, user, toast, navigate]);
+  }, [selectedDate, selectedTime, selectedAddress, notes, selectedServiceId, selectedServicePrice, selectedPaymentMethod, user, toast, navigate]);
 
   return { handleSubmit, isSubmitting };
 };

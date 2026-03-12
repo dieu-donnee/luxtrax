@@ -1,83 +1,92 @@
 
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { MoveLeft, Gavel } from "lucide-react";
 
 export default function TermsOfService() {
   const navigate = useNavigate();
-  
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Button 
-        variant="ghost" 
-        onClick={() => navigate(-1)}
-        className="mb-6"
-      >
-        ← Retour
-      </Button>
 
-      <div className="prose prose-sm sm:prose lg:prose-lg mx-auto dark:prose-invert">
-        <h1 className="text-3xl font-bold mb-8 text-center">Conditions d'utilisation de LustraX</h1>
-        
-        <div className="text-sm text-muted-foreground mb-8 text-center">
-          Dernière mise à jour : {new Date().toLocaleDateString()}
+  return (
+    <div className="min-h-screen bg-[#FDFDFD] p-6 pb-28 animate-in fade-in duration-700">
+      <div className="max-w-2xl mx-auto space-y-12 pt-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="h-12 px-6 rounded-xl hover:bg-gray-50 text-[#1A1A1A] font-black text-[10px] uppercase tracking-widest flex items-center gap-2 transition-all group"
+        >
+          <MoveLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+          Go Back
+        </Button>
+
+        <div className="space-y-6 text-center">
+          <div className="inline-flex p-4 bg-primary/5 rounded-[2rem] text-primary mb-2">
+            <Gavel size={32} />
+          </div>
+          <h1 className="text-4xl font-black text-[#1A1A1A] tracking-tighter uppercase italic">Terms of Service</h1>
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">
+            Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          </p>
         </div>
 
-        <p className="mb-8">
-          Bienvenue sur <strong>LustraX</strong>, l'application de lavage de voiture à domicile. 
-          En utilisant notre service, vous acceptez ces conditions d'utilisation.
-        </p>
+        <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-gray-50 shadow-2xl shadow-gray-200/20 space-y-10">
+          <section className="space-y-4">
+            <p className="text-sm font-bold text-gray-500 leading-relaxed italic border-l-2 border-primary/20 pl-6">
+              Welcome to Luxtrax, the premier on-demand car care application.
+              By utilizing our services, you agree to the following terms and conditions.
+            </p>
+          </section>
 
-        <h2 className="text-2xl font-semibold mt-8 mb-4">1. Acceptation des conditions</h2>
-        <p>
-          L'utilisation de LustraX implique l'acceptation totale et sans réserve de ces conditions. 
-          Si vous n'êtes pas d'accord, veuillez ne pas utiliser l'application.
-        </p>
+          <section className="space-y-6">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-[#1A1A1A] border-b border-gray-100 pb-2">1. Acceptance</h2>
+            <p className="text-xs font-bold text-gray-600 leading-relaxed">
+              The use of Luxtrax implies total and unreserved acceptance of these conditions.
+              If you do not agree with any part of these terms, please discontinue use immediately.
+            </p>
+          </section>
 
-        <h2 className="text-2xl font-semibold mt-8 mb-4">2. Description du service</h2>
-        <p>
-          LustraX permet aux utilisateurs de réserver un lavage de voiture à domicile auprès de 
-          professionnels qualifiés. L'application sert d'intermédiaire entre les clients et les prestataires.
-        </p>
+          <section className="space-y-6">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-[#1A1A1A] border-b border-gray-100 pb-2">2. Service Description</h2>
+            <p className="text-xs font-bold text-gray-600 leading-relaxed">
+              Luxtrax provides an exclusive platform connecting car owners with professional detailers.
+              We act as a sophisticated intermediary ensuring quality and security in every transaction.
+            </p>
+          </section>
 
-        <h2 className="text-2xl font-semibold mt-8 mb-4">3. Inscription et compte utilisateur</h2>
-        <ul className="list-disc pl-6 mb-4">
-          <li>Vous devez fournir des informations exactes et à jour.</li>
-          <li>Vous êtes responsable de la confidentialité de votre compte.</li>
-          <li>LustraX se réserve le droit de suspendre ou supprimer tout compte suspect.</li>
-        </ul>
+          <section className="space-y-6">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-[#1A1A1A] border-b border-gray-100 pb-2">3. User Obligations</h2>
+            <ul className="grid grid-cols-1 gap-3">
+              {[
+                "Provide accurate and updated vehicle information.",
+                "Ensure appropriate access to the vehicle at the scheduled time.",
+                "Maintain the confidentiality of your account credentials.",
+                "Use the platform only for legitimate and legal purposes."
+              ].map((item, i) => (
+                <li key={i} className="flex items-center gap-3 text-xs font-bold text-gray-600 bg-gray-50/50 p-3 rounded-xl">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary/30" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </section>
 
-        <h2 className="text-2xl font-semibold mt-8 mb-4">4. Réservation et paiement</h2>
-        <ul className="list-disc pl-6 mb-4">
-          <li>Les services sont réservables via l'application et doivent être payés en ligne.</li>
-          <li>En cas d'annulation, des frais peuvent s'appliquer selon les conditions spécifiques de la prestation.</li>
-          <li>LustraX n'est pas responsable des litiges entre clients et prestataires.</li>
-        </ul>
+          <section className="space-y-6">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-[#1A1A1A] border-b border-gray-100 pb-2">4. Booking & Payment</h2>
+            <p className="text-xs font-bold text-gray-600 leading-relaxed">
+              Services must be reserved and paid for exclusively through the application.
+              Cancellations are subject to specific fees as outlined in your booking summary.
+            </p>
+          </section>
 
-        <h2 className="text-2xl font-semibold mt-8 mb-4">5. Obligations des utilisateurs</h2>
-        <ul className="list-disc pl-6 mb-4">
-          <li>Respecter les horaires de rendez-vous.</li>
-          <li>Fournir un accès approprié au véhicule à laver.</li>
-          <li>Ne pas utiliser l'application à des fins frauduleuses ou illégales.</li>
-        </ul>
+          <div className="pt-10 border-t border-gray-50 flex flex-col items-center gap-4">
+            <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">Legal Assistance</p>
+            <a href="mailto:lustrax70@gmail.com" className="text-xs font-black text-primary hover:text-primary/80 transition-colors underline-offset-4 underline">
+              lustrax70@gmail.com
+            </a>
+          </div>
+        </div>
 
-        <h2 className="text-2xl font-semibold mt-8 mb-4">6. Responsabilités et garanties</h2>
-        <ul className="list-disc pl-6 mb-4">
-          <li>LustraX ne garantit pas l'absence d'interruptions ou d'erreurs dans le service.</li>
-          <li>LustraX n'est pas responsable des dommages causés par un prestataire tiers.</li>
-        </ul>
-
-        <h2 className="text-2xl font-semibold mt-8 mb-4">7. Modification des conditions</h2>
-        <p>
-          Nous nous réservons le droit de modifier ces conditions à tout moment. Les modifications 
-          seront notifiées via l'application.
-        </p>
-
-        <h2 className="text-2xl font-semibold mt-8 mb-4">8. Contact</h2>
-        <p>
-          Pour toute question, contactez-nous à{" "}
-          <a href="mailto:lustrax70@gmail.com" className="text-primary hover:underline">
-            lustrax70@gmail.com
-          </a>
+        <p className="text-center text-[9px] font-black text-gray-300 uppercase tracking-[0.4em]">
+          Luxtrax &bull; Standard of Excellence
         </p>
       </div>
     </div>
