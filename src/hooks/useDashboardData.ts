@@ -54,7 +54,8 @@ export const useDashboardData = () => {
     const [bookingsResult, providersResult] = await Promise.all([
       supabase
         .from("bookings")
-        .select("*, services(name)"),
+        .select("*, services(name)")
+        .eq("user_id", user.id),
       supabase
         .from("profiles")
         .select("*")
@@ -93,7 +94,7 @@ export const useDashboardData = () => {
       .slice(0, 2)
       .map((booking, index) => ({
         id: index + 1,
-        service: (booking.services as any)?.name || "Service",
+        service: booking.services?.name || "Service",
         date: new Date(booking.scheduled_date).toLocaleDateString('fr-FR', {
           day: 'numeric',
           month: 'long',

@@ -20,46 +20,13 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-
-interface NavItem {
-    label: string;
-    icon: React.ElementType;
-    path: string;
-}
+import { useNavigationItems, NavItem } from "@/hooks/useNavigationItems";
 
 const Sidebar = () => {
     const location = useLocation();
-    const { profile, signOut } = useAuth();
+    const { signOut } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
-
-    const getNavItems = (): NavItem[] => {
-        if (profile?.role === 'provider') {
-            return [
-                { label: "Tableau de bord", icon: Home, path: "/" },
-                { label: "Missions", icon: Compass, path: "/provider/missions" },
-                { label: "Portefeuille", icon: Wallet, path: "/provider/wallet" },
-                { label: "Académie", icon: GraduationCap, path: "/provider/academy" },
-                { label: "Profil", icon: User, path: "/profile" },
-            ];
-        }
-
-        if (profile?.role === 'admin') {
-            return [
-                { label: "Administration", icon: ShieldAlert, path: "/admin" },
-                { label: "Accueil", icon: Home, path: "/" },
-                { label: "Profil", icon: User, path: "/profile" },
-            ];
-        }
-
-        return [
-            { label: "Accueil", icon: Home, path: "/" },
-            { label: "Réservations", icon: Activity, path: "/bookings" },
-            { label: "Profil", icon: User, path: "/profile" },
-            { label: "Support", icon: LifeBuoy, path: "/support" },
-        ];
-    };
-
-    const navItems = getNavItems();
+    const navItems = useNavigationItems();
 
     // Hide sidebar on auth page
     if (location.pathname === "/auth") return null;

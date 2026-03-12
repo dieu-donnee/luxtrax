@@ -17,7 +17,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   profile: null,
   loading: false,
-  signOut: async () => {},
+  signOut: async () => { },
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -26,17 +26,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select()
-      .eq("id", userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select()
+        .eq("id", userId)
+        .single();
 
-    if (!error && data) {
-      setProfile(data);
+      if (error) throw error;
+      if (data) {
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération du profil:", error);
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   useEffect(() => {

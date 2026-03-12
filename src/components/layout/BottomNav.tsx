@@ -3,40 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
+import { useNavigationItems } from "@/hooks/useNavigationItems";
+
 const BottomNav = () => {
     const location = useLocation();
-    const { profile } = useAuth();
-
-    const getNavItems = () => {
-        if (profile?.role === 'provider') {
-            return [
-                { label: "Accueil", icon: Home, path: "/" },
-                { label: "Missions", icon: Compass, path: "/provider/missions" },
-                { label: "Portefeuille", icon: Wallet, path: "/provider/wallet" },
-                { label: "Académie", icon: GraduationCap, path: "/provider/academy" },
-                { label: "Profil", icon: User, path: "/profile" },
-            ];
-        }
-
-        if (profile?.role === 'admin') {
-            return [
-                { label: "Admin", icon: ShieldAlert, path: "/admin" },
-                { label: "Accueil", icon: Home, path: "/" },
-                { label: "Profil", icon: User, path: "/profile" },
-            ];
-        }
-
-        // Default Client Items
-        return [
-            { label: "Accueil", icon: Home, path: "/" },
-            { label: "Réserver", icon: Calendar, path: "/booking" },
-            { label: "Historique", icon: Activity, path: "/bookings" },
-            { label: "Support", icon: LifeBuoy, path: "/support" },
-            { label: "Profil", icon: User, path: "/profile" },
-        ];
-    };
-
-    const navItems = getNavItems();
+    const navItems = useNavigationItems();
 
     // Don't show on auth page
     if (location.pathname === "/auth") return null;

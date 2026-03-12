@@ -27,6 +27,7 @@ const Profile = lazy(() => import("./pages/profile"));
 const Support = lazy(() => import("./pages/support"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AuthCallback = lazy(() => import("./pages/auth/AuthCallback"));
+import Sidebar from "./components/layout/Sidebar";
 
 // Create a new QueryClient instance with optimized settings
 const queryClient = new QueryClient({
@@ -43,12 +44,6 @@ const queryClient = new QueryClient({
 // Component to handle protected routes
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
-  // The linter might complain if it's not used, but it's checked in the if statement.
-  // Wait, the lint said 35:9 'user' is assigned a value but never used. 
-  // But it IS used in the line below: if (!user) { ... }
-  // This might be a false positive or I misread the line number. 
-  // Actually, sometimes linters complain if it's only used in a check but then the body doesn't use it.
-  // I'll check if there's any other 'user' variable.
 
 
   if (!user) {
@@ -152,8 +147,6 @@ const AppRoutes = () => {
     </Suspense>
   );
 };
-
-import Sidebar from "./components/layout/Sidebar";
 
 // Main App component with proper nesting order
 const App = () => {
