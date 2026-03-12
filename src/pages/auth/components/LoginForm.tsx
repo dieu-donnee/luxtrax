@@ -20,7 +20,7 @@ export function LoginForm({
   return (
     <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-700">
       <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 pl-1">Email Address</label>
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground pl-1">Adresse email</label>
         <div className="relative group">
           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary transition-all duration-300 h-5 w-5" />
           <Input
