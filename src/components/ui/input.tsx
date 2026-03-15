@@ -1,22 +1,45 @@
-import * as React from "react"
+import React from 'react';
+import styles from './Input.module.css';
+import { clsx } from 'clsx';
+import { AlertCircle } from 'lucide-react';
 
-import { cn } from "@/lib/utils"
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  icon?: React.ReactNode;
+  rightAction?: React.ReactNode;
+  error?: string;
+}
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
-    return (
-      <input
-        type={type}
-        className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          className
-        )}
-        ref={ref}
-        {...props}
-      />
-    )
-  }
-)
-Input.displayName = "Input"
+const Input: React.FC<InputProps> = ({ 
+  icon, 
+  rightAction, 
+  error, 
+  className, 
+  ...props 
+}) => {
+  return (
+    <div className={styles.wrapper}>
+      <div className={styles.inputContainer}>
+        {icon && <span className={styles.icon}>{icon}</span>}
+        <input 
+          className={clsx(
+            styles.input, 
+            icon && styles.hasIcon, 
+            rightAction && styles.hasRightAction,
+            error && styles.error,
+            className
+          )} 
+          {...props} 
+        />
+        {rightAction && <div className={styles.rightAction}>{rightAction}</div>}
+      </div>
+      {error && (
+        <span className={styles.errorText}>
+          <AlertCircle size={14} />
+          {error}
+        </span>
+      )}
+    </div>
+  );
+};
 
-export { Input }
+export default Input;

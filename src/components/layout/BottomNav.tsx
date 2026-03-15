@@ -1,54 +1,32 @@
-import { Home, Calendar, User, Activity, Wallet, GraduationCap, Compass, ShieldAlert, LifeBuoy } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthContext";
-
-import { useNavigationItems } from "@/hooks/useNavigationItems";
+import React from 'react';
+import { Home, Calendar, User, MessageSquare } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import styles from './BottomNav.module.css';
 
 const BottomNav = () => {
-    const location = useLocation();
-    const navItems = useNavigationItems();
+  const location = useLocation();
 
-    // Don't show on auth page
-    if (location.pathname === "/auth") return null;
+  const items = [
+    { icon: <Home size={20} />, label: 'Accueil', path: '/' },
+    { icon: <Calendar size={20} />, label: 'Réservations', path: '/bookings' },
+    { icon: <User size={20} />, label: 'Profil', path: '/profile' },
+    { icon: <MessageSquare size={20} />, label: 'Support', path: '/support' },
+  ];
 
-    return (
-        <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-2xl border-t border-border px-4 py-2 lg:hidden shadow-[0_-8px_30px_rgb(0,0,0,0.04)]">
-            <div className="flex justify-around items-center max-w-md mx-auto">
-                {navItems.map((item) => {
-                    const isActive = location.pathname === item.path;
-                    const Icon = item.icon;
-
-                    return (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={cn(
-                                "relative flex flex-col items-center py-2 px-2 transition-all duration-300",
-                                isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                            )}
-                        >
-                            <div className={cn(
-                                "relative z-10 transition-transform duration-300",
-                                isActive && "transform scale-110"
-                            )}>
-                                <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-                            </div>
-                            <span className={cn(
-                                "text-[9px] font-black mt-1 transition-all duration-300 tracking-tight uppercase",
-                                isActive ? "opacity-100" : "opacity-70"
-                            )}>
-                                {item.label}
-                            </span>
-                            {isActive && (
-                                <div className="absolute top-0 w-8 h-1 bg-primary rounded-full animate-in fade-in slide-in-from-top-1 duration-300" />
-                            )}
-                        </Link>
-                    );
-                })}
-            </div>
-        </nav>
-    );
+  return (
+    <nav className={styles.bottomNav}>
+      {items.map((item) => (
+        <Link 
+          key={item.path} 
+          to={item.path} 
+          className={`${styles.navItem} ${location.pathname === item.path ? styles.active : ''}`}
+        >
+          {item.icon}
+          <span>{item.label}</span>
+        </Link>
+      ))}
+    </nav>
+  );
 };
 
 export default BottomNav;
