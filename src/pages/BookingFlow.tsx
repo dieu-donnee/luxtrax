@@ -22,30 +22,51 @@ const BookingFlow = () => {
   });
 
   useEffect(() => {
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth Event:", event);
+      if (session) {
+        setUser(session.user);
+        initData();
+      } else if (event === 'SIGNED_OUT' || (!session && !isLoading)) {
+        navigate('/auth');
+      }
+    });
+
     const initData = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      
       if (!session) {
-        navigate('/auth');
-        return;
+        // Give a tiny bit of time for OAuth hash parsing if we just landed
+        const timer = setTimeout(() => {
+          if (!session) navigate('/auth');
+        }, 1500);
+        return () => clearTimeout(timer);
       }
+
       setUser(session.user);
 
       // Fetch dynamic services
-      const { data: servicesData, error } = await supabase
+      const { data: servicesData } = await supabase
         .from('services')
         .select('*')
-        .eq('type', 'carwash'); // Focus on carwash for now
+        .eq('type', 'carwash');
       
       if (servicesData) {
         setServices(servicesData);
-        if (servicesData.length > 0) {
+        if (servicesData.length > 0 && !bookingData.service) {
           setBookingData(prev => ({ ...prev, service: servicesData[0].id }));
         }
       }
       
       setIsLoading(false);
     };
+
     initData();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const handleStartBooking = () => {
