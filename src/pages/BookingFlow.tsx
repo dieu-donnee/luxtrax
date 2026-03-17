@@ -49,13 +49,7 @@ const BookingFlow = () => {
 
       const { data: { session } } = await supabase.auth.getSession();
       
-      if (!session) {
-        // Rediriger "doucement" après avoir attendu si Supabase confirme qu'il n'y a personne en mémoire
-        const timer = setTimeout(() => {
-          if (!user) navigate('/auth');
-        }, 1500);
-        return () => clearTimeout(timer);
-      } else {
+      if (session) {
         setUser(session.user);
       }
       setIsLoading(false);
