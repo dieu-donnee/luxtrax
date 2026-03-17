@@ -34,19 +34,7 @@ const BookingFlow = () => {
     });
 
     const initData = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        // Give a tiny bit of time for OAuth hash parsing if we just landed
-        const timer = setTimeout(() => {
-          if (!session) navigate('/auth');
-        }, 1500);
-        return () => clearTimeout(timer);
-      }
-
-      setUser(session.user);
-
-      // Fetch dynamic services
+      // Fetch dynamic services immediately while auth initializes
       const { data: servicesData } = await supabase
         .from('services')
         .select('*')
@@ -58,7 +46,18 @@ const BookingFlow = () => {
           setBookingData(prev => ({ ...prev, service: servicesData[0].id }));
         }
       }
+
+      const { data: { session } } = await supabase.auth.getSession();
       
+      if (!session) {
+        // Rediriger "doucement" après avoir attendu si Supabase confirme qu'il n'y a personne en mémoire
+        const timer = setTimeout(() => {
+          if (!user) navigate('/auth');
+        }, 1500);
+        return () => clearTimeout(timer);
+      } else {
+        setUser(session.user);
+      }
       setIsLoading(false);
     };
 
@@ -67,7 +66,7 @@ const BookingFlow = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, bookingData.service, isLoading, user]);
 
   const handleStartBooking = () => {
     setStep(1);
