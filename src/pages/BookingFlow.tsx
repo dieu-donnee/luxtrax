@@ -163,6 +163,11 @@ const BookingFlow = () => {
             <Button 
               style={{ marginTop: '2rem' }}
               onClick={async () => {
+                if (!user) {
+                  toast.error("Veuillez vous connecter pour finaliser votre réservation.");
+                  navigate('/auth');
+                  return;
+                }
                 try {
                   const { data, error } = await supabase.from('bookings').insert({
                     user_id: user.id,

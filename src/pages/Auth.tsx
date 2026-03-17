@@ -129,6 +129,12 @@ const Auth = () => {
           Pas encore de compte ? 
           <Link to="/signup" className={styles.signupLink}>S'inscrire</Link>
         </p>
+
+        <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+          <Button variant="ghost" onClick={() => navigate('/')}>
+            Continuer en tant qu'invité
+          </Button>
+        </div>
       </div>
     </div>
   );
