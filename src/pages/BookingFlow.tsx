@@ -27,9 +27,8 @@ const BookingFlow = () => {
       console.log("Auth Event:", event);
       if (session) {
         setUser(session.user);
-        initData();
-      } else if (event === 'SIGNED_OUT' || (!session && !isLoading)) {
-        navigate('/auth');
+      } else {
+        setUser(null);
       }
     });
 
@@ -60,7 +59,7 @@ const BookingFlow = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, bookingData.service, isLoading, user]);
+  }, []);
 
   const handleStartBooking = () => {
     setStep(1);
