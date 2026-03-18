@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Calendar, User, MessageSquare } from 'lucide-react';
+import { Home, Bell, User, MessageSquare } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './BottomNav.module.css';
 
@@ -8,7 +8,7 @@ const BottomNav = () => {
 
   const items = [
     { icon: <Home size={20} />, label: 'Accueil', path: '/' },
-    { icon: <Calendar size={20} />, label: 'Réservations', path: '/bookings' },
+    { icon: <Bell size={20} />, label: 'Notifications', path: '/notifications' },
     { icon: <User size={20} />, label: 'Profil', path: '/profile' },
     { icon: <MessageSquare size={20} />, label: 'Support', path: '/support' },
   ];

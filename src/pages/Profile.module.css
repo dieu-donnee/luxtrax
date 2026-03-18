@@ -1,0 +1,155 @@
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2rem 0 1rem;
+}
+
+.avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--border);
+}
+
+.name {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.email {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.editBtn {
+  margin-top: 0.5rem;
+  width: auto !important;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.25rem;
+}
+
+.infoRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.infoLabel {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.infoValue {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.historyRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.historyRow:last-child {
+  border-bottom: none;
+}
+
+.historyService {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--foreground);
+}
+
+.historyDate {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+
+.historyPrice {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--foreground);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 0.25rem;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  color: var(--foreground);
+  width: 100%;
+  text-align: left;
+}
+
+.actionRow span {
+  flex: 1;
+}
+
+.actionRow:hover {
+  color: var(--primary);
+}
+
+.actionRowDanger {
+  composes: actionRow;
+  color: var(--error);
+  border-bottom: none;
+}
+
+.actionRowDanger:hover {
+  opacity: 0.8;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
