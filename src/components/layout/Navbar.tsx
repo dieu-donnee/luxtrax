@@ -30,16 +30,16 @@ const Navbar = () => {
         </Link>
         <div className={styles.navLinks}>
           <Link to="/" className={`${styles.link} ${location.pathname === '/' ? styles.active : ''}`}>Accueil</Link>
-          <Link to="/bookings" className={styles.link}>Réservations</Link>
+          <Link to="/notifications" className={`${styles.link} ${location.pathname === '/notifications' ? styles.active : ''}`}>Notifications</Link>
           
           {user ? (
             <>
-              <Link to="/profile" className={styles.link}>Profil</Link>
-              <Link to="/support" className={styles.link}>Support</Link>
+              <Link to="/profile" className={`${styles.link} ${location.pathname === '/profile' ? styles.active : ''}`}>Profil</Link>
+              <Link to="/support" className={`${styles.link} ${location.pathname === '/support' ? styles.active : ''}`}>Support</Link>
             </>
           ) : (
             <>
-              <Link to="/support" className={styles.link}>Support</Link>
+              <Link to="/support" className={`${styles.link} ${location.pathname === '/support' ? styles.active : ''}`}>Support</Link>
               <button 
                 onClick={() => navigate('/auth')} 
                 className={styles.link} 
