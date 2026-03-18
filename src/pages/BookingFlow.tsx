@@ -59,7 +59,7 @@ const BookingFlow = () => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, bookingData.service, isLoading, user]);
+  }, []);
 
   const handleStartBooking = () => {
     setStep(1);
