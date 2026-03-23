@@ -41,7 +41,8 @@ const Auth = () => {
         navigate('/');
       }
     } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la connexion");
+      console.error('[Auth]', error.code, error.message);
+      toast.error("Email ou mot de passe incorrect.");
     } finally {
       setIsSubmitting(false);
     }
