@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -18,12 +19,33 @@ const problemTypes = [
 const Complaint = () => {
   const { bookingId } = useParams();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     name: '',
     email: '',
     problemType: '',
     description: '',
   });
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { navigate('/auth'); return; }
+      if (bookingId) {
+        const { data } = await supabase
+          .from('bookings')
+          .select('id')
+          .eq('id', bookingId)
+          .eq('user_id', session.user.id)
+          .single();
+        if (!data) { toast.error('Réservation introuvable'); navigate('/'); return; }
+      }
+      setLoading(false);
+    };
+    checkAuth();
+  }, [bookingId, navigate]);
+
+  if (loading) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

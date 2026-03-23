@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/ui/Button';
 import { CheckCircle2, AlertTriangle, Star } from 'lucide-react';
@@ -14,6 +15,27 @@ const Review = () => {
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { navigate('/auth'); return; }
+      if (bookingId) {
+        const { data } = await supabase
+          .from('bookings')
+          .select('id')
+          .eq('id', bookingId)
+          .eq('user_id', session.user.id)
+          .single();
+        if (!data) { toast.error('Réservation introuvable'); navigate('/'); return; }
+      }
+      setLoading(false);
+    };
+    checkAuth();
+  }, [bookingId, navigate]);
+
+  if (loading) return null;
 
   const handleSubmit = () => {
     if (completed === null) { toast.error('Veuillez confirmer le statut'); return; }
