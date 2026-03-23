@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/ui/Button';
@@ -8,12 +9,13 @@ import styles from './BookingFlow.module.css';
 import layoutStyles from './BookingLayout.module.css';
 import { LocationStep, VehicleStep, ServiceStep, ScheduleStep } from './BookingSteps';
 import { ShoppingCart } from 'lucide-react';
+import type { ServiceData } from '@/types/models';
 
 const BookingFlow = () => {
-  const [step, setStep] = useState(0); 
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
-  const [services, setServices] = useState<any[]>([]);
-  const [user, setUser] = useState<any>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [services, setServices] = useState<ServiceData[]>([]);
   const navigate = useNavigate();
   const [bookingData, setBookingData] = useState({
     vehicle: 'sedan',
@@ -22,92 +24,103 @@ const BookingFlow = () => {
   });
 
   useEffect(() => {
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth Event:", event);
-      if (session) {
-        setUser(session.user);
-      } else {
-        setUser(null);
-      }
-    });
-
-    const initData = async () => {
-      // Fetch dynamic services immediately while auth initializes
-      const { data: servicesData } = await supabase
+    const fetchServices = async () => {
+      const { data } = await supabase
         .from('services')
         .select('*')
         .eq('type', 'carwash');
-      
-      if (servicesData) {
-        setServices(servicesData);
-        if (servicesData.length > 0 && !bookingData.service) {
-          setBookingData(prev => ({ ...prev, service: servicesData[0].id }));
-        }
-      }
 
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        setUser(session.user);
+      if (data) {
+        setServices(data as unknown as ServiceData[]);
+        if (data.length > 0 && !bookingData.service) {
+          setBookingData(prev => ({ ...prev, service: data[0].id }));
+        }
       }
       setIsLoading(false);
     };
-
-    initData();
-
-    return () => {
-      subscription.unsubscribe();
-    };
+    fetchServices();
   }, []);
 
-  const handleStartBooking = () => {
-    setStep(1);
-    const element = document.getElementById('booking-section');
-    if (element) element.scrollIntoView({ behavior: 'smooth' });
+  const selectedService = services.find(s => s.id === bookingData.service);
+  const price = selectedService?.price ?? 0;
+  const tva = price * 0.2;
+  const total = price + tva;
+
+  const handleConfirm = async () => {
+    if (!user) {
+      toast.error('Veuillez vous connecter pour finaliser votre réservation.');
+      navigate('/auth');
+      return;
+    }
+    if (!bookingData.service) {
+      toast.error('Veuillez sélectionner un service.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.from('bookings').insert({
+        user_id: user.id,
+        service_id: bookingData.service,
+        address: bookingData.location.trim() || 'Adresse non spécifiée',
+        scheduled_date: new Date().toISOString(),
+        status: 'pending',
+      }).select();
+
+      if (error) throw error;
+      toast.success('Réservation confirmée avec succès !');
+      navigate('/');
+    } catch {
+      toast.error('Impossible de confirmer la réservation. Réessayez.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (isLoading) {
-    return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Chargement...</div>;
+    return (
+      <MainLayout>
+        <div style={{ height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}>
+          Chargement des services...
+        </div>
+      </MainLayout>
+    );
   }
 
   return (
     <MainLayout>
       <section className={styles.hero}>
         <div className={styles.imageWrapper}>
-          <img 
-            src="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?q=80&w=1000&auto=format&fit=crop" 
-            alt="Lavage auto premium" 
+          <img
+            src="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?q=80&w=1000&auto=format&fit=crop"
+            alt="Lavage auto premium"
             className={styles.image}
+            loading="lazy"
           />
         </div>
         <div className={styles.content}>
           <h1 className={styles.title}>Lavez votre voiture chez vous, sans effort.</h1>
           <p className={styles.description}>
-            Un service de lavage professionnel à votre porte, 7 jours sur 7. 
-            Gagnez du temps et gardez votre véhicule impeccable.
+            Un service de lavage professionnel à votre porte, 7 jours sur 7.
           </p>
-          <Button onClick={handleStartBooking} size="lg" style={{ maxWidth: '200px' }}>
-            Réserver maintenant
-          </Button>
         </div>
       </section>
 
       <div id="booking-section" className={layoutStyles.bookingLayout}>
         <div className={layoutStyles.stepsColumn}>
           <h2 style={{ marginBottom: '2rem', fontSize: '1.5rem', fontWeight: 800 }}>Réservez votre service</h2>
-          
+
           <LocationStep />
-          
-          <VehicleStep 
-            selected={bookingData.vehicle} 
-            onSelect={(id: string) => setBookingData(prev => ({ ...prev, vehicle: id }))} 
+
+          <VehicleStep
+            selected={bookingData.vehicle}
+            onSelect={(id: string) => setBookingData(prev => ({ ...prev, vehicle: id }))}
           />
-          
-          <ServiceStep 
-            selected={bookingData.service} 
+
+          <ServiceStep
+            selected={bookingData.service}
             services={services}
-            onSelect={(id: string) => setBookingData(prev => ({ ...prev, service: id }))} 
+            onSelect={(id: string) => setBookingData(prev => ({ ...prev, service: id }))}
           />
 
           <ScheduleStep />
@@ -119,10 +132,10 @@ const BookingFlow = () => {
               <ShoppingCart size={20} className={layoutStyles.logoIcon} />
               Résumé
             </h3>
-            
+
             <div className={layoutStyles.summaryRow}>
               <span className={layoutStyles.label}>Service</span>
-              <span className={layoutStyles.value}>{services.find(s => s.id === bookingData.service)?.name || 'Sélectionnez'}</span>
+              <span className={layoutStyles.value}>{selectedService?.name || 'Sélectionnez'}</span>
             </div>
             <div className={layoutStyles.summaryRow}>
               <span className={layoutStyles.label}>Véhicule</span>
@@ -130,56 +143,31 @@ const BookingFlow = () => {
             </div>
             <div className={layoutStyles.summaryRow}>
               <span className={layoutStyles.label}>Lieu</span>
-              <span className={layoutStyles.value}>{bookingData.location || '123 Rue de Luxe'}</span>
+              <span className={layoutStyles.value}>{bookingData.location || 'Non spécifié'}</span>
             </div>
 
             <div className={layoutStyles.divider} />
 
             <div className={layoutStyles.summaryRow}>
               <span className={layoutStyles.label}>Sous-total</span>
-              <span className={layoutStyles.value}>{services.find(s => s.id === bookingData.service)?.price || '0'} €</span>
+              <span className={layoutStyles.value}>{price.toFixed(2)} €</span>
             </div>
             <div className={layoutStyles.summaryRow}>
               <span className={layoutStyles.label}>TVA (20%)</span>
-              <span className={layoutStyles.value}>
-                {(parseFloat(services.find(s => s.id === bookingData.service)?.price || '0') * 0.2).toFixed(2)} €
-              </span>
+              <span className={layoutStyles.value}>{tva.toFixed(2)} €</span>
             </div>
 
             <div className={layoutStyles.total}>
               <span>Total</span>
-              <span>
-                {(parseFloat(services.find(s => s.id === bookingData.service)?.price || '0') * 1.2).toFixed(2)} €
-              </span>
+              <span>{total.toFixed(2)} €</span>
             </div>
 
-            <Button 
+            <Button
               style={{ marginTop: '2rem' }}
-              onClick={async () => {
-                if (!user) {
-                  toast.error("Veuillez vous connecter pour finaliser votre réservation.");
-                  navigate('/auth');
-                  return;
-                }
-                try {
-                  const { data, error } = await supabase.from('bookings').insert({
-                    user_id: user.id,
-                    service_id: bookingData.service,
-                    address: bookingData.location || '123 Rue de Luxe',
-                    scheduled_date: new Date().toISOString(), // Simulation aujourd'hui
-                    status: 'pending'
-                  }).select();
-
-                  if (error) throw error;
-                  toast.success("Réservation confirmée avec succès !");
-                  setStep(0); 
-                } catch (error: any) {
-                  console.error('[Booking]', error.code, error.message);
-                  toast.error("Impossible de confirmer la réservation. Réessayez.");
-                }
-              }}
+              onClick={handleConfirm}
+              disabled={submitting}
             >
-              Confirmer la réservation
+              {submitting ? 'Confirmation...' : 'Confirmer la réservation'}
             </Button>
           </div>
         </aside>

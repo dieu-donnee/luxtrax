@@ -56,3 +56,21 @@
 .link:hover, .active {
   color: var(--primary);
 }
+
+.loginBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  transition: color 0.2s ease;
+}
+
+.loginBtn:hover {
+  color: var(--primary);
+}

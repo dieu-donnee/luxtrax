@@ -1,76 +1,40 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import type { BookingData, ProfileData } from '@/types/models';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/ui/Button';
-import { Star, CheckCircle2, AlertTriangle, ChevronRight, Droplets } from 'lucide-react';
+import BookingCard from '../components/ui/BookingCard';
+import EmptyState from '../components/ui/EmptyState';
+import { BookingCardSkeleton } from '../components/ui/Skeleton';
+import { ChevronRight, Droplets } from 'lucide-react';
 import styles from './Home.module.css';
 
 const Car3D = lazy(() => import('../components/3d/Car3D'));
 
 const Home = () => {
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
-  const [recentBookings, setRecentBookings] = useState<any[]>([]);
+  const { user, loading: authLoading } = useAuth();
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [recentBookings, setRecentBookings] = useState<BookingData[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
   const navigate = useNavigate();
 
-  const fetchBookings = async (userId: string) => {
-    const { data } = await supabase
-      .from('bookings')
-      .select('*, services(name, price)')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(2);
-    if (data) setRecentBookings(data);
-  };
-
-  const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    if (data) setProfile(data);
-  };
-
   useEffect(() => {
-    const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUser(session.user);
-        fetchBookings(session.user.id);
-        fetchProfile(session.user.id);
-      }
+    if (authLoading) return;
+    if (!user) { setDataLoading(false); return; }
+
+    const fetchData = async () => {
+      const [profileRes, bookingsRes] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', user.id).single(),
+        supabase.from('bookings').select('*, services(name, price)').eq('user_id', user.id).order('created_at', { ascending: false }).limit(2),
+      ]);
+      if (profileRes.data) setProfile(profileRes.data as unknown as ProfileData);
+      if (bookingsRes.data) setRecentBookings(bookingsRes.data as unknown as BookingData[]);
+      setDataLoading(false);
     };
-    init();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null);
-      if (session) {
-        fetchBookings(session.user.id);
-        fetchProfile(session.user.id);
-      } else {
-        setRecentBookings([]);
-        setProfile(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const statusConfig: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
-    pending: { label: 'En attente', className: styles.statusPending, icon: <Droplets size={14} /> },
-    ongoing: { label: 'En cours', className: styles.statusOngoing, icon: <Droplets size={14} /> },
-    completed: { label: 'Terminé', className: styles.statusCompleted, icon: <CheckCircle2 size={14} /> },
-    cancelled: { label: 'Annulé', className: styles.statusCancelled, icon: <AlertTriangle size={14} /> },
-  };
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'short',
-    });
-  };
+    fetchData();
+  }, [user, authLoading]);
 
   const firstName = profile?.full_name?.split(' ')[0] || 'Bienvenue';
 
@@ -83,14 +47,14 @@ const Home = () => {
             <p className={styles.greetingSub}>Bonjour 👋</p>
             <h1 className={styles.greetingName}>{firstName}</h1>
           </div>
-          {!user && (
+          {!authLoading && !user && (
             <Button onClick={() => navigate('/auth')} size="sm" variant="outline">
               Connexion
             </Button>
           )}
         </header>
 
-        {/* 3D Car Section */}
+        {/* 3D Car */}
         <section className={styles.carSection}>
           <Suspense fallback={<div className={styles.carPlaceholder}>Chargement 3D...</div>}>
             <Car3D height="260px" />
@@ -101,17 +65,13 @@ const Home = () => {
         </section>
 
         {/* CTA */}
-        <Button
-          onClick={() => navigate('/booking')}
-          size="lg"
-          className={styles.ctaButton}
-        >
+        <Button onClick={() => navigate('/booking')} size="lg" className={styles.ctaButton}>
           <Droplets size={20} />
           Réserver un lavage
         </Button>
 
         {/* Recent Bookings */}
-        {user && recentBookings.length > 0 && (
+        {user && (
           <section className={styles.recentSection}>
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Réservations récentes</h2>
@@ -120,64 +80,28 @@ const Home = () => {
               </button>
             </div>
 
-            <div className={styles.bookingList}>
-              {recentBookings.map((booking) => {
-                const status = statusConfig[booking.status] || statusConfig.pending;
-                return (
-                  <div key={booking.id} className={styles.bookingCard}>
-                    <div className={styles.bookingTop}>
-                      <div className={styles.bookingMeta}>
-                        <span className={styles.bookingService}>
-                          {booking.services?.name || 'Service'}
-                        </span>
-                        <span className={styles.bookingDate}>
-                          {formatDate(booking.scheduled_date)}
-                        </span>
-                      </div>
-                      <div className={`${styles.statusBadge} ${status.className}`}>
-                        {status.icon}
-                        {status.label}
-                      </div>
-                    </div>
-
-                    <div className={styles.bookingBottom}>
-                      <span className={styles.bookingPrice}>
-                        {booking.services?.price} €
-                      </span>
-                      <div className={styles.bookingActions}>
-                        {booking.status === 'completed' && (
-                          <>
-                            <button
-                              className={styles.actionBtn}
-                              onClick={() => navigate(`/review/${booking.id}`)}
-                            >
-                              <Star size={14} />
-                              Avis
-                            </button>
-                            <button
-                              className={styles.actionBtnDanger}
-                              onClick={() => navigate(`/complaint/${booking.id}`)}
-                            >
-                              <AlertTriangle size={14} />
-                              Signaler
-                            </button>
-                          </>
-                        )}
-                        {booking.status === 'pending' && (
-                          <button
-                            className={styles.actionBtn}
-                            onClick={() => navigate(`/review/${booking.id}`)}
-                          >
-                            <CheckCircle2 size={14} />
-                            Confirmer
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            {dataLoading ? (
+              <div className={styles.bookingList}>
+                <BookingCardSkeleton />
+                <BookingCardSkeleton />
+              </div>
+            ) : recentBookings.length > 0 ? (
+              <div className={styles.bookingList}>
+                {recentBookings.map((booking) => (
+                  <BookingCard key={booking.id} booking={booking} />
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                title="Aucune réservation"
+                description="Réservez votre premier lavage en quelques secondes"
+                action={
+                  <Button onClick={() => navigate('/booking')} size="sm">
+                    Réserver maintenant
+                  </Button>
+                }
+              />
+            )}
           </section>
         )}
       </div>
