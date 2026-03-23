@@ -1,0 +1,109 @@
+.card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 1rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.serviceName {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: hsl(var(--foreground));
+}
+
+.date {
+  font-size: 0.8rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.statusPending {
+  background: hsl(45 93% 90%);
+  color: hsl(45 93% 30%);
+}
+
+.statusOngoing {
+  background: hsl(210 100% 90%);
+  color: hsl(210 100% 35%);
+}
+
+.statusCompleted {
+  background: hsl(142 76% 90%);
+  color: hsl(142 76% 25%);
+}
+
+.statusCancelled {
+  background: hsl(0 84% 92%);
+  color: hsl(0 84% 40%);
+}
+
+.bottomRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: hsl(var(--foreground));
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  transition: background 0.15s;
+}
+
+.actionBtn:hover {
+  background: hsl(var(--muted));
+}
+
+.actionBtnDanger {
+  composes: actionBtn;
+  color: hsl(0 84% 50%);
+  border-color: hsl(0 84% 85%);
+}
+
+.actionBtnDanger:hover {
+  background: hsl(0 84% 95%);
+}
