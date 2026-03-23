@@ -49,7 +49,8 @@ const SignUp = () => {
         }
       }
     } catch (error: any) {
-      toast.error(error.message || "Une erreur est survenue lors de l'inscription");
+      console.error('[SignUp]', error.code, error.message);
+      toast.error("Une erreur est survenue lors de l'inscription. Réessayez.");
     } finally {
       setIsSubmitting(false);
     }
@@ -65,7 +66,8 @@ const SignUp = () => {
       });
       if (error) throw error;
     } catch (error: any) {
-      toast.error(error.message || "Erreur lors de l'inscription Google");
+      console.error('[SignUp:Google]', error.code, error.message);
+      toast.error("Erreur lors de la connexion. Réessayez.");
     }
   };
 

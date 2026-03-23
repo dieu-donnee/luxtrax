@@ -174,7 +174,8 @@ const BookingFlow = () => {
                   toast.success("Réservation confirmée avec succès !");
                   setStep(0); 
                 } catch (error: any) {
-                  toast.error("Erreur : " + error.message);
+                  console.error('[Booking]', error.code, error.message);
+                  toast.error("Impossible de confirmer la réservation. Réessayez.");
                 }
               }}
             >
