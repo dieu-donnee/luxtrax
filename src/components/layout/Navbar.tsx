@@ -1,25 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Layers, LogIn, User } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <nav className={styles.navbar}>
@@ -29,21 +19,30 @@ const Navbar = () => {
           LustraX
         </Link>
         <div className={styles.navLinks}>
-          <Link to="/" className={`${styles.link} ${location.pathname === '/' ? styles.active : ''}`}>Accueil</Link>
-          <Link to="/notifications" className={`${styles.link} ${location.pathname === '/notifications' ? styles.active : ''}`}>Notifications</Link>
-          
+          <Link to="/" className={`${styles.link} ${isActive('/') ? styles.active : ''}`}>
+            Accueil
+          </Link>
+          <Link to="/notifications" className={`${styles.link} ${isActive('/notifications') ? styles.active : ''}`}>
+            Notifications
+          </Link>
+
           {user ? (
             <>
-              <Link to="/profile" className={`${styles.link} ${location.pathname === '/profile' ? styles.active : ''}`}>Profil</Link>
-              <Link to="/support" className={`${styles.link} ${location.pathname === '/support' ? styles.active : ''}`}>Support</Link>
+              <Link to="/profile" className={`${styles.link} ${isActive('/profile') ? styles.active : ''}`}>
+                Profil
+              </Link>
+              <Link to="/support" className={`${styles.link} ${isActive('/support') ? styles.active : ''}`}>
+                Support
+              </Link>
             </>
           ) : (
             <>
-              <Link to="/support" className={`${styles.link} ${location.pathname === '/support' ? styles.active : ''}`}>Support</Link>
-              <button 
-                onClick={() => navigate('/auth')} 
-                className={styles.link} 
-                style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 'inherit', color: 'inherit' }}
+              <Link to="/support" className={`${styles.link} ${isActive('/support') ? styles.active : ''}`}>
+                Support
+              </Link>
+              <button
+                onClick={() => navigate('/auth')}
+                className={styles.loginBtn}
               >
                 <LogIn size={18} />
                 Se connecter

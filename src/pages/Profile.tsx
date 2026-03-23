@@ -1,61 +1,59 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import type { ProfileData, BookingData } from '@/types/models';
+import { formatDateFull } from '@/types/models';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import { User, Mail, Phone, MapPin, Lock, LogOut, Trash2, Pencil, ChevronRight } from 'lucide-react';
+import EmptyState from '../components/ui/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton';
+import { User, Phone, MapPin, Lock, LogOut, Trash2, Pencil, ChevronRight } from 'lucide-react';
 import styles from './Profile.module.css';
 
+const MAX_NAME_LEN = 100;
+const MAX_PHONE_LEN = 20;
+const MAX_ADDR_LEN = 255;
+const PHONE_REGEX = /^[+\d\s\-()]{7,20}$/;
+
 const Profile = () => {
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const { user, loading: authLoading } = useAuth();
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({ full_name: '', phone_number: '', address: '' });
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<BookingData[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { navigate('/auth'); return; }
-      setUser(session.user);
+    if (authLoading) return;
+    if (!user) { navigate('/auth'); return; }
 
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-      
-      if (profileData) {
-        setProfile(profileData);
+    const fetchData = async () => {
+      const [profileRes, bookingsRes] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', user.id).single(),
+        supabase.from('bookings').select('*, services(name, price)').eq('user_id', user.id).eq('status', 'completed').order('created_at', { ascending: false }).limit(5),
+      ]);
+
+      if (profileRes.data) {
+        const p = profileRes.data as unknown as ProfileData;
+        setProfile(p);
         setFormData({
-          full_name: profileData.full_name || '',
-          phone_number: profileData.phone_number || '',
-          address: profileData.address || '',
+          full_name: p.full_name || '',
+          phone_number: p.phone_number || '',
+          address: p.address || '',
         });
       }
-
-      const { data: bookingsData } = await supabase
-        .from('bookings')
-        .select('*, services(name, price)')
-        .eq('user_id', session.user.id)
-        .eq('status', 'completed')
-        .order('created_at', { ascending: false })
-        .limit(5);
-      if (bookingsData) setBookings(bookingsData);
+      if (bookingsRes.data) setBookings(bookingsRes.data as unknown as BookingData[]);
+      setDataLoading(false);
     };
-    init();
-  }, [navigate]);
+    fetchData();
+  }, [user, authLoading, navigate]);
 
   const handleSave = async () => {
     if (!user) return;
-
-    const MAX_NAME_LEN = 100;
-    const MAX_PHONE_LEN = 20;
-    const MAX_ADDR_LEN = 255;
-    const PHONE_REGEX = /^[+\d\s\-()]{7,20}$/;
 
     const name = formData.full_name.trim();
     const phone = formData.phone_number.trim();
@@ -67,12 +65,13 @@ const Profile = () => {
 
     const sanitized = { full_name: name, phone_number: phone, address };
 
-    const { error } = await supabase
-      .from('profiles')
-      .update(sanitized)
-      .eq('id', user.id);
-    if (error) { console.error('[Profile]', error.code, error.message); toast.error("Impossible de mettre à jour le profil."); return; }
-    setProfile({ ...profile, ...sanitized });
+    const { error } = await supabase.from('profiles').update(sanitized).eq('id', user.id);
+    if (error) {
+      console.error('[Profile]', error.code, error.message);
+      toast.error('Impossible de mettre à jour le profil.');
+      return;
+    }
+    setProfile(prev => prev ? { ...prev, ...sanitized } : null);
     setIsEditing(false);
     toast.success('Profil mis à jour');
   };
@@ -82,8 +81,19 @@ const Profile = () => {
     navigate('/');
   };
 
-  const formatDate = (d: string) =>
-    new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+  if (authLoading || dataLoading) {
+    return (
+      <MainLayout>
+        <div className={styles.container}>
+          <div className={styles.header}>
+            <Skeleton width="80px" height="80px" borderRadius="50%" />
+            <Skeleton width="10rem" height="1.25rem" />
+            <Skeleton width="14rem" height="0.875rem" />
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
 
   if (!user) return null;
 
@@ -104,7 +114,7 @@ const Profile = () => {
             className={styles.editBtn}
           >
             <Pencil size={14} />
-            Modifier mes infos
+            {isEditing ? 'Annuler' : 'Modifier mes infos'}
           </Button>
         </div>
 
@@ -116,18 +126,21 @@ const Profile = () => {
               placeholder="Nom complet"
               value={formData.full_name}
               onChange={(e) => setFormData(p => ({ ...p, full_name: e.target.value }))}
+              maxLength={MAX_NAME_LEN}
             />
             <Input
               icon={<Phone size={18} />}
               placeholder="Téléphone"
               value={formData.phone_number}
               onChange={(e) => setFormData(p => ({ ...p, phone_number: e.target.value }))}
+              maxLength={MAX_PHONE_LEN}
             />
             <Input
               icon={<MapPin size={18} />}
               placeholder="Adresse"
               value={formData.address}
               onChange={(e) => setFormData(p => ({ ...p, address: e.target.value }))}
+              maxLength={MAX_ADDR_LEN}
             />
             <Button onClick={handleSave}>Enregistrer</Button>
           </div>
@@ -147,20 +160,22 @@ const Profile = () => {
         </div>
 
         {/* Booking History */}
-        {bookings.length > 0 && (
-          <div className={styles.card}>
-            <h3 className={styles.cardTitle}>Historique des lavages</h3>
-            {bookings.map((b) => (
+        <div className={styles.card}>
+          <h3 className={styles.cardTitle}>Historique des lavages</h3>
+          {bookings.length > 0 ? (
+            bookings.map((b) => (
               <div key={b.id} className={styles.historyRow}>
                 <div>
                   <span className={styles.historyService}>{b.services?.name}</span>
-                  <span className={styles.historyDate}>{formatDate(b.scheduled_date)}</span>
+                  <span className={styles.historyDate}>{formatDateFull(b.scheduled_date)}</span>
                 </div>
                 <span className={styles.historyPrice}>{b.services?.price} €</span>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          ) : (
+            <EmptyState title="Aucun lavage terminé" description="Vos lavages complétés apparaîtront ici" />
+          )}
+        </div>
 
         {/* Actions */}
         <div className={styles.actions}>
