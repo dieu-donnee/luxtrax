@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import { AlertTriangle, Camera, Clock, ArrowLeft } from 'lucide-react';
+import { AlertTriangle, Clock, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import styles from './Complaint.module.css';
 
@@ -20,9 +20,9 @@ const Complaint = () => {
   const { bookingId } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const [form, setForm] = useState({
-    name: '',
-    email: '',
     problemType: '',
     description: '',
   });
@@ -31,6 +31,7 @@ const Complaint = () => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { navigate('/auth'); return; }
+      setUserId(session.user.id);
       if (bookingId) {
         const { data } = await supabase
           .from('bookings')
@@ -47,11 +48,28 @@ const Complaint = () => {
 
   if (loading) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.problemType) { toast.error('Sélectionnez le type de problème'); return; }
-    toast.success('Réclamation envoyée ! Nous vous répondrons sous 24h.');
-    setTimeout(() => navigate('/'), 2000);
+    if (!form.description.trim()) { toast.error('Décrivez votre problème'); return; }
+    if (!userId || !bookingId) return;
+
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.from('complaints').insert({
+        booking_id: bookingId,
+        user_id: userId,
+        problem_type: form.problemType,
+        description: form.description.trim(),
+      });
+      if (error) throw error;
+      toast.success('Réclamation envoyée ! Nous vous répondrons sous 24h.');
+      setTimeout(() => navigate('/'), 2000);
+    } catch {
+      toast.error('Impossible d\'envoyer la réclamation. Réessayez.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -74,27 +92,6 @@ const Complaint = () => {
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Nom complet</label>
-            <Input
-              value={form.name}
-              onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))}
-              placeholder="Jean Dupont"
-              required
-            />
-          </div>
-
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>Adresse email</label>
-            <Input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm(p => ({ ...p, email: e.target.value }))}
-              placeholder="jean.dupont@email.com"
-              required
-            />
-          </div>
-
-          <div className={styles.fieldGroup}>
             <label className={styles.label}>Nature du problème</label>
             <select
               className={styles.select}
@@ -114,23 +111,16 @@ const Complaint = () => {
             <textarea
               className={styles.textarea}
               value={form.description}
-              onChange={(e) => setForm(p => ({ ...p, description: e.target.value }))}
+              onChange={(e) => setForm(p => ({ ...p, description: e.target.value.slice(0, 1000) }))}
               placeholder="Donnez-nous plus de détails sur votre situation..."
               rows={5}
+              maxLength={1000}
               required
             />
           </div>
 
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>Ajouter une photo (optionnel)</label>
-            <div className={styles.uploadArea}>
-              <Camera size={28} color="var(--muted-foreground)" />
-              <span>Formats acceptés: JPG, PNG</span>
-            </div>
-          </div>
-
-          <Button type="submit" style={{ background: '#fca5a5', color: 'var(--error)' }}>
-            Envoyer ma réclamation
+          <Button type="submit" disabled={submitting} style={{ background: '#fca5a5', color: 'var(--error)' }}>
+            {submitting ? 'Envoi...' : 'Envoyer ma réclamation'}
           </Button>
         </form>
 

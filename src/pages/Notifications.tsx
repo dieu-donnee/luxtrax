@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import MainLayout from '../components/layout/MainLayout';
-import { Calendar, Tag, Info, ChevronRight } from 'lucide-react';
+import { Calendar, Tag, Info, ChevronRight, Bell } from 'lucide-react';
+import { toast } from 'sonner';
 import styles from './Notifications.module.css';
 
 type TabKey = 'all' | 'reservations' | 'offers' | 'system';
@@ -12,46 +15,71 @@ const tabs: { key: TabKey; label: string }[] = [
   { key: 'system', label: 'Système' },
 ];
 
-const mockNotifications = [
-  {
-    id: '1', type: 'reservations' as TabKey,
-    icon: <Calendar size={20} />,
-    title: 'Réservation confirmée',
-    body: 'Lavage prévu le 15 juin à 15h, Calavi Arconville',
-    time: 'Il y a 2 heures',
-    isNew: true,
-  },
-  {
-    id: '2', type: 'offers' as TabKey,
-    icon: <Tag size={20} />,
-    title: 'Offre Spéciale Weekend',
-    body: '-20% sur tous les services premium ce weekend',
-    time: 'Hier',
-    isNew: false,
-  },
-  {
-    id: '3', type: 'system' as TabKey,
-    icon: <Info size={20} />,
-    title: "Mise à jour de l'application",
-    body: 'Nouvelle version disponible avec des fonctionnalités améliorées',
-    time: '2 jours',
-    isNew: false,
-  },
-];
+const iconMap: Record<string, React.ReactNode> = {
+  reservations: <Calendar size={20} />,
+  offers: <Tag size={20} />,
+  system: <Info size={20} />,
+};
 
 const Notifications = () => {
   const [activeTab, setActiveTab] = useState<TabKey>('all');
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { navigate('/auth'); return; }
+
+      const { data } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false });
+
+      if (data) setNotifications(data);
+      setLoading(false);
+    };
+    init();
+  }, [navigate]);
 
   const filtered = activeTab === 'all'
-    ? mockNotifications
-    : mockNotifications.filter(n => n.type === activeTab);
+    ? notifications
+    : notifications.filter(n => n.type === activeTab);
+
+  const markAllRead = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', session.user.id)
+      .eq('is_read', false);
+    if (!error) {
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      toast.success('Toutes les notifications marquées comme lues');
+    }
+  };
+
+  const formatTime = (dateStr: string) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `Il y a ${mins} min`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `Il y a ${hours}h`;
+    const days = Math.floor(hours / 24);
+    return `Il y a ${days}j`;
+  };
 
   return (
     <MainLayout>
       <div className={styles.container}>
         <div className={styles.header}>
           <h1 className={styles.pageTitle}>Notifications</h1>
-          <button className={styles.markAllRead}>Tout marquer comme lu</button>
+          <button className={styles.markAllRead} onClick={markAllRead}>
+            Tout marquer comme lu
+          </button>
         </div>
 
         <div className={styles.tabs}>
@@ -67,22 +95,30 @@ const Notifications = () => {
         </div>
 
         <div className={styles.list}>
-          {filtered.map(n => (
+          {loading && (
+            <p style={{ textAlign: 'center', color: 'var(--muted-foreground)', padding: '2rem' }}>
+              Chargement...
+            </p>
+          )}
+
+          {!loading && filtered.map(n => (
             <div key={n.id} className={styles.notifCard}>
-              <div className={styles.notifIcon} style={{ color: 'var(--primary)' }}>{n.icon}</div>
+              <div className={styles.notifIcon} style={{ color: 'var(--primary)' }}>
+                {iconMap[n.type] || <Bell size={20} />}
+              </div>
               <div className={styles.notifContent}>
                 <div className={styles.notifTitleRow}>
                   <span className={styles.notifTitle}>{n.title}</span>
-                  {n.isNew && <span className={styles.badge}>Nouveau</span>}
+                  {!n.is_read && <span className={styles.badge}>Nouveau</span>}
                 </div>
-                <p className={styles.notifBody}>{n.body}</p>
-                <span className={styles.notifTime}>{n.time}</span>
+                <p className={styles.notifBody}>{n.message}</p>
+                <span className={styles.notifTime}>{formatTime(n.created_at)}</span>
               </div>
               <ChevronRight size={18} color="var(--muted-foreground)" />
             </div>
           ))}
 
-          {filtered.length === 0 && (
+          {!loading && filtered.length === 0 && (
             <p style={{ textAlign: 'center', color: 'var(--muted-foreground)', padding: '2rem' }}>
               Aucune notification
             </p>
