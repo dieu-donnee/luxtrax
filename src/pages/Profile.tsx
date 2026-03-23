@@ -51,12 +51,28 @@ const Profile = () => {
 
   const handleSave = async () => {
     if (!user) return;
+
+    const MAX_NAME_LEN = 100;
+    const MAX_PHONE_LEN = 20;
+    const MAX_ADDR_LEN = 255;
+    const PHONE_REGEX = /^[+\d\s\-()]{7,20}$/;
+
+    const name = formData.full_name.trim();
+    const phone = formData.phone_number.trim();
+    const address = formData.address.trim();
+
+    if (name.length > MAX_NAME_LEN) { toast.error('Le nom ne doit pas dépasser 100 caractères'); return; }
+    if (phone && !PHONE_REGEX.test(phone)) { toast.error('Numéro de téléphone invalide'); return; }
+    if (address.length > MAX_ADDR_LEN) { toast.error("L'adresse ne doit pas dépasser 255 caractères"); return; }
+
+    const sanitized = { full_name: name, phone_number: phone, address };
+
     const { error } = await supabase
       .from('profiles')
-      .update(formData)
+      .update(sanitized)
       .eq('id', user.id);
     if (error) { console.error('[Profile]', error.code, error.message); toast.error("Impossible de mettre à jour le profil."); return; }
-    setProfile({ ...profile, ...formData });
+    setProfile({ ...profile, ...sanitized });
     setIsEditing(false);
     toast.success('Profil mis à jour');
   };
