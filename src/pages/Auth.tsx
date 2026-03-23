@@ -58,7 +58,8 @@ const Auth = () => {
       });
       if (error) throw error;
     } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la connexion Google");
+      console.error('[Auth:Google]', error.code, error.message);
+      toast.error("Erreur lors de la connexion. Réessayez.");
     }
   };
 

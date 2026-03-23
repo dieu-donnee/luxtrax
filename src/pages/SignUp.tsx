@@ -66,7 +66,8 @@ const SignUp = () => {
       });
       if (error) throw error;
     } catch (error: any) {
-      toast.error(error.message || "Erreur lors de l'inscription Google");
+      console.error('[SignUp:Google]', error.code, error.message);
+      toast.error("Erreur lors de la connexion. Réessayez.");
     }
   };
 

@@ -55,7 +55,7 @@ const Profile = () => {
       .from('profiles')
       .update(formData)
       .eq('id', user.id);
-    if (error) { toast.error(error.message); return; }
+    if (error) { console.error('[Profile]', error.code, error.message); toast.error("Impossible de mettre à jour le profil."); return; }
     setProfile({ ...profile, ...formData });
     setIsEditing(false);
     toast.success('Profil mis à jour');
