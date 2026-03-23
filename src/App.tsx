@@ -8,6 +8,7 @@ import Support from './pages/Support';
 import Notifications from './pages/Notifications';
 import Review from './pages/Review';
 import Complaint from './pages/Complaint';
+import Bookings from './pages/Bookings';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/" element={<Home />} />
         <Route path="/booking" element={<BookingFlow />} />
+        <Route path="/bookings" element={<Bookings />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/support" element={<Support />} />
         <Route path="/notifications" element={<Notifications />} />
