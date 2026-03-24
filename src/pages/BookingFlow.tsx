@@ -32,11 +32,16 @@ const BookingFlow = () => {
 
       if (error) {
         console.error('[BookingFlow] fetchServices:', error.code, error.message);
-        toast.error('Impossible de charger les services.');
-      } else if (data) {
+        toast.error('Impossible de charger les services (Erreur Base de Données). Vérifiez les permissions RLS.');
+        setServices([]);
+      } else if (data && data.length > 0) {
         setServices(data as ServiceData[]);
         // Pré-sélection du premier service si aucun n'est encore choisi
-        setBookingData(prev => prev.service ? prev : { ...prev, service: data[0]?.id ?? '' });
+        setBookingData(prev => prev.service ? prev : { ...prev, service: data[0].id });
+      } else {
+        // La table est vide ou rien n'est accessible
+        console.warn('[BookingFlow] Aucun service trouvé dans la table "services".');
+        setServices([]);
       }
       setIsLoading(false);
     };
@@ -157,16 +162,16 @@ const BookingFlow = () => {
 
             <div className={layoutStyles.summaryRow}>
               <span className={layoutStyles.label}>Sous-total</span>
-              <span className={layoutStyles.value}>{price.toFixed(2)} €</span>
+              <span className={layoutStyles.value}>{Math.round(price)} FCFA</span>
             </div>
             <div className={layoutStyles.summaryRow}>
               <span className={layoutStyles.label}>TVA (20%)</span>
-              <span className={layoutStyles.value}>{tva.toFixed(2)} €</span>
+              <span className={layoutStyles.value}>{Math.round(tva)} FCFA</span>
             </div>
 
             <div className={layoutStyles.total}>
               <span>Total</span>
-              <span>{total.toFixed(2)} €</span>
+              <span>{Math.round(total)} FCFA</span>
             </div>
 
             <Button

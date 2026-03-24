@@ -4,32 +4,43 @@ import type { ServiceData } from '@/types/models';
 import styles from './BookingSteps.module.css';
 import Input from '../components/ui/Input';
 import { clsx } from 'clsx';
+import { toast } from 'sonner';
 
 interface LocationStepProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-export const LocationStep: React.FC<LocationStepProps> = ({ value, onChange }) => (
-  <div className={styles.stepCard}>
-    <div className={styles.stepHeader}>
-      <div className={styles.stepNumber}>1</div>
-      <h3 className={styles.stepTitle}>Localisation</h3>
-    </div>
-    <div className={styles.mapPlaceholder}>
-      <div className={styles.mapFallback}>
-        <MapPin size={32} strokeWidth={1.5} />
-        <span>Entrez votre adresse ci-dessous</span>
+import { useGeolocation } from '@/hooks/useGeolocation';
+
+export const LocationStep: React.FC<LocationStepProps> = ({ value, onChange }) => {
+  const { locate, isLocating } = useGeolocation(onChange);
+
+  return (
+    <div className={styles.stepCard}>
+      <div className={styles.stepHeader}>
+        <div className={styles.stepNumber}>1</div>
+        <h3 className={styles.stepTitle}>Localisation</h3>
       </div>
+      <div 
+        className={styles.mapPlaceholder}
+        onClick={locate}
+        style={{ cursor: 'pointer', opacity: isLocating ? 0.7 : 1 }}
+      >
+        <div className={styles.mapFallback}>
+          <MapPin size={32} strokeWidth={1.5} />
+          <span>{isLocating ? 'Recherche en cours...' : 'Touchez ici pour vous géolocaliser ou entrez votre adresse ci-dessous'}</span>
+        </div>
+      </div>
+      <Input
+        icon={<MapPin size={18} />}
+        placeholder="Entrez votre adresse"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
     </div>
-    <Input
-      icon={<MapPin size={18} />}
-      placeholder="Entrez votre adresse"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    />
-  </div>
-);
+  );
+};
 
 interface VehicleStepProps {
   selected: string;
@@ -93,7 +104,7 @@ export const ServiceStep: React.FC<ServiceStepProps> = ({ selected, services, on
                 <Clock size={14} /> <span>30-90 min</span>
               </div>
             </div>
-            <span className={styles.price}>{s.price} €</span>
+            <span className={styles.price}>{Math.round(s.price)} FCFA</span>
           </div>
         ))}
       </div>
