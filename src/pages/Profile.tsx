@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useClerk } from '@clerk/react';
 import { toast } from 'sonner';
 import type { ProfileData, BookingData } from '@/types/models';
 import { formatDateFull } from '@/types/models';
@@ -20,6 +21,7 @@ const PHONE_REGEX = /^[+\d\s\-()]{7,20}$/;
 
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
+  const { signOut } = useClerk();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({ full_name: '', phone_number: '', address: '' });
@@ -77,7 +79,7 @@ const Profile = () => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut();
     navigate('/');
   };
 

@@ -99,11 +99,26 @@
 }
 
 .actionBtnDanger {
-  composes: actionBtn;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: hsl(var(--background));
+  transition: background 0.15s;
   color: hsl(0 84% 50%);
-  border-color: hsl(0 84% 85%);
+  border: 1px solid hsl(0 84% 85%);
 }
 
 .actionBtnDanger:hover {
   background: hsl(0 84% 95%);
+}
+
+.statusNote {
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+  font-style: italic;
 }

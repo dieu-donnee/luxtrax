@@ -25,20 +25,23 @@ const BookingFlow = () => {
 
   useEffect(() => {
     const fetchServices = async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('services')
         .select('*')
         .eq('type', 'carwash');
 
-      if (data) {
-        setServices(data as unknown as ServiceData[]);
-        if (data.length > 0 && !bookingData.service) {
-          setBookingData(prev => ({ ...prev, service: data[0].id }));
-        }
+      if (error) {
+        console.error('[BookingFlow] fetchServices:', error.code, error.message);
+        toast.error('Impossible de charger les services.');
+      } else if (data) {
+        setServices(data as ServiceData[]);
+        // Pré-sélection du premier service si aucun n'est encore choisi
+        setBookingData(prev => prev.service ? prev : { ...prev, service: data[0]?.id ?? '' });
       }
       setIsLoading(false);
     };
     fetchServices();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const selectedService = services.find(s => s.id === bookingData.service);
@@ -62,15 +65,16 @@ const BookingFlow = () => {
       const { error } = await supabase.from('bookings').insert({
         user_id: user.id,
         service_id: bookingData.service,
-        address: bookingData.location.trim() || 'Adresse non spécifiée',
+        address: (bookingData.location ?? '').trim() || 'Adresse non spécifiée',
         scheduled_date: new Date().toISOString(),
         status: 'pending',
-      }).select();
+      });
 
       if (error) throw error;
       toast.success('Réservation confirmée avec succès !');
       navigate('/');
-    } catch {
+    } catch (err) {
+      console.error('[BookingFlow] handleConfirm:', err);
       toast.error('Impossible de confirmer la réservation. Réessayez.');
     } finally {
       setSubmitting(false);
@@ -110,7 +114,10 @@ const BookingFlow = () => {
         <div className={layoutStyles.stepsColumn}>
           <h2 style={{ marginBottom: '2rem', fontSize: '1.5rem', fontWeight: 800 }}>Réservez votre service</h2>
 
-          <LocationStep />
+          <LocationStep
+            value={bookingData.location}
+            onChange={(value) => setBookingData(prev => ({ ...prev, location: value }))}
+          />
 
           <VehicleStep
             selected={bookingData.vehicle}

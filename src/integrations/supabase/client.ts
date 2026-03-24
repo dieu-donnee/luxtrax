@@ -8,10 +8,29 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
+let clerkTokenFetcher: (() => Promise<string | null>) | null = null;
+
+export const setClerkTokenFetcher = (fetcher: () => Promise<string | null>) => {
+  clerkTokenFetcher = fetcher;
+};
+
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: localStorage,
-    persistSession: true,
-    autoRefreshToken: true,
+    persistSession: false, // Plus géré par Supabase
+    autoRefreshToken: false,
+  },
+  global: {
+    fetch: async (url, options = {}) => {
+      const headers = new Headers(options?.headers);
+      if (clerkTokenFetcher) {
+        // 'supabase' doit être le nom de votre JWT Template dans Clerk
+        const token = await clerkTokenFetcher();
+        if (token) {
+          headers.set('Authorization', `Bearer ${token}`);
+        }
+      }
+      return fetch(url, { ...options, headers });
+    }
   }
 });

@@ -61,13 +61,9 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking, showYear = false }) 
             </>
           )}
           {booking.status === 'pending' && (
-            <button
-              className={styles.actionBtn}
-              onClick={() => navigate(`/review/${booking.id}`)}
-            >
-              <CheckCircle2 size={14} />
-              Confirmer
-            </button>
+            <span className={styles.statusNote}>
+              En attente de prestataire
+            </span>
           )}
         </div>
       </div>

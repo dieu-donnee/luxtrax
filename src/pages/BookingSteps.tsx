@@ -1,29 +1,48 @@
-import React from 'react';
-import { MapPin, Car, CheckCircle2, Clock, Calendar, ChevronRight } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { MapPin, Car, Clock, Calendar, ChevronRight } from 'lucide-react';
+import type { ServiceData } from '@/types/models';
 import styles from './BookingSteps.module.css';
 import Input from '../components/ui/Input';
 import { clsx } from 'clsx';
 
-export const LocationStep = () => (
+interface LocationStepProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+export const LocationStep: React.FC<LocationStepProps> = ({ value, onChange }) => (
   <div className={styles.stepCard}>
     <div className={styles.stepHeader}>
       <div className={styles.stepNumber}>1</div>
       <h3 className={styles.stepTitle}>Localisation</h3>
     </div>
     <div className={styles.mapPlaceholder}>
-      <img src="https://api.mapbox.com/styles/v1/mapbox/light-v10/static/pin-s-l+000(-74.006,40.712)/-74.006,40.712,12/600x400?access_token=pk.eyJ1IjoiZGV2ZWxvcGVyIiwiYSI6ImNreHh4eHh4eHh4eHh4eHh4eHh4eHh4In0" alt="Carte" className={styles.mapImage} />
+      <div className={styles.mapFallback}>
+        <MapPin size={32} strokeWidth={1.5} />
+        <span>Entrez votre adresse ci-dessous</span>
+      </div>
     </div>
-    <Input icon={<MapPin size={18} />} placeholder="Entrez votre adresse" />
+    <Input
+      icon={<MapPin size={18} />}
+      placeholder="Entrez votre adresse"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    />
   </div>
 );
 
-export const VehicleStep = ({ selected, onSelect }: any) => {
-  const vehicles = [
+interface VehicleStepProps {
+  selected: string;
+  onSelect: (id: string) => void;
+}
+
+export const VehicleStep: React.FC<VehicleStepProps> = ({ selected, onSelect }) => {
+  const vehicles = useMemo(() => [
     { id: 'compact', label: 'Compact', icon: <Car size={24} /> },
     { id: 'sedan', label: 'Sédan', icon: <Car size={24} /> },
     { id: 'suv', label: 'SUV', icon: <Car size={24} /> },
     { id: 'pickup', label: 'Pickup', icon: <Car size={24} /> },
-  ];
+  ], []);
 
   return (
     <div className={styles.stepCard}>
@@ -47,7 +66,13 @@ export const VehicleStep = ({ selected, onSelect }: any) => {
   );
 };
 
-export const ServiceStep = ({ selected, services, onSelect }: any) => {
+interface ServiceStepProps {
+  selected: string;
+  services: ServiceData[];
+  onSelect: (id: string) => void;
+}
+
+export const ServiceStep: React.FC<ServiceStepProps> = ({ selected, services, onSelect }) => {
   return (
     <div className={styles.stepCard}>
       <div className={styles.stepHeader}>
@@ -55,7 +80,7 @@ export const ServiceStep = ({ selected, services, onSelect }: any) => {
         <h3 className={styles.stepTitle}>Sélection du Service</h3>
       </div>
       <div className={styles.serviceList}>
-        {services.map((s: any) => (
+        {services.map((s) => (
           <div 
             key={s.id} 
             className={clsx(styles.serviceCard, selected === s.id && styles.serviceCardActive)}
@@ -63,7 +88,7 @@ export const ServiceStep = ({ selected, services, onSelect }: any) => {
           >
             <div className={styles.serviceInfo}>
               <span className={styles.serviceName}>{s.name}</span>
-              <span className={styles.serviceDesc}>{s.description}</span>
+              <span className={styles.serviceDesc}>{s.description ?? ''}</span>
               <div className={styles.serviceMeta}>
                 <Clock size={14} /> <span>30-90 min</span>
               </div>
@@ -76,7 +101,11 @@ export const ServiceStep = ({ selected, services, onSelect }: any) => {
   );
 };
 
-export const ScheduleStep = () => (
+export const ScheduleStep = () => {
+  const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const todayLabel = today.charAt(0).toUpperCase() + today.slice(1);
+
+  return (
   <div className={styles.stepCard}>
     <div className={styles.stepHeader}>
       <div className={styles.stepNumber}>4</div>
@@ -88,7 +117,7 @@ export const ScheduleStep = () => (
           <Calendar className={styles.logoIcon} size={20} />
           <div className={styles.serviceInfo}>
             <span style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>Date</span>
-            <span className={styles.serviceName}>Aujourd'hui, 15 Mars</span>
+            <span className={styles.serviceName}>{todayLabel}</span>
           </div>
         </div>
         <ChevronRight size={20} color="var(--muted-foreground)" />
@@ -106,4 +135,5 @@ export const ScheduleStep = () => (
       </div>
     </div>
   </div>
-);
+  );
+};

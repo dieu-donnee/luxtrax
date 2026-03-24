@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Layers, LogIn, User } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { Show, UserButton } from '@clerk/react';
 import styles from './Navbar.module.css';
 
 const Navbar = () => {
@@ -26,29 +27,30 @@ const Navbar = () => {
             Notifications
           </Link>
 
-          {user ? (
-            <>
-              <Link to="/profile" className={`${styles.link} ${isActive('/profile') ? styles.active : ''}`}>
-                Profil
-              </Link>
-              <Link to="/support" className={`${styles.link} ${isActive('/support') ? styles.active : ''}`}>
-                Support
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link to="/support" className={`${styles.link} ${isActive('/support') ? styles.active : ''}`}>
-                Support
-              </Link>
-              <button
-                onClick={() => navigate('/auth')}
-                className={styles.loginBtn}
-              >
-                <LogIn size={18} />
-                Se connecter
-              </button>
-            </>
-          )}
+          <Show when="signed-in">
+            <Link to="/profile" className={`${styles.link} ${isActive('/profile') ? styles.active : ''}`}>
+              Profil
+            </Link>
+            <Link to="/support" className={`${styles.link} ${isActive('/support') ? styles.active : ''}`}>
+              Support
+            </Link>
+            <div style={{ marginLeft: '1rem', display: 'flex', alignItems: 'center' }}>
+              <UserButton />
+            </div>
+          </Show>
+          
+          <Show when="signed-out">
+            <Link to="/support" className={`${styles.link} ${isActive('/support') ? styles.active : ''}`}>
+              Support
+            </Link>
+            <button
+              onClick={() => navigate('/auth')}
+              className={styles.loginBtn}
+            >
+              <LogIn size={18} />
+              Se connecter
+            </button>
+          </Show>
         </div>
       </div>
     </nav>

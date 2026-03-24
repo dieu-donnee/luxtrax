@@ -36,23 +36,24 @@ const Home = () => {
     fetchData();
   }, [user, authLoading]);
 
-  const firstName = profile?.full_name?.split(' ')[0] || 'Bienvenue';
+  const firstName = profile?.full_name?.split(' ')[0] ?? null;
 
   return (
     <MainLayout>
       <div className={styles.dashboard}>
-        {/* Greeting */}
-        <header className={styles.greeting}>
-          <div>
-            <p className={styles.greetingSub}>Bonjour 👋</p>
+        {/* Greeting Card */}
+        <div className={styles.greetingCard}>
+          {firstName ? (
             <h1 className={styles.greetingName}>{firstName}</h1>
-          </div>
+          ) : (
+            <h1 className={styles.greetingName}>Bienvenue</h1>
+          )}
           {!authLoading && !user && (
-            <Button onClick={() => navigate('/auth')} size="sm" variant="outline">
-              Connexion
+            <Button onClick={() => navigate('/auth')} size="sm" variant="primary" className={styles.connexionBtn}>
+              Se connecter
             </Button>
           )}
-        </header>
+        </div>
 
         {/* 3D Car */}
         <section className={styles.carSection}>

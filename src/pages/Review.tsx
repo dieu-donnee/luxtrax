@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/ui/Button';
 import { CheckCircle2, AlertTriangle, Star } from 'lucide-react';
@@ -19,26 +20,30 @@ const Review = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  const { user, loading: authLoading } = useAuth();
+
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { navigate('/auth'); return; }
-      setUserId(session.user.id);
+    if (authLoading) return;
+    if (!user) { navigate('/auth'); return; }
+    
+    setUserId(user.id);
+
+    const checkBooking = async () => {
       if (bookingId) {
         const { data } = await supabase
           .from('bookings')
           .select('id')
           .eq('id', bookingId)
-          .eq('user_id', session.user.id)
+          .eq('user_id', user.id)
           .single();
         if (!data) { toast.error('Réservation introuvable'); navigate('/'); return; }
       }
       setLoading(false);
     };
-    checkAuth();
-  }, [bookingId, navigate]);
+    checkBooking();
+  }, [user, authLoading, bookingId, navigate]);
 
-  if (loading) return null;
+  if (authLoading || loading) return null;
 
   const handleSubmit = async () => {
     if (completed === null) { toast.error('Veuillez confirmer le statut'); return; }

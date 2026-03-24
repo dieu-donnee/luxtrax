@@ -12,6 +12,7 @@
     "sync": "git pull && git add . && git commit -m \"sync: automated update\" && git push"
   },
   "dependencies": {
+    "@clerk/react": "^6.1.2",
     "@hookform/resolvers": "^3.9.0",
     "@lovable.dev/cloud-auth-js": "^0.0.3",
     "@radix-ui/react-accordion": "^1.2.0",

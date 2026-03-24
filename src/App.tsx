@@ -9,10 +9,23 @@ import Notifications from './pages/Notifications';
 import Review from './pages/Review';
 import Complaint from './pages/Complaint';
 import Bookings from './pages/Bookings';
+import { useAuth } from '@clerk/react';
+import { setClerkTokenFetcher } from '@/integrations/supabase/client';
+import { useEffect } from 'react';
+
+function ClerkSupabaseSync() {
+  const { getToken } = useAuth();
+  useEffect(() => {
+    // Lie le client Supabase au token Clerk (en utilisant le template 'supabase')
+    setClerkTokenFetcher(() => getToken({ template: 'supabase' }));
+  }, [getToken]);
+  return null;
+}
 
 function App() {
   return (
     <Router>
+      <ClerkSupabaseSync />
       <Routes>
         <Route path="/auth" element={<Auth />} />
         <Route path="/signup" element={<SignUp />} />
