@@ -22,15 +22,27 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   },
   global: {
     fetch: async (url, options = {}) => {
-      const headers = new Headers(options?.headers);
+      const headers = new Headers((options as any)?.headers);
+      
       if (clerkTokenFetcher) {
-        // 'supabase' doit être le nom de votre JWT Template dans Clerk
-        const token = await clerkTokenFetcher();
-        if (token) {
-          headers.set('Authorization', `Bearer ${token}`);
+        try {
+          const token = await clerkTokenFetcher();
+          if (token) {
+            headers.set('Authorization', `Bearer ${token}`);
+          }
+        } catch (e) {
+          console.error('[Supabase Client] Error fetching Clerk token:', e);
         }
       }
-      return fetch(url, { ...options, headers });
+
+      const response = await fetch(url, { ...options, headers });
+      
+      // Auto-diagnostic pour l'utilisateur
+      if (response.status === 401) {
+        console.error('[Supabase Expert] 401 Unauthorized: Le JWT Clerk est rejeté. Vérifiez la synchronisation du JWT Secret dans le Dashboard Supabase.');
+      }
+      
+      return response;
     }
   }
 });

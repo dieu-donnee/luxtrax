@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-export const useGeolocation = (onSuccess: (address: string) => void) => {
+export interface GeolocationResult {
+  address: string;
+  latitude: number;
+  longitude: number;
+}
+
+export const useGeolocation = (onSuccess: (result: GeolocationResult) => void) => {
   const [isLocating, setIsLocating] = useState(false);
 
   const locate = () => {
@@ -21,7 +27,8 @@ export const useGeolocation = (onSuccess: (address: string) => void) => {
           
           const data = await res.json();
           const address = data.display_name || `${latitude}, ${longitude}`;
-          onSuccess(address);
+          
+          onSuccess({ address, latitude, longitude });
           toast.success("Position détectée avec succès !");
         } catch (error) {
           console.error("Erreur géocodage:", error);

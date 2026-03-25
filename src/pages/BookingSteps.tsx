@@ -8,13 +8,23 @@ import { toast } from 'sonner';
 
 interface LocationStepProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string, lat?: number, lng?: number) => void;
 }
 
 import { useGeolocation } from '@/hooks/useGeolocation';
 
 export const LocationStep: React.FC<LocationStepProps> = ({ value, onChange }) => {
-  const { locate, isLocating } = useGeolocation(onChange);
+  const { locate, isLocating } = useGeolocation((res) => {
+    onChange(res.address, res.latitude, res.longitude);
+  });
+
+  // Géolocalisation proactive : on tente de localiser dès que le composant est monté
+  // si aucune adresse n'est encore renseignée.
+  React.useEffect(() => {
+    if (!value) {
+      locate();
+    }
+  }, []); // Exécuté une seule fois au montage
 
   return (
     <div className={styles.stepCard}>
@@ -25,11 +35,25 @@ export const LocationStep: React.FC<LocationStepProps> = ({ value, onChange }) =
       <div 
         className={styles.mapPlaceholder}
         onClick={locate}
-        style={{ cursor: 'pointer', opacity: isLocating ? 0.7 : 1 }}
+        style={{ cursor: 'pointer' }}
       >
         <div className={styles.mapFallback}>
-          <MapPin size={32} strokeWidth={1.5} />
-          <span>{isLocating ? 'Recherche en cours...' : 'Touchez ici pour vous géolocaliser ou entrez votre adresse ci-dessous'}</span>
+          <div className={styles.radarContainer}>
+            <div className={styles.radarPulse}></div>
+            <div className={styles.radarPulse}></div>
+            <div className={styles.radarPulse}></div>
+            <MapPin className={styles.locationIcon3d} size={48} strokeWidth={1.5} />
+          </div>
+          <span className={styles.locatingText}>
+            {isLocating 
+              ? '📡 Détection de votre position...' 
+              : '📍 Touchez ici pour vous géolocaliser'}
+          </span>
+          {!isLocating && (
+            <span style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginTop: '-1rem' }}>
+              ou entrez votre adresse manuellement ci-dessous
+            </span>
+          )}
         </div>
       </div>
       <Input
@@ -112,9 +136,15 @@ export const ServiceStep: React.FC<ServiceStepProps> = ({ selected, services, on
   );
 };
 
-export const ScheduleStep = () => {
-  const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-  const todayLabel = today.charAt(0).toUpperCase() + today.slice(1);
+interface ScheduleStepProps {
+  date: string;
+  time: string;
+  onDateChange: (value: string) => void;
+  onTimeChange: (value: string) => void;
+}
+
+export const ScheduleStep: React.FC<ScheduleStepProps> = ({ date, time, onDateChange, onTimeChange }) => {
+  const minDate = new Date().toISOString().split('T')[0];
 
   return (
   <div className={styles.stepCard}>
@@ -123,26 +153,35 @@ export const ScheduleStep = () => {
       <h3 className={styles.stepTitle}>Planification</h3>
     </div>
     <div className={styles.serviceList}>
-      <div className={styles.serviceCard}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div className={styles.serviceCard} style={{ cursor: 'default' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}>
           <Calendar className={styles.logoIcon} size={20} />
-          <div className={styles.serviceInfo}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>Date</span>
-            <span className={styles.serviceName}>{todayLabel}</span>
+          <div className={styles.serviceInfo} style={{ flex: 1 }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>Date d'intervention</span>
+            <input 
+              type="date" 
+              value={date} 
+              min={minDate}
+              onChange={(e) => onDateChange(e.target.value)}
+              className={styles.dynamicInput}
+            />
           </div>
         </div>
-        <ChevronRight size={20} color="var(--muted-foreground)" />
       </div>
 
-      <div className={styles.serviceCard}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div className={styles.serviceCard} style={{ cursor: 'default' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%' }}>
           <Clock className={styles.logoIcon} size={20} />
-          <div className={styles.serviceInfo}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>Heure</span>
-            <span className={styles.serviceName}>14:30</span>
+          <div className={styles.serviceInfo} style={{ flex: 1 }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)' }}>Heure souhaitée</span>
+            <input 
+              type="time" 
+              value={time} 
+              onChange={(e) => onTimeChange(e.target.value)}
+              className={styles.dynamicInput}
+            />
           </div>
         </div>
-        <ChevronRight size={20} color="var(--muted-foreground)" />
       </div>
     </div>
   </div>

@@ -9,6 +9,7 @@ import Notifications from './pages/Notifications';
 import Review from './pages/Review';
 import Complaint from './pages/Complaint';
 import Bookings from './pages/Bookings';
+import AdminServices from './pages/AdminServices';
 import { useAuth } from '@clerk/react';
 import { setClerkTokenFetcher } from '@/integrations/supabase/client';
 import { useEffect } from 'react';
@@ -37,6 +38,7 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/review/:bookingId" element={<Review />} />
         <Route path="/complaint/:bookingId" element={<Complaint />} />
+        <Route path="/admin/services" element={<AdminServices />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

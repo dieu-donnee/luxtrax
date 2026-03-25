@@ -8,7 +8,7 @@ import Button from '../components/ui/Button';
 import styles from './BookingFlow.module.css';
 import layoutStyles from './BookingLayout.module.css';
 import { LocationStep, VehicleStep, ServiceStep, ScheduleStep } from './BookingSteps';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, AlertCircle } from 'lucide-react';
 import type { ServiceData } from '@/types/models';
 
 const BookingFlow = () => {
@@ -21,6 +21,10 @@ const BookingFlow = () => {
     vehicle: 'sedan',
     service: '',
     location: '',
+    latitude: null as number | null,
+    longitude: null as number | null,
+    date: new Date().toISOString().split('T')[0],
+    time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace('h', ':'),
   });
 
   useEffect(() => {
@@ -31,16 +35,19 @@ const BookingFlow = () => {
         .eq('type', 'carwash');
 
       if (error) {
-        console.error('[BookingFlow] fetchServices:', error.code, error.message);
-        toast.error('Impossible de charger les services (Erreur Base de Données). Vérifiez les permissions RLS.');
+        console.error('[BookingFlow] fetchServices Error:', error);
+        if (error.code === '401' || (error as any).status === 401) {
+          toast.error('Session Invalide : Veuillez synchroniser le JWT Secret dans Supabase.');
+        } else {
+          toast.error('Impossible de charger les services (Erreur Base de Données). Vérifiez les permissions RLS.');
+        }
         setServices([]);
       } else if (data && data.length > 0) {
+        console.log('[BookingFlow] Services chargés:', data.length);
         setServices(data as ServiceData[]);
-        // Pré-sélection du premier service si aucun n'est encore choisi
         setBookingData(prev => prev.service ? prev : { ...prev, service: data[0].id });
       } else {
-        // La table est vide ou rien n'est accessible
-        console.warn('[BookingFlow] Aucun service trouvé dans la table "services".');
+        console.warn('[BookingFlow] Aucun service trouvé.');
         setServices([]);
       }
       setIsLoading(false);
@@ -71,7 +78,9 @@ const BookingFlow = () => {
         user_id: user.id,
         service_id: bookingData.service,
         address: (bookingData.location ?? '').trim() || 'Adresse non spécifiée',
-        scheduled_date: new Date().toISOString(),
+        latitude: bookingData.latitude,
+        longitude: bookingData.longitude,
+        scheduled_date: `${bookingData.date}T${bookingData.time}:00Z`,
         status: 'pending',
       });
 
@@ -121,7 +130,12 @@ const BookingFlow = () => {
 
           <LocationStep
             value={bookingData.location}
-            onChange={(value) => setBookingData(prev => ({ ...prev, location: value }))}
+            onChange={(value, lat, lng) => setBookingData(prev => ({ 
+              ...prev, 
+              location: value,
+              latitude: lat !== undefined ? lat : prev.latitude,
+              longitude: lng !== undefined ? lng : prev.longitude
+            }))}
           />
 
           <VehicleStep
@@ -134,8 +148,25 @@ const BookingFlow = () => {
             services={services}
             onSelect={(id: string) => setBookingData(prev => ({ ...prev, service: id }))}
           />
+          {services.length === 0 && (
+            <div style={{ padding: '1.5rem', background: '#fff7ed', border: '1px solid #ffedd5', borderRadius: '1.25rem', color: '#9a3412', marginBottom: '2rem', textAlign: 'center' }}>
+              <AlertCircle style={{ marginBottom: '0.5rem' }} />
+              <p style={{ fontWeight: 600, marginBottom: '0.75rem' }}>⚠️ Aucun service disponible.</p>
+              <button 
+                onClick={() => window.location.reload()}
+                style={{ padding: '0.5rem 1rem', background: '#ea580c', color: 'white', border: 'none', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}
+              >
+                Recharger la page
+              </button>
+            </div>
+          )}
 
-          <ScheduleStep />
+          <ScheduleStep 
+            date={bookingData.date}
+            time={bookingData.time}
+            onDateChange={(val) => setBookingData(prev => ({ ...prev, date: val }))}
+            onTimeChange={(val) => setBookingData(prev => ({ ...prev, time: val }))}
+          />
         </div>
 
         <aside className={layoutStyles.summaryColumn}>
@@ -156,6 +187,10 @@ const BookingFlow = () => {
             <div className={layoutStyles.summaryRow}>
               <span className={layoutStyles.label}>Lieu</span>
               <span className={layoutStyles.value}>{bookingData.location || 'Non spécifié'}</span>
+            </div>
+            <div className={layoutStyles.summaryRow}>
+              <span className={layoutStyles.label}>Planification</span>
+              <span className={layoutStyles.value}>{bookingData.date} à {bookingData.time}</span>
             </div>
 
             <div className={layoutStyles.divider} />

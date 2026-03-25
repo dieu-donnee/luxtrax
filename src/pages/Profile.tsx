@@ -11,7 +11,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import EmptyState from '../components/ui/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton';
-import { User, Phone, MapPin, Lock, LogOut, Trash2, Pencil, ChevronRight } from 'lucide-react';
+import { User, Phone, MapPin, Lock, LogOut, Trash2, Pencil, ChevronRight, Settings } from 'lucide-react';
 import styles from './Profile.module.css';
 
 const MAX_NAME_LEN = 100;
@@ -148,6 +148,27 @@ const Profile = () => {
           </div>
         )}
 
+        {/* Admin Section */}
+        {profile?.role === 'admin' && (
+          <div className={styles.adminCard}>
+            <div className={styles.adminInfo}>
+              <Settings size={20} className={styles.adminIcon} />
+              <div>
+                <h3 className={styles.adminTitle}>Administration</h3>
+                <p className={styles.adminDesc}>Gérez le catalogue des services et les réservations.</p>
+              </div>
+            </div>
+            <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/admin/services')}
+                className={styles.adminBtn}
+            >
+              Gérer les Services
+            </Button>
+          </div>
+        )}
+
         {/* Personal Info */}
         <div className={styles.card}>
           <h3 className={styles.cardTitle}>Informations personnelles</h3>
@@ -171,7 +192,7 @@ const Profile = () => {
                   <span className={styles.historyService}>{b.services?.name}</span>
                   <span className={styles.historyDate}>{formatDateFull(b.scheduled_date)}</span>
                 </div>
-                <span className={styles.historyPrice}>{b.services?.price} €</span>
+                <span className={styles.historyPrice}>{Math.round(b.services?.price || 0)} FCFA</span>
               </div>
             ))
           ) : (
