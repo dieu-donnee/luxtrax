@@ -108,6 +108,126 @@
   letter-spacing: -0.03em;
 }
 
+.wizardHeader {
+  margin-bottom: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.wizardStepCount {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.wizardStepCount span {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.wizardStepCount strong {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.wizardProgress {
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--primary-strong);
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.stepperButton {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 0.95rem;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--foreground);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.6rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+.stepperButton:not(:disabled):hover {
+  transform: translateY(-1px);
+  border-color: rgba(15, 118, 110, 0.32);
+}
+
+.stepperButtonActive {
+  border-color: rgba(15, 118, 110, 0.5);
+  background: rgba(204, 251, 241, 0.48);
+}
+
+.stepperButtonDone {
+  border-color: rgba(15, 118, 110, 0.28);
+}
+
+.stepperButtonLocked {
+  opacity: 0.68;
+  cursor: not-allowed;
+}
+
+.stepperIndex {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.14);
+  color: var(--primary-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepViewport {
+  min-height: 220px;
+}
+
+.wizardActions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.backButton {
+  order: 2;
+}
+
+.nextButton {
+  order: 1;
+}
+
+.wizardHelpText {
+  margin-top: 0.8rem;
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+}
+
 .loadingState {
   min-height: 60vh;
   display: flex;
@@ -125,6 +245,23 @@
   .content {
     padding: 2rem;
     justify-content: center;
+  }
+
+  .stepper {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .wizardActions {
+    grid-template-columns: minmax(0, 180px) minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .backButton {
+    order: 1;
+  }
+
+  .nextButton {
+    order: 2;
   }
 
   .benefits {

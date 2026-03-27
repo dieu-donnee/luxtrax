@@ -33,10 +33,19 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
         }
       }
 
-      const response = await fetch(url, { ...(options ?? {}), headers });
+      let response = await fetch(url, { ...(options ?? {}), headers });
 
       if (response.status === 401) {
-        console.error('[Supabase Expert] 401 Unauthorized: Le JWT Clerk est rejete. Verifiez la synchronisation du JWT Secret dans le Dashboard Supabase.');
+        console.error('[Supabase Expert] 401 Unauthorized: Le JWT Clerk est rejete. Verifiez la configuration Third-Party Auth dans le Dashboard Supabase.');
+
+        // Fallback: Si c'est une requête GET (données publiques comme les services), on réessaye sans le token
+        const isGetRequest = !options?.method || options.method.toUpperCase() === 'GET';
+        if (isGetRequest && headers.has('Authorization')) {
+          console.warn('[Supabase Expert] Tentative de récupération sans jeton pour les données publiques...');
+          const headersWithoutAuth = new Headers(headers);
+          headersWithoutAuth.delete('Authorization');
+          response = await fetch(url, { ...(options ?? {}), headers: headersWithoutAuth });
+        }
       }
 
       return response;

@@ -70,6 +70,54 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(231, 240, 236, 0.9));
 }
 
+.radarContainer {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.radarPulse {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 118, 110, 0.35);
+  animation: pulse 2.1s ease-out infinite;
+}
+
+.radarPulse:nth-child(2) {
+  animation-delay: 0.55s;
+}
+
+.radarPulse:nth-child(3) {
+  animation-delay: 1.1s;
+}
+
+.locationIcon3d {
+  color: var(--primary-strong);
+  z-index: 1;
+}
+
+.locatingText {
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.72);
+    opacity: 0.75;
+  }
+
+  100% {
+    transform: scale(1.18);
+    opacity: 0;
+  }
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -105,6 +153,13 @@
   transform: translateY(-1px);
   border-color: rgba(15, 118, 110, 0.34);
   background-color: rgba(255, 255, 255, 0.72);
+}
+
+.optionCard:focus-visible,
+.serviceCard:focus-visible,
+.mapPlaceholder:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .optionCardActive,
@@ -165,4 +220,26 @@
   font-weight: 800;
   font-size: 1rem;
   white-space: nowrap;
+}
+
+.logoIcon {
+  color: var(--primary-strong);
+}
+
+.dynamicInput {
+  width: 100%;
+  margin-top: 0.4rem;
+  min-height: 46px;
+  border-radius: 0.8rem;
+  border: 1px solid var(--border);
+  padding: 0.55rem 0.7rem;
+  font-size: 0.92rem;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--foreground);
+}
+
+.dynamicInput:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--ring);
+  outline: none;
 }

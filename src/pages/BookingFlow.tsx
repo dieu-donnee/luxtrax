@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { toast } from 'sonner';
+import { clsx } from 'clsx';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/ui/Button';
 import styles from './BookingFlow.module.css';
 import layoutStyles from './BookingLayout.module.css';
 import { LocationStep, VehicleStep, ServiceStep, ScheduleStep } from './BookingSteps';
-import { CheckCircle2, MapPinned, ShieldCheck, ShoppingCart, Sparkles } from 'lucide-react';
+import { CheckCircle2, ChevronLeft, ChevronRight, Lock, MapPinned, ShieldCheck, ShoppingCart, Sparkles } from 'lucide-react';
 import type { ServiceData } from '@/types/models';
+
+const TOTAL_STEPS = 4;
 
 const BookingFlow = () => {
   usePageMeta(
@@ -22,6 +25,7 @@ const BookingFlow = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [services, setServices] = useState<ServiceData[]>([]);
+  const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
   const [bookingData, setBookingData] = useState({
     vehicle: 'sedan',
@@ -56,12 +60,81 @@ const BookingFlow = () => {
     fetchServices();
   }, []);
 
+  const stepItems = useMemo(() => [
+    { id: 1, title: 'Adresse' },
+    { id: 2, title: 'Vehicule' },
+    { id: 3, title: 'Formule' },
+    { id: 4, title: 'Horaire' },
+  ], []);
+
   const selectedService = services.find(s => s.id === bookingData.service);
   const price = selectedService?.price ?? 0;
   const tva = price * 0.2;
   const total = price + tva;
+  const isLastStep = currentStep === TOTAL_STEPS;
+
+  const isStepValid = (stepId: number) => {
+    if (stepId === 1) {
+      return bookingData.location.trim().length > 4;
+    }
+    if (stepId === 2) {
+      return bookingData.vehicle.trim().length > 0;
+    }
+    if (stepId === 3) {
+      return bookingData.service.trim().length > 0;
+    }
+    if (stepId === 4) {
+      return Boolean(bookingData.date && bookingData.time);
+    }
+    return false;
+  };
+
+  const getStepErrorMessage = (stepId: number) => {
+    if (stepId === 1) {
+      return 'Renseigne ton adresse avant de passer a la suite.';
+    }
+    if (stepId === 2) {
+      return 'Choisis ton type de vehicule.';
+    }
+    if (stepId === 3) {
+      return 'Selectionne une formule pour continuer.';
+    }
+    if (stepId === 4) {
+      return 'Choisis une date et un horaire.';
+    }
+    return 'Complete cette etape pour continuer.';
+  };
+
+  const canOpenStep = (targetStep: number) => targetStep <= currentStep;
+
+  const handleStepOpen = (targetStep: number) => {
+    if (!canOpenStep(targetStep)) return;
+    setCurrentStep(targetStep);
+  };
+
+  const handleNextStep = () => {
+    if (!isStepValid(currentStep)) {
+      toast.error(getStepErrorMessage(currentStep));
+      return;
+    }
+    setCurrentStep(prev => Math.min(prev + 1, TOTAL_STEPS));
+  };
+
+  const handlePreviousStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+
+  const completedSteps = stepItems.filter(step => isStepValid(step.id)).length;
+  const scheduleLabel = bookingData.date && bookingData.time
+    ? `${bookingData.date} a ${bookingData.time}`
+    : 'Non specifie';
+  const nextStepLabel = stepItems.find(step => step.id === currentStep + 1)?.title;
 
   const handleConfirm = async () => {
+    if (!isStepValid(TOTAL_STEPS)) {
+      toast.error(getStepErrorMessage(TOTAL_STEPS));
+      return;
+    }
     if (!user) {
       toast.error('Connecte-toi pour finir ta reservation.');
       navigate('/auth');
@@ -153,33 +226,119 @@ const BookingFlow = () => {
             </p>
           </div>
 
-          <LocationStep
-            value={bookingData.location}
-            onChange={(value, lat, lng) => setBookingData(prev => ({
-              ...prev,
-              location: value,
-              latitude: lat !== undefined ? lat : prev.latitude,
-              longitude: lng !== undefined ? lng : prev.longitude,
-            }))}
-          />
+          <div className={styles.wizardHeader}>
+            <div className={styles.wizardStepCount}>
+              <span>Etape {currentStep}/{TOTAL_STEPS}</span>
+              <strong>{stepItems[currentStep - 1]?.title}</strong>
+            </div>
+            <span className={styles.wizardProgress}>{Math.round((completedSteps / TOTAL_STEPS) * 100)}% complete</span>
+          </div>
 
-          <VehicleStep
-            selected={bookingData.vehicle}
-            onSelect={(id: string) => setBookingData(prev => ({ ...prev, vehicle: id }))}
-          />
+          <ol className={styles.stepper} aria-label="Progression de la reservation">
+            {stepItems.map((step) => {
+              const isDone = step.id < currentStep;
+              const isActive = step.id === currentStep;
+              const isLocked = !canOpenStep(step.id);
 
-          <ServiceStep
-            selected={bookingData.service}
-            services={services}
-            onSelect={(id: string) => setBookingData(prev => ({ ...prev, service: id }))}
-          />
+              return (
+                <li key={step.id}>
+                  <button
+                    type="button"
+                    className={clsx(
+                      styles.stepperButton,
+                      isDone && styles.stepperButtonDone,
+                      isActive && styles.stepperButtonActive,
+                      isLocked && styles.stepperButtonLocked,
+                    )}
+                    onClick={() => handleStepOpen(step.id)}
+                    disabled={isLocked}
+                    aria-current={isActive ? 'step' : undefined}
+                  >
+                    <span className={styles.stepperIndex}>
+                      {isDone ? <CheckCircle2 size={14} /> : step.id}
+                    </span>
+                    <span>{step.title}</span>
+                    {isLocked && <Lock size={14} />}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
 
-          <ScheduleStep
-            date={bookingData.date}
-            time={bookingData.time}
-            onDateChange={(value: string) => setBookingData(prev => ({ ...prev, date: value }))}
-            onTimeChange={(value: string) => setBookingData(prev => ({ ...prev, time: value }))}
-          />
+          <div className={styles.stepViewport}>
+            {currentStep === 1 && (
+              <LocationStep
+                value={bookingData.location}
+                onChange={(value, lat, lng) => setBookingData(prev => ({
+                  ...prev,
+                  location: value,
+                  latitude: lat !== undefined ? lat : prev.latitude,
+                  longitude: lng !== undefined ? lng : prev.longitude,
+                }))}
+              />
+            )}
+
+            {currentStep === 2 && (
+              <VehicleStep
+                selected={bookingData.vehicle}
+                onSelect={(id: string) => setBookingData(prev => ({ ...prev, vehicle: id }))}
+              />
+            )}
+
+            {currentStep === 3 && (
+              <ServiceStep
+                selected={bookingData.service}
+                services={services}
+                onSelect={(id: string) => setBookingData(prev => ({ ...prev, service: id }))}
+              />
+            )}
+
+            {currentStep === 4 && (
+              <ScheduleStep
+                date={bookingData.date}
+                time={bookingData.time}
+                onDateChange={(value: string) => setBookingData(prev => ({ ...prev, date: value }))}
+                onTimeChange={(value: string) => setBookingData(prev => ({ ...prev, time: value }))}
+              />
+            )}
+          </div>
+
+          <div className={styles.wizardActions}>
+            <Button
+              variant="outline"
+              className={styles.backButton}
+              onClick={handlePreviousStep}
+              disabled={currentStep === 1 || submitting}
+            >
+              <ChevronLeft size={16} />
+              Precedent
+            </Button>
+
+            {!isLastStep && (
+              <Button
+                className={styles.nextButton}
+                onClick={handleNextStep}
+                disabled={submitting}
+              >
+                Suivant{nextStepLabel ? `: ${nextStepLabel}` : ''}
+                <ChevronRight size={16} />
+              </Button>
+            )}
+
+            {isLastStep && (
+              <Button
+                className={styles.nextButton}
+                onClick={handleConfirm}
+                disabled={submitting}
+              >
+                {submitting ? 'Validation...' : 'Finaliser ma reservation'}
+              </Button>
+            )}
+          </div>
+
+          {!isStepValid(currentStep) && (
+            <p className={styles.wizardHelpText}>{getStepErrorMessage(currentStep)}</p>
+          )}
         </div>
 
         <aside className={layoutStyles.summaryColumn}>
@@ -208,6 +367,10 @@ const BookingFlow = () => {
               <span className={layoutStyles.label}>Lieu</span>
               <span className={layoutStyles.value}>{bookingData.location || 'Non specifie'}</span>
             </div>
+            <div className={layoutStyles.summaryRow}>
+              <span className={layoutStyles.label}>Horaire</span>
+              <span className={layoutStyles.value}>{scheduleLabel}</span>
+            </div>
 
             <div className={layoutStyles.divider} />
 
@@ -231,13 +394,19 @@ const BookingFlow = () => {
               <div><CheckCircle2 size={16} /> Tu suis tout ensuite dans tes reservations</div>
             </div>
 
-            <Button
-              className={layoutStyles.confirmButton}
-              onClick={handleConfirm}
-              disabled={submitting}
-            >
-              {submitting ? 'Validation...' : 'Je confirme ma reservation'}
-            </Button>
+            {isLastStep ? (
+              <Button
+                className={layoutStyles.confirmButton}
+                onClick={handleConfirm}
+                disabled={submitting}
+              >
+                {submitting ? 'Validation...' : 'Je confirme ma reservation'}
+              </Button>
+            ) : (
+              <div className={layoutStyles.pendingConfirm}>
+                Termine les etapes pour debloquer la confirmation finale.
+              </div>
+            )}
           </div>
         </aside>
       </div>

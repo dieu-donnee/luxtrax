@@ -52,7 +52,7 @@ export const LocationStep: React.FC<LocationStepProps> = ({ value, onChange }) =
             <MapPin className={styles.locationIcon3d} size={48} strokeWidth={1.5} />
           </div>
           <span className={styles.locatingText}>
-            {isLocating ? 'Detection de ta position...' : 'Touchez ici pour te geolocaliser'}
+            {isLocating ? 'Detection de ta position...' : 'Touche ici pour te geolocaliser'}
           </span>
           {!isLocating && (
             <span style={{ fontSize: '0.75rem', color: 'var(--muted-foreground)', marginTop: '-1rem' }}>
