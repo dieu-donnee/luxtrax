@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { usePageMeta } from '@/hooks/usePageMeta';
 import { useClerk } from '@clerk/react';
 import { toast } from 'sonner';
 import type { ProfileData, BookingData } from '@/types/models';
@@ -11,7 +12,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import EmptyState from '../components/ui/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton';
-import { User, Phone, MapPin, Lock, LogOut, Trash2, Pencil, ChevronRight, Settings } from 'lucide-react';
+import { ChevronRight, Lock, LogOut, MapPin, Pencil, Phone, Settings, ShieldCheck, Trash2, User } from 'lucide-react';
 import styles from './Profile.module.css';
 
 const MAX_NAME_LEN = 100;
@@ -20,6 +21,11 @@ const MAX_ADDR_LEN = 255;
 const PHONE_REGEX = /^[+\d\s\-()]{7,20}$/;
 
 const Profile = () => {
+  usePageMeta(
+    'Mon profil | Luxtrax',
+    'Mets a jour tes infos et retrouve facilement ton historique de lavages sur Luxtrax.',
+  );
+
   const { user, loading: authLoading } = useAuth();
   const { signOut } = useClerk();
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -31,7 +37,10 @@ const Profile = () => {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) { navigate('/auth'); return; }
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
 
     const fetchData = async () => {
       const [profileRes, bookingsRes] = await Promise.all([
@@ -61,21 +70,21 @@ const Profile = () => {
     const phone = formData.phone_number.trim();
     const address = formData.address.trim();
 
-    if (name.length > MAX_NAME_LEN) { toast.error('Le nom ne doit pas dépasser 100 caractères'); return; }
-    if (phone && !PHONE_REGEX.test(phone)) { toast.error('Numéro de téléphone invalide'); return; }
-    if (address.length > MAX_ADDR_LEN) { toast.error("L'adresse ne doit pas dépasser 255 caractères"); return; }
+    if (name.length > MAX_NAME_LEN) { toast.error('Ton nom est un peu trop long (max 100 caracteres).'); return; }
+    if (phone && !PHONE_REGEX.test(phone)) { toast.error('Le numero ne semble pas valide.'); return; }
+    if (address.length > MAX_ADDR_LEN) { toast.error("Ton adresse est trop longue (max 255 caracteres)."); return; }
 
     const sanitized = { full_name: name, phone_number: phone, address };
 
     const { error } = await supabase.from('profiles').update(sanitized).eq('id', user.id);
     if (error) {
       console.error('[Profile]', error.code, error.message);
-      toast.error('Impossible de mettre à jour le profil.');
+      toast.error("On n'a pas pu enregistrer tes infos.");
       return;
     }
     setProfile(prev => prev ? { ...prev, ...sanitized } : null);
     setIsEditing(false);
-    toast.success('Profil mis à jour');
+    toast.success('Parfait, ton profil est a jour.');
   };
 
   const handleLogout = async () => {
@@ -87,10 +96,14 @@ const Profile = () => {
     return (
       <MainLayout>
         <div className={styles.container}>
-          <div className={styles.header}>
-            <Skeleton width="80px" height="80px" borderRadius="50%" />
-            <Skeleton width="10rem" height="1.25rem" />
-            <Skeleton width="14rem" height="0.875rem" />
+          <div className={styles.heroCard}>
+            <div className={styles.heroTop}>
+              <Skeleton width="84px" height="84px" borderRadius="50%" />
+              <div className={styles.heroTextSkeleton}>
+                <Skeleton width="11rem" height="1.2rem" />
+                <Skeleton width="15rem" height="0.95rem" />
+              </div>
+            </div>
           </div>
         </div>
       </MainLayout>
@@ -102,89 +115,94 @@ const Profile = () => {
   return (
     <MainLayout>
       <div className={styles.container}>
-        {/* Header */}
-        <div className={styles.header}>
-          <div className={styles.avatar}>
-            <User size={40} color="var(--muted-foreground)" />
+        <section className={styles.heroCard}>
+          <div className={styles.heroTop}>
+            <div className={styles.avatar}>
+              <User size={38} color="var(--muted-foreground)" />
+            </div>
+            <div>
+              <h1 className={styles.name}>{profile?.full_name || 'Utilisateur'}</h1>
+              <p className={styles.email}>{user.email}</p>
+            </div>
           </div>
-          <h2 className={styles.name}>{profile?.full_name || 'Utilisateur'}</h2>
-          <span className={styles.email}>{user.email}</span>
+
+          <div className={styles.pills}>
+            <span className={styles.pill}><ShieldCheck size={14} /> Ton compte</span>
+            <span className={styles.pill}>Role: {profile?.role || 'client'}</span>
+          </div>
+
           <Button
-            variant="primary"
+            variant={isEditing ? 'outline' : 'primary'}
             size="sm"
             onClick={() => setIsEditing(!isEditing)}
             className={styles.editBtn}
           >
             <Pencil size={14} />
-            {isEditing ? 'Annuler' : 'Modifier mes infos'}
+            {isEditing ? 'Fermer' : 'Modifier mes infos'}
           </Button>
-        </div>
+        </section>
 
-        {/* Edit form */}
         {isEditing && (
-          <div className={styles.card}>
-            <Input
-              icon={<User size={18} />}
-              placeholder="Nom complet"
-              value={formData.full_name}
-              onChange={(e) => setFormData(p => ({ ...p, full_name: e.target.value }))}
-              maxLength={MAX_NAME_LEN}
-            />
-            <Input
-              icon={<Phone size={18} />}
-              placeholder="Téléphone"
-              value={formData.phone_number}
-              onChange={(e) => setFormData(p => ({ ...p, phone_number: e.target.value }))}
-              maxLength={MAX_PHONE_LEN}
-            />
-            <Input
-              icon={<MapPin size={18} />}
-              placeholder="Adresse"
-              value={formData.address}
-              onChange={(e) => setFormData(p => ({ ...p, address: e.target.value }))}
-              maxLength={MAX_ADDR_LEN}
-            />
+          <section className={styles.card}>
+            <h2 className={styles.cardTitle}>Modifier mes coordonnees</h2>
+            <div className={styles.formGrid}>
+              <Input
+                icon={<User size={18} />}
+                placeholder="Nom complet"
+                value={formData.full_name}
+                onChange={(e) => setFormData(p => ({ ...p, full_name: e.target.value }))}
+                maxLength={MAX_NAME_LEN}
+              />
+              <Input
+                icon={<Phone size={18} />}
+                placeholder="Telephone"
+                value={formData.phone_number}
+                onChange={(e) => setFormData(p => ({ ...p, phone_number: e.target.value }))}
+                maxLength={MAX_PHONE_LEN}
+              />
+              <Input
+                icon={<MapPin size={18} />}
+                placeholder="Adresse"
+                value={formData.address}
+                onChange={(e) => setFormData(p => ({ ...p, address: e.target.value }))}
+                maxLength={MAX_ADDR_LEN}
+              />
+            </div>
             <Button onClick={handleSave}>Enregistrer</Button>
-          </div>
+          </section>
         )}
 
-        {/* Admin Section */}
         {profile?.role === 'admin' && (
-          <div className={styles.adminCard}>
+          <section className={styles.adminCard}>
             <div className={styles.adminInfo}>
               <Settings size={20} className={styles.adminIcon} />
               <div>
-                <h3 className={styles.adminTitle}>Administration</h3>
-                <p className={styles.adminDesc}>Gérez le catalogue des services et les réservations.</p>
+                <h3 className={styles.adminTitle}>Espace administration</h3>
+                <p className={styles.adminDesc}>Gere les services et le catalogue en quelques clics.</p>
               </div>
             </div>
-            <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => navigate('/admin/services')}
-                className={styles.adminBtn}
-            >
-              Gérer les Services
+            <Button variant="outline" size="sm" onClick={() => navigate('/admin/services')} className={styles.adminBtn}>
+              Gerer les services
             </Button>
-          </div>
+          </section>
         )}
 
-        {/* Personal Info */}
-        <div className={styles.card}>
-          <h3 className={styles.cardTitle}>Informations personnelles</h3>
-          <div className={styles.infoRow}>
-            <span className={styles.infoLabel}>Téléphone</span>
-            <span className={styles.infoValue}>{profile?.phone_number || 'Non renseigné'}</span>
+        <section className={styles.card}>
+          <h2 className={styles.cardTitle}>Informations personnelles</h2>
+          <div className={styles.infoList}>
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>Telephone</span>
+              <span className={styles.infoValue}>{profile?.phone_number || 'Non renseigne'}</span>
+            </div>
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>Adresse</span>
+              <span className={styles.infoValue}>{profile?.address || 'Non renseignee'}</span>
+            </div>
           </div>
-          <div className={styles.infoRow}>
-            <span className={styles.infoLabel}>Adresse</span>
-            <span className={styles.infoValue}>{profile?.address || 'Non renseignée'}</span>
-          </div>
-        </div>
+        </section>
 
-        {/* Booking History */}
-        <div className={styles.card}>
-          <h3 className={styles.cardTitle}>Historique des lavages</h3>
+        <section className={styles.card}>
+          <h2 className={styles.cardTitle}>Historique des lavages</h2>
           {bookings.length > 0 ? (
             bookings.map((b) => (
               <div key={b.id} className={styles.historyRow}>
@@ -196,28 +214,27 @@ const Profile = () => {
               </div>
             ))
           ) : (
-            <EmptyState title="Aucun lavage terminé" description="Vos lavages complétés apparaîtront ici" />
+            <EmptyState title="Pas encore de lavage termine" description="Des que ce sera fait, tu retrouveras l&apos;historique ici." />
           )}
-        </div>
+        </section>
 
-        {/* Actions */}
-        <div className={styles.actions}>
-          <button className={styles.actionRow} onClick={() => toast.info('Fonctionnalité à venir')}>
+        <section className={styles.actionsCard}>
+          <button className={styles.actionRow} onClick={() => toast.info('Cette option arrive bientot.')}>
             <Lock size={18} />
             <span>Changer mon mot de passe</span>
             <ChevronRight size={18} />
           </button>
           <button className={styles.actionRow} onClick={handleLogout}>
             <LogOut size={18} />
-            <span>Se déconnecter</span>
+            <span>Se deconnecter</span>
             <ChevronRight size={18} />
           </button>
-          <button className={styles.actionRowDanger} onClick={() => toast.info('Contactez le support')}>
+          <button className={styles.actionRowDanger} onClick={() => toast.info('Ecris-nous via le support pour cette demande.')}>
             <Trash2 size={18} />
             <span>Supprimer mon compte</span>
             <ChevronRight size={18} />
           </button>
-        </div>
+        </section>
       </div>
     </MainLayout>
   );

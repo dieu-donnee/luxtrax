@@ -1,16 +1,27 @@
 :root {
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --background: #ffffff;
-  --foreground: #020617;
-  --muted: #f8fafc;
-  --muted-foreground: #64748b;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #3b82f6;
-  --radius: 0.75rem;
-  --error: #ef4444;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --primary: #0f766e;
+  --primary-strong: #115e59;
+  --primary-soft: #ccfbf1;
+  --accent: #f59e0b;
+  --background: #f4efe7;
+  --background-strong: #fbf8f3;
+  --surface: rgba(255, 252, 247, 0.82);
+  --surface-solid: #fffdf9;
+  --surface-strong: #f2ebe2;
+  --foreground: #17211f;
+  --muted: #e7ddd1;
+  --muted-foreground: #5f6d68;
+  --border: rgba(23, 33, 31, 0.12);
+  --border-strong: rgba(23, 33, 31, 0.18);
+  --ring: rgba(15, 118, 110, 0.22);
+  --shadow: 0 24px 60px rgba(29, 33, 30, 0.12);
+  --shadow-soft: 0 12px 28px rgba(29, 33, 30, 0.08);
+  --error: #b91c1c;
+  --success: #166534;
+  --warning: #92400e;
+  --radius: 1.25rem;
+  --radius-sm: 0.95rem;
+  --font-sans: "Plus Jakarta Sans", "Avenir Next", "Segoe UI", sans-serif;
 }
 
 * {
@@ -19,34 +30,73 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: var(--font-sans);
-  background-color: var(--background);
   color: var(--foreground);
+  background:
+    radial-gradient(circle at top left, rgba(20, 184, 166, 0.11), transparent 26%),
+    radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), transparent 22%),
+    linear-gradient(180deg, #f7f1e8 0%, #f4efe7 44%, #efe5d9 100%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
-input, button {
-  font-family: inherit;
+a {
+  color: inherit;
 }
 
-input:focus {
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 4px var(--ring);
+}
+
+#root {
+  min-height: 100vh;
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  box-shadow: var(--shadow-soft);
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {

@@ -2,16 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { usePageMeta } from '@/hooks/usePageMeta';
 import { toast } from 'sonner';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/ui/Button';
 import styles from './BookingFlow.module.css';
 import layoutStyles from './BookingLayout.module.css';
 import { LocationStep, VehicleStep, ServiceStep, ScheduleStep } from './BookingSteps';
-import { ShoppingCart, AlertCircle } from 'lucide-react';
+import { CheckCircle2, MapPinned, ShieldCheck, ShoppingCart, Sparkles } from 'lucide-react';
 import type { ServiceData } from '@/types/models';
 
 const BookingFlow = () => {
+  usePageMeta(
+    'Reservation | Luxtrax',
+    'Choisis ton lavage auto a domicile en quelques etapes: adresse, vehicule, formule, puis validation.',
+  );
+
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -24,7 +30,7 @@ const BookingFlow = () => {
     latitude: null as number | null,
     longitude: null as number | null,
     date: new Date().toISOString().split('T')[0],
-    time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace('h', ':'),
+    time: '14:30',
   });
 
   useEffect(() => {
@@ -35,25 +41,19 @@ const BookingFlow = () => {
         .eq('type', 'carwash');
 
       if (error) {
-        console.error('[BookingFlow] fetchServices Error:', error);
-        if (error.code === '401' || (error as any).status === 401) {
-          toast.error('Session Invalide : Veuillez synchroniser le JWT Secret dans Supabase.');
-        } else {
-          toast.error('Impossible de charger les services (Erreur Base de Données). Vérifiez les permissions RLS.');
-        }
+        console.error('[BookingFlow] fetchServices:', error.code, error.message);
+        toast.error("Oups, on n'arrive pas a charger les services pour le moment.");
         setServices([]);
       } else if (data && data.length > 0) {
-        console.log('[BookingFlow] Services chargés:', data.length);
         setServices(data as ServiceData[]);
         setBookingData(prev => prev.service ? prev : { ...prev, service: data[0].id });
       } else {
-        console.warn('[BookingFlow] Aucun service trouvé.');
+        console.warn('[BookingFlow] Aucun service trouve dans la table "services".');
         setServices([]);
       }
       setIsLoading(false);
     };
     fetchServices();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const selectedService = services.find(s => s.id === bookingData.service);
@@ -63,12 +63,12 @@ const BookingFlow = () => {
 
   const handleConfirm = async () => {
     if (!user) {
-      toast.error('Veuillez vous connecter pour finaliser votre réservation.');
+      toast.error('Connecte-toi pour finir ta reservation.');
       navigate('/auth');
       return;
     }
     if (!bookingData.service) {
-      toast.error('Veuillez sélectionner un service.');
+      toast.error('Choisis d&apos;abord une formule.');
       return;
     }
 
@@ -77,19 +77,19 @@ const BookingFlow = () => {
       const { error } = await supabase.from('bookings').insert({
         user_id: user.id,
         service_id: bookingData.service,
-        address: (bookingData.location ?? '').trim() || 'Adresse non spécifiée',
+        address: (bookingData.location ?? '').trim() || 'Adresse non specifiee',
         latitude: bookingData.latitude,
         longitude: bookingData.longitude,
-        scheduled_date: `${bookingData.date}T${bookingData.time}:00Z`,
+        scheduled_date: new Date().toISOString(),
         status: 'pending',
       });
 
       if (error) throw error;
-      toast.success('Réservation confirmée avec succès !');
+      toast.success('Top, ta reservation est confirmee !');
       navigate('/');
     } catch (err) {
       console.error('[BookingFlow] handleConfirm:', err);
-      toast.error('Impossible de confirmer la réservation. Réessayez.');
+      toast.error("On n'a pas pu confirmer. Reessaie dans un instant.");
     } finally {
       setSubmitting(false);
     }
@@ -98,9 +98,7 @@ const BookingFlow = () => {
   if (isLoading) {
     return (
       <MainLayout>
-        <div style={{ height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted-foreground)' }}>
-          Chargement des services...
-        </div>
+        <div className={styles.loadingState}>On prepare les services...</div>
       </MainLayout>
     );
   }
@@ -108,6 +106,32 @@ const BookingFlow = () => {
   return (
     <MainLayout>
       <section className={styles.hero}>
+        <div className={styles.content}>
+          <span className={styles.eyebrow}>
+            <Sparkles size={16} />
+            Ta reservation en quelques etapes
+          </span>
+          <h1 className={styles.title}>Dis-nous ou tu es, choisis ta formule, et c&apos;est regle.</h1>
+          <p className={styles.description}>
+            On te guide pas a pas pour que tu ne rates rien: adresse, vehicule, formule, puis validation.
+          </p>
+
+          <div className={styles.benefits}>
+            <div>
+              <MapPinned size={18} />
+              <span>Adresse facile a saisir</span>
+            </div>
+            <div>
+              <ShieldCheck size={18} />
+              <span>Resume clair avant validation</span>
+            </div>
+            <div>
+              <CheckCircle2 size={18} />
+              <span>Suivi direct dans ton espace</span>
+            </div>
+          </div>
+        </div>
+
         <div className={styles.imageWrapper}>
           <img
             src="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?q=80&w=1000&auto=format&fit=crop"
@@ -115,26 +139,27 @@ const BookingFlow = () => {
             className={styles.image}
             loading="lazy"
           />
-        </div>
-        <div className={styles.content}>
-          <h1 className={styles.title}>Lavez votre voiture chez vous, sans effort.</h1>
-          <p className={styles.description}>
-            Un service de lavage professionnel à votre porte, 7 jours sur 7.
-          </p>
+          <div className={styles.imageBadge}>Simple a utiliser, meme sur mobile</div>
         </div>
       </section>
 
       <div id="booking-section" className={layoutStyles.bookingLayout}>
         <div className={layoutStyles.stepsColumn}>
-          <h2 style={{ marginBottom: '2rem', fontSize: '1.5rem', fontWeight: 800 }}>Réservez votre service</h2>
+          <div className={styles.headingBlock}>
+            <span className={styles.headingTag}>Etapes</span>
+            <h2 className={styles.headingTitle}>Remplis juste l&apos;essentiel.</h2>
+            <p className={styles.headingBody}>
+              Chaque bloc t&apos;aide a avancer sans te perdre, que tu sois sur telephone ou ordi.
+            </p>
+          </div>
 
           <LocationStep
             value={bookingData.location}
-            onChange={(value, lat, lng) => setBookingData(prev => ({ 
-              ...prev, 
+            onChange={(value, lat, lng) => setBookingData(prev => ({
+              ...prev,
               location: value,
               latitude: lat !== undefined ? lat : prev.latitude,
-              longitude: lng !== undefined ? lng : prev.longitude
+              longitude: lng !== undefined ? lng : prev.longitude,
             }))}
           />
 
@@ -148,49 +173,40 @@ const BookingFlow = () => {
             services={services}
             onSelect={(id: string) => setBookingData(prev => ({ ...prev, service: id }))}
           />
-          {services.length === 0 && (
-            <div style={{ padding: '1.5rem', background: '#fff7ed', border: '1px solid #ffedd5', borderRadius: '1.25rem', color: '#9a3412', marginBottom: '2rem', textAlign: 'center' }}>
-              <AlertCircle style={{ marginBottom: '0.5rem' }} />
-              <p style={{ fontWeight: 600, marginBottom: '0.75rem' }}>⚠️ Aucun service disponible.</p>
-              <button 
-                onClick={() => window.location.reload()}
-                style={{ padding: '0.5rem 1rem', background: '#ea580c', color: 'white', border: 'none', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}
-              >
-                Recharger la page
-              </button>
-            </div>
-          )}
 
-          <ScheduleStep 
+          <ScheduleStep
             date={bookingData.date}
             time={bookingData.time}
-            onDateChange={(val) => setBookingData(prev => ({ ...prev, date: val }))}
-            onTimeChange={(val) => setBookingData(prev => ({ ...prev, time: val }))}
+            onDateChange={(value: string) => setBookingData(prev => ({ ...prev, date: value }))}
+            onTimeChange={(value: string) => setBookingData(prev => ({ ...prev, time: value }))}
           />
         </div>
 
         <aside className={layoutStyles.summaryColumn}>
           <div className={layoutStyles.summaryCard}>
-            <h3 className={layoutStyles.summaryTitle}>
-              <ShoppingCart size={20} className={layoutStyles.logoIcon} />
-              Résumé
-            </h3>
+            <div className={layoutStyles.summaryHeader}>
+              <h3 className={layoutStyles.summaryTitle}>
+                <ShoppingCart size={20} className={layoutStyles.logoIcon} />
+                Resume
+              </h3>
+              <span className={layoutStyles.summaryTag}>Avant de valider</span>
+            </div>
+
+            <p className={layoutStyles.summaryIntro}>
+              Relis tranquillement ici avant de confirmer.
+            </p>
 
             <div className={layoutStyles.summaryRow}>
               <span className={layoutStyles.label}>Service</span>
-              <span className={layoutStyles.value}>{selectedService?.name || 'Sélectionnez'}</span>
+              <span className={layoutStyles.value}>{selectedService?.name || 'Choisis'}</span>
             </div>
             <div className={layoutStyles.summaryRow}>
-              <span className={layoutStyles.label}>Véhicule</span>
+              <span className={layoutStyles.label}>Vehicule</span>
               <span className={layoutStyles.value}>{bookingData.vehicle.charAt(0).toUpperCase() + bookingData.vehicle.slice(1)}</span>
             </div>
             <div className={layoutStyles.summaryRow}>
               <span className={layoutStyles.label}>Lieu</span>
-              <span className={layoutStyles.value}>{bookingData.location || 'Non spécifié'}</span>
-            </div>
-            <div className={layoutStyles.summaryRow}>
-              <span className={layoutStyles.label}>Planification</span>
-              <span className={layoutStyles.value}>{bookingData.date} à {bookingData.time}</span>
+              <span className={layoutStyles.value}>{bookingData.location || 'Non specifie'}</span>
             </div>
 
             <div className={layoutStyles.divider} />
@@ -209,12 +225,18 @@ const BookingFlow = () => {
               <span>{Math.round(total)} FCFA</span>
             </div>
 
+            <div className={layoutStyles.reassuranceList}>
+              <div><CheckCircle2 size={16} /> Tu confirmes en un clic</div>
+              <div><CheckCircle2 size={16} /> Le recap reste visible jusqu&apos;a validation</div>
+              <div><CheckCircle2 size={16} /> Tu suis tout ensuite dans tes reservations</div>
+            </div>
+
             <Button
-              style={{ marginTop: '2rem' }}
+              className={layoutStyles.confirmButton}
               onClick={handleConfirm}
               disabled={submitting}
             >
-              {submitting ? 'Confirmation...' : 'Confirmer la réservation'}
+              {submitting ? 'Validation...' : 'Je confirme ma reservation'}
             </Button>
           </div>
         </aside>

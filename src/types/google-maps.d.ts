@@ -1,16 +1,17 @@
-
 // Type definitions for Google Maps JavaScript API 3.51
 // Source: https://developers.google.com/maps/documentation/javascript/reference
 
 declare namespace google {
   namespace maps {
+    type MapsEventHandler = (...args: unknown[]) => void;
+
     class Map {
       constructor(mapDiv: Element, opts?: MapOptions);
       setCenter(latLng: LatLng | LatLngLiteral): void;
       getCenter(): LatLng;
       setZoom(zoom: number): void;
       getZoom(): number;
-      addListener(eventName: string, handler: Function): MapsEventListener;
+      addListener(eventName: string, handler: MapsEventHandler): MapsEventListener;
     }
 
     class Marker {
@@ -19,7 +20,7 @@ declare namespace google {
       getPosition(): LatLng;
       setMap(map: Map | null): void;
       getMap(): Map | null;
-      addListener(eventName: string, handler: Function): MapsEventListener;
+      addListener(eventName: string, handler: MapsEventHandler): MapsEventListener;
     }
 
     class LatLng {
@@ -83,7 +84,7 @@ declare namespace google {
     }
 
     namespace event {
-      function clearInstanceListeners(instance: any): void;
+      function clearInstanceListeners(instance: unknown): void;
     }
   }
 }

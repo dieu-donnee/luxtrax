@@ -1,8 +1,11 @@
-import { useUser, useSession } from '@clerk/react';
+import { useSession, useUser } from '@clerk/react';
+
+type ClerkUser = ReturnType<typeof useUser>['user'];
+type ClerkSession = ReturnType<typeof useSession>['session'];
 
 interface AuthState {
-  user: any; // On utilise 'any' ou le type de Clerk, mais any simplifie la compatibilité existante
-  session: any;
+  user: ClerkUser | null;
+  session: ClerkSession | null;
   loading: boolean;
 }
 
@@ -11,8 +14,8 @@ export const useAuth = (): AuthState => {
   const { isLoaded: isSessionLoaded, session } = useSession();
 
   return {
-    user: user ? user : null,
-    session: session ? session : null,
+    user: user ?? null,
+    session: session ?? null,
     loading: !(isUserLoaded && isSessionLoaded),
   };
 };

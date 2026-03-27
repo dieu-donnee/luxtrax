@@ -1,71 +1,73 @@
 .button {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.25rem;
-  border-radius: var(--radius);
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: none;
+  gap: 0.7rem;
   width: 100%;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.98rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .primary {
-  background-color: var(--primary);
   color: white;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
+  box-shadow: 0 16px 34px rgba(15, 118, 110, 0.22);
 }
 
-.primary:hover {
-  background-color: var(--primary-hover);
+.primary:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-}
-
-.primary:active {
-  transform: translateY(0);
+  box-shadow: 0 18px 40px rgba(15, 118, 110, 0.28);
 }
 
 .outline {
-  background-color: white;
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.68);
   color: var(--foreground);
-  font-weight: 500;
+  border-color: var(--border);
 }
 
-.outline:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
+.outline:hover:not(:disabled) {
   transform: translateY(-1px);
+  border-color: var(--border-strong);
 }
 
 .ghost {
-  background: none;
-  border: none;
+  background: transparent;
   color: var(--primary);
-  padding: 0;
   width: auto;
-  font-weight: 500;
+  padding-inline: 0;
+  border-radius: 0;
 }
 
-.ghost:hover {
-  text-decoration: underline;
+.ghost:hover:not(:disabled) {
+  opacity: 0.78;
 }
 
 .sm {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
   width: auto;
+  min-height: 42px;
+  padding: 0.7rem 1.05rem;
+  font-size: 0.84rem;
 }
 
 .md {
-  padding: 0.875rem 1.25rem;
+  min-height: 52px;
+  padding: 0.92rem 1.3rem;
 }
 
 .lg {
-  padding: 1.125rem 2rem;
-  font-size: 1.125rem;
+  min-height: 60px;
+  padding: 1rem 1.55rem;
+  font-size: 1.02rem;
 }

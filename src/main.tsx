@@ -11,16 +11,16 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       afterSignOutUrl="/"
       appearance={{
         variables: {
-          colorPrimary: '#1d4ed8', // Bleu Luxtrax
-          colorText: '#0f172a',
-          colorBackground: '#ffffff',
-          colorInputBackground: '#f8fafc',
-          colorInputText: '#0f172a',
-          borderRadius: '0.75rem'
+          colorPrimary: '#0f766e',
+          colorText: '#17211f',
+          colorBackground: '#fdf9f3',
+          colorInputBackground: '#fffdf9',
+          colorInputText: '#17211f',
+          borderRadius: '1rem'
         },
         elements: {
-          card: 'shadow-none border border-slate-200 backdrop-blur-md bg-white/80',
-          formButtonPrimary: 'shadow-md uppercase text-sm font-bold tracking-wide'
+          card: 'shadow-none border border-stone-200 backdrop-blur-md bg-white/80',
+          formButtonPrimary: 'shadow-md text-sm font-bold tracking-wide'
         }
       }}
     >

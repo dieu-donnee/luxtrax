@@ -17,32 +17,29 @@ export const setClerkTokenFetcher = (fetcher: () => Promise<string | null>) => {
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
     storage: localStorage,
-    persistSession: false, // Plus géré par Supabase
+    persistSession: false,
     autoRefreshToken: false,
   },
   global: {
-    fetch: async (url, options = {}) => {
-      const headers = new Headers((options as any)?.headers);
-      
+    fetch: async (url: RequestInfo | URL, options?: RequestInit) => {
+      const headers = new Headers(options?.headers);
+
       if (clerkTokenFetcher) {
         try {
           const token = await clerkTokenFetcher();
-          if (token) {
-            headers.set('Authorization', `Bearer ${token}`);
-          }
-        } catch (e) {
-          console.error('[Supabase Client] Error fetching Clerk token:', e);
+          if (token) headers.set('Authorization', `Bearer ${token}`);
+        } catch (error) {
+          console.error('[Supabase Client] Error fetching Clerk token:', error);
         }
       }
 
-      const response = await fetch(url, { ...options, headers });
-      
-      // Auto-diagnostic pour l'utilisateur
+      const response = await fetch(url, { ...(options ?? {}), headers });
+
       if (response.status === 401) {
-        console.error('[Supabase Expert] 401 Unauthorized: Le JWT Clerk est rejeté. Vérifiez la synchronisation du JWT Secret dans le Dashboard Supabase.');
+        console.error('[Supabase Expert] 401 Unauthorized: Le JWT Clerk est rejete. Verifiez la synchronisation du JWT Secret dans le Dashboard Supabase.');
       }
-      
+
       return response;
-    }
-  }
+    },
+  },
 });

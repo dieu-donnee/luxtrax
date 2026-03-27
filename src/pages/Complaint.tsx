@@ -2,22 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { usePageMeta } from '@/hooks/usePageMeta';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/ui/Button';
-import Input from '../components/ui/Input';
-import { AlertTriangle, Clock, ArrowLeft } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Clock, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import styles from './Complaint.module.css';
 
 const problemTypes = [
-  'Service non effectué',
-  'Qualité insuffisante',
+  'Service non effectue',
+  'Qualite insuffisante',
   'Retard du prestataire',
-  'Dommage sur le véhicule',
+  'Dommage sur le vehicule',
   'Autre',
 ];
 
 const Complaint = () => {
+  usePageMeta(
+    'Signaler un probleme | Luxtrax',
+    'Signale facilement un souci sur ta prestation pour qu on puisse le regler vite.',
+  );
+
   const { bookingId } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -32,8 +37,11 @@ const Complaint = () => {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) { navigate('/auth'); return; }
-    
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
     setUserId(user.id);
 
     const checkBooking = async () => {
@@ -44,7 +52,11 @@ const Complaint = () => {
           .eq('id', bookingId)
           .eq('user_id', user.id)
           .single();
-        if (!data) { toast.error('Réservation introuvable'); navigate('/'); return; }
+        if (!data) {
+          toast.error('Reservation introuvable');
+          navigate('/');
+          return;
+        }
       }
       setLoading(false);
     };
@@ -55,8 +67,8 @@ const Complaint = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.problemType) { toast.error('Sélectionnez le type de problème'); return; }
-    if (!form.description.trim()) { toast.error('Décrivez votre problème'); return; }
+    if (!form.problemType) { toast.error('Choisis le type de souci.'); return; }
+    if (!form.description.trim()) { toast.error('Explique-nous vite ce qui s est passe.'); return; }
     if (!userId || !bookingId) return;
 
     setSubmitting(true);
@@ -68,10 +80,10 @@ const Complaint = () => {
         description: form.description.trim(),
       });
       if (error) throw error;
-      toast.success('Réclamation envoyée ! Nous vous répondrons sous 24h.');
+      toast.success('C est envoye. On te repond sous 24h.');
       setTimeout(() => navigate('/'), 2000);
     } catch {
-      toast.error('Impossible d\'envoyer la réclamation. Réessayez.');
+      toast.error("On n'a pas pu envoyer ta reclamation. Reessaie.");
     } finally {
       setSubmitting(false);
     }
@@ -80,31 +92,37 @@ const Complaint = () => {
   return (
     <MainLayout>
       <div className={styles.container}>
-        <button className={styles.backBtn} onClick={() => navigate(-1)}>
-          <ArrowLeft size={20} />
-          <span>Signaler un problème</span>
-        </button>
+        <header className={styles.headerCard}>
+          <button className={styles.backBtn} onClick={() => navigate(-1)}>
+            <ArrowLeft size={18} />
+            Retour
+          </button>
+          <span className={styles.badge}>
+            <Sparkles size={14} />
+            Aide rapide
+          </span>
+          <h1 className={styles.title}>Signaler un souci sur ta prestation</h1>
+          <p className={styles.subtitle}>Donne-nous les details importants et on s&apos;en occupe rapidement.</p>
+        </header>
 
-        <div className={styles.alertCard}>
-          <AlertTriangle size={24} color="var(--error)" />
+        <section className={styles.alertCard}>
+          <AlertTriangle size={24} className={styles.alertIcon} />
           <div>
-            <h2 className={styles.alertTitle}>Un souci avec votre prestation ?</h2>
-            <p className={styles.alertDesc}>
-              Dites-nous ce qui s'est passé pour que nous puissions vous aider rapidement.
-            </p>
+            <h2 className={styles.alertTitle}>Un souci avec ton service ?</h2>
+            <p className={styles.alertDesc}>Sois direct et precis pour qu on puisse t aider plus vite.</p>
           </div>
-        </div>
+        </section>
 
-        <form className={styles.form} onSubmit={handleSubmit}>
+        <form className={styles.formCard} onSubmit={handleSubmit}>
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Nature du problème</label>
+            <label className={styles.label}>Quel est le souci ?</label>
             <select
               className={styles.select}
               value={form.problemType}
               onChange={(e) => setForm(p => ({ ...p, problemType: e.target.value }))}
               required
             >
-              <option value="">Sélectionnez le type de problème</option>
+              <option value="">Choisis un type de souci</option>
               {problemTypes.map(t => (
                 <option key={t} value={t}>{t}</option>
               ))}
@@ -112,26 +130,26 @@ const Complaint = () => {
           </div>
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Décrivez votre problème</label>
+            <label className={styles.label}>Raconte-nous ce qui s&apos;est passe</label>
             <textarea
               className={styles.textarea}
               value={form.description}
               onChange={(e) => setForm(p => ({ ...p, description: e.target.value.slice(0, 1000) }))}
-              placeholder="Donnez-nous plus de détails sur votre situation..."
+              placeholder="Exemple: date, ce qui n allait pas, ce que tu attends..."
               rows={5}
               maxLength={1000}
               required
             />
           </div>
 
-          <Button type="submit" disabled={submitting} style={{ background: '#fca5a5', color: 'var(--error)' }}>
-            {submitting ? 'Envoi...' : 'Envoyer ma réclamation'}
+          <Button type="submit" disabled={submitting}>
+            {submitting ? 'Envoi...' : 'Envoyer ma demande'}
           </Button>
         </form>
 
         <div className={styles.responseInfo}>
           <Clock size={16} />
-          <span>Notre équipe s'engage à vous répondre sous 24h</span>
+          <span>On te repond en general en moins de 24h</span>
         </div>
       </div>
     </MainLayout>

@@ -1,80 +1,128 @@
 .container {
-  max-width: 480px;
+  max-width: 760px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-  animation: fadeIn 0.5s ease-out;
+  gap: 1rem;
+  padding-bottom: 6rem;
 }
 
-.header {
+.heroCard,
+.card,
+.actionsCard,
+.adminCard {
+  border-radius: 1.5rem;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: var(--shadow-soft);
+}
+
+.heroCard {
+  padding: 1.3rem;
   display: flex;
   flex-direction: column;
+  gap: 0.9rem;
+}
+
+.heroTop {
+  display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 2rem 0 1rem;
+  gap: 0.9rem;
+}
+
+.heroTextSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .avatar {
-  width: 88px;
-  height: 88px;
+  width: 84px;
+  height: 84px;
   border-radius: 50%;
-  background: var(--muted);
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid var(--border);
 }
 
 .name {
-  font-size: 1.375rem;
-  font-weight: 700;
-  color: var(--foreground);
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 0.3rem;
 }
 
 .email {
-  font-size: 0.875rem;
   color: var(--muted-foreground);
+}
+
+.pills {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.11);
+  color: var(--primary-strong);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
 }
 
 .editBtn {
-  margin-top: 0.5rem;
-  width: auto !important;
+  width: fit-content !important;
 }
 
 .card {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  padding: 1.25rem;
+  padding: 1.3rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.9rem;
 }
 
 .cardTitle {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--foreground);
-  margin-bottom: 0.25rem;
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.formGrid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.infoList {
+  display: grid;
+  gap: 0.75rem;
 }
 
 .infoRow {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
+  padding: 0.85rem;
+  border-radius: 0.95rem;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .infoLabel {
-  font-size: 0.75rem;
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.73rem;
   color: var(--muted-foreground);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.07em;
 }
 
 .infoValue {
-  font-size: 0.9375rem;
-  font-weight: 500;
+  font-weight: 700;
   color: var(--foreground);
 }
 
@@ -82,7 +130,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 0;
+  gap: 0.8rem;
+  padding: 0.9rem 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -92,111 +141,88 @@
 
 .historyService {
   display: block;
-  font-weight: 600;
-  font-size: 0.9375rem;
-  color: var(--foreground);
+  font-weight: 700;
 }
 
 .historyDate {
   display: block;
-  font-size: 0.8125rem;
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
   color: var(--muted-foreground);
 }
 
 .historyPrice {
-  font-weight: 700;
-  font-size: 0.9375rem;
-  color: var(--foreground);
+  font-weight: 800;
 }
 
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+.actionsCard {
+  padding: 0.4rem 1rem;
 }
 
-.actionRow {
+.actionRow,
+.actionRowDanger {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem 0.25rem;
-  background: none;
-  border: none;
+  padding: 0.95rem 0.2rem;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
-  font-family: inherit;
-  font-size: 0.9375rem;
   color: var(--foreground);
-  width: 100%;
-  text-align: left;
 }
 
-.actionRow span {
+.actionRow span,
+.actionRowDanger span {
   flex: 1;
-}
-
-.actionRow:hover {
-  color: var(--primary);
+  text-align: left;
+  font-weight: 700;
 }
 
 .actionRowDanger {
-  composes: actionRow;
-  color: var(--error);
   border-bottom: none;
-}
-
-.actionRowDanger:hover {
-  opacity: 0.8;
-}
-
-.actionRowDanger:hover span {
-  color: white;
+  color: #991b1b;
 }
 
 .adminCard {
-  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
-  border: 1px solid #dbeafe;
-  border-radius: 1.25rem;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+  padding: 1.1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1rem;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.08), rgba(245, 158, 11, 0.1));
 }
 
 .adminInfo {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .adminIcon {
-  color: var(--primary);
-  background: white;
-  padding: 0.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  color: var(--primary-strong);
 }
 
 .adminTitle {
-  font-weight: 700;
   font-size: 1rem;
-  margin-bottom: 0.25rem;
+  font-weight: 800;
+  margin-bottom: 0.2rem;
 }
 
 .adminDesc {
-  font-size: 0.8125rem;
+  font-size: 0.82rem;
   color: var(--muted-foreground);
 }
 
 .adminBtn {
-  background: white;
   white-space: nowrap;
 }
 
+@media (min-width: 768px) {
+  .formGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  .formGrid > :last-child {
+    grid-column: 1 / -1;
+  }
 }
