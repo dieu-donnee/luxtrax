@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Bell, User, MessageSquare } from 'lucide-react';
+import { Home, User, MessageSquare, Sparkles, Calendar } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './BottomNav.module.css';
 
@@ -8,23 +8,37 @@ const BottomNav = () => {
 
   const items = [
     { icon: <Home size={20} />, label: 'Accueil', path: '/' },
-    { icon: <Bell size={20} />, label: 'Notifications', path: '/notifications' },
-    { icon: <User size={20} />, label: 'Profil', path: '/profile' },
+    { icon: <Calendar size={20} />, label: 'Réservations', path: '/bookings' },
+    { icon: <Sparkles size={22} />, label: 'Réserver', path: '/booking', isSpecial: true },
     { icon: <MessageSquare size={20} />, label: 'Support', path: '/support' },
+    { icon: <User size={20} />, label: 'Profil', path: '/profile' },
   ];
 
   return (
     <nav className={styles.bottomNav}>
-      {items.map((item) => (
-        <Link 
-          key={item.path} 
-          to={item.path} 
-          className={`${styles.navItem} ${location.pathname === item.path ? styles.active : ''}`}
-        >
-          {item.icon}
-          <span>{item.label}</span>
-        </Link>
-      ))}
+      {items.map((item) => {
+        if (item.isSpecial) {
+          return (
+            <Link 
+              key={item.path} 
+              to={item.path} 
+              className={styles.special}
+            >
+              {item.icon}
+            </Link>
+          );
+        }
+        
+        return (
+          <Link 
+            key={item.path} 
+            to={item.path} 
+            className={`${styles.navItem} ${location.pathname === item.path ? styles.active : ''}`}
+          >
+            {item.icon}
+          </Link>
+        );
+      })}
     </nav>
   );
 };

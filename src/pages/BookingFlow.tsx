@@ -5,25 +5,29 @@ import { useAuth } from '@/hooks/useAuth';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import { toast } from 'sonner';
 import { clsx } from 'clsx';
+import { CheckCircle2, ChevronLeft, ChevronRight, Lock, ShoppingCart } from 'lucide-react';
 import MainLayout from '../components/layout/MainLayout';
 import Button from '../components/ui/Button';
+import BookingSuccess from '../components/booking/BookingSuccess';
 import styles from './BookingFlow.module.css';
 import layoutStyles from './BookingLayout.module.css';
 import { LocationStep, VehicleStep, ServiceStep, ScheduleStep } from './BookingSteps';
-import { CheckCircle2, ChevronLeft, ChevronRight, Lock, MapPinned, ShieldCheck, ShoppingCart, Sparkles } from 'lucide-react';
+import OfferCarousel from '../components/ui/OfferCarousel';
 import type { ServiceData } from '@/types/models';
 
 const TOTAL_STEPS = 4;
 
 const BookingFlow = () => {
   usePageMeta(
-    'Reservation | Luxtrax',
-    'Choisis ton lavage auto a domicile en quelques etapes: adresse, vehicule, formule, puis validation.',
+    'Réservation | LustraX',
+    'Ton lavage sur-mesure en 4 étapes rapides. On arrive chez toi !',
   );
 
   const { user } = useAuth();
+  const [userLoading, setUserLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [services, setServices] = useState<ServiceData[]>([]);
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
@@ -136,7 +140,7 @@ const BookingFlow = () => {
       return;
     }
     if (!user) {
-      toast.error('Connecte-toi pour finir ta reservation.');
+      toast.error('Connecte-toi pour finir ta réservation.');
       navigate('/auth');
       return;
     }
@@ -158,8 +162,10 @@ const BookingFlow = () => {
       });
 
       if (error) throw error;
-      toast.success('Top, ta reservation est confirmee !');
-      navigate('/');
+      
+      // Instead of bizarre notification and direct navigate, show the animated card
+      setShowSuccess(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error('[BookingFlow] handleConfirm:', err);
       toast.error("On n'a pas pu confirmer. Reessaie dans un instant.");
@@ -176,55 +182,29 @@ const BookingFlow = () => {
     );
   }
 
+  if (showSuccess) {
+    return (
+      <MainLayout>
+        <BookingSuccess 
+          serviceName={selectedService?.name || 'Service LustraX'}
+          date={bookingData.date}
+          time={bookingData.time}
+          location={bookingData.location}
+        />
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout>
-      <section className={styles.hero}>
-        <div className={styles.content}>
-          <span className={styles.eyebrow}>
-            <Sparkles size={16} />
-            Ta reservation en quelques etapes
-          </span>
-          <h1 className={styles.title}>Dis-nous ou tu es, choisis ta formule, et c&apos;est regle.</h1>
-          <p className={styles.description}>
-            On te guide pas a pas pour que tu ne rates rien: adresse, vehicule, formule, puis validation.
-          </p>
-
-          <div className={styles.benefits}>
-            <div>
-              <MapPinned size={18} />
-              <span>Adresse facile a saisir</span>
-            </div>
-            <div>
-              <ShieldCheck size={18} />
-              <span>Resume clair avant validation</span>
-            </div>
-            <div>
-              <CheckCircle2 size={18} />
-              <span>Suivi direct dans ton espace</span>
-            </div>
-          </div>
-        </div>
-
-        <div className={styles.imageWrapper}>
-          <img
-            src="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?q=80&w=1000&auto=format&fit=crop"
-            alt="Lavage auto premium"
-            className={styles.image}
-            loading="lazy"
-          />
-          <div className={styles.imageBadge}>Simple a utiliser, meme sur mobile</div>
-        </div>
-      </section>
+      {currentStep === 1 && (
+        <section className={styles.hero}>
+          <OfferCarousel />
+        </section>
+      )}
 
       <div id="booking-section" className={layoutStyles.bookingLayout}>
         <div className={layoutStyles.stepsColumn}>
-          <div className={styles.headingBlock}>
-            <span className={styles.headingTag}>Etapes</span>
-            <h2 className={styles.headingTitle}>Remplis juste l&apos;essentiel.</h2>
-            <p className={styles.headingBody}>
-              Chaque bloc t&apos;aide a avancer sans te perdre, que tu sois sur telephone ou ordi.
-            </p>
-          </div>
 
           <div className={styles.wizardHeader}>
             <div className={styles.wizardStepCount}>
@@ -311,7 +291,7 @@ const BookingFlow = () => {
               disabled={currentStep === 1 || submitting}
             >
               <ChevronLeft size={16} />
-              Precedent
+              Retour
             </Button>
 
             {!isLastStep && (
@@ -320,7 +300,7 @@ const BookingFlow = () => {
                 onClick={handleNextStep}
                 disabled={submitting}
               >
-                Suivant{nextStepLabel ? `: ${nextStepLabel}` : ''}
+                Suivant
                 <ChevronRight size={16} />
               </Button>
             )}
@@ -341,60 +321,60 @@ const BookingFlow = () => {
           )}
         </div>
 
-        <aside className={layoutStyles.summaryColumn}>
-          <div className={layoutStyles.summaryCard}>
-            <div className={layoutStyles.summaryHeader}>
-              <h3 className={layoutStyles.summaryTitle}>
-                <ShoppingCart size={20} className={layoutStyles.logoIcon} />
-                Resume
-              </h3>
-              <span className={layoutStyles.summaryTag}>Avant de valider</span>
-            </div>
+        {isLastStep && (
+          <aside className={layoutStyles.summaryColumn}>
+            <div className={layoutStyles.summaryCard}>
+              <div className={layoutStyles.summaryHeader}>
+                <h3 className={layoutStyles.summaryTitle}>
+                  <ShoppingCart size={20} className={layoutStyles.logoIcon} />
+                  Resume
+                </h3>
+                <span className={layoutStyles.summaryTag}>Avant de valider</span>
+              </div>
 
-            <p className={layoutStyles.summaryIntro}>
-              Relis tranquillement ici avant de confirmer.
-            </p>
+              <p className={layoutStyles.summaryIntro}>
+                Vérifie tes infos avant de confirmer.
+              </p>
 
-            <div className={layoutStyles.summaryRow}>
-              <span className={layoutStyles.label}>Service</span>
-              <span className={layoutStyles.value}>{selectedService?.name || 'Choisis'}</span>
-            </div>
-            <div className={layoutStyles.summaryRow}>
-              <span className={layoutStyles.label}>Vehicule</span>
-              <span className={layoutStyles.value}>{bookingData.vehicle.charAt(0).toUpperCase() + bookingData.vehicle.slice(1)}</span>
-            </div>
-            <div className={layoutStyles.summaryRow}>
-              <span className={layoutStyles.label}>Lieu</span>
-              <span className={layoutStyles.value}>{bookingData.location || 'Non specifie'}</span>
-            </div>
-            <div className={layoutStyles.summaryRow}>
-              <span className={layoutStyles.label}>Horaire</span>
-              <span className={layoutStyles.value}>{scheduleLabel}</span>
-            </div>
+              <div className={layoutStyles.summaryRow}>
+                <span className={layoutStyles.label}>Service</span>
+                <span className={layoutStyles.value}>{selectedService?.name || 'Choisis'}</span>
+              </div>
+              <div className={layoutStyles.summaryRow}>
+                <span className={layoutStyles.label}>Vehicule</span>
+                <span className={layoutStyles.value}>{bookingData.vehicle.charAt(0).toUpperCase() + bookingData.vehicle.slice(1)}</span>
+              </div>
+              <div className={layoutStyles.summaryRow}>
+                <span className={layoutStyles.label}>Lieu</span>
+                <span className={layoutStyles.value}>{bookingData.location || 'Non specifie'}</span>
+              </div>
+              <div className={layoutStyles.summaryRow}>
+                <span className={layoutStyles.label}>Horaire</span>
+                <span className={layoutStyles.value}>{scheduleLabel}</span>
+              </div>
 
-            <div className={layoutStyles.divider} />
+              <div className={layoutStyles.divider} />
 
-            <div className={layoutStyles.summaryRow}>
-              <span className={layoutStyles.label}>Sous-total</span>
-              <span className={layoutStyles.value}>{Math.round(price)} FCFA</span>
-            </div>
-            <div className={layoutStyles.summaryRow}>
-              <span className={layoutStyles.label}>TVA (20%)</span>
-              <span className={layoutStyles.value}>{Math.round(tva)} FCFA</span>
-            </div>
+              <div className={layoutStyles.summaryRow}>
+                <span className={layoutStyles.label}>Sous-total</span>
+                <span className={layoutStyles.value}>{Math.round(price)} FCFA</span>
+              </div>
+              <div className={layoutStyles.summaryRow}>
+                <span className={layoutStyles.label}>TVA (20%)</span>
+                <span className={layoutStyles.value}>{Math.round(tva)} FCFA</span>
+              </div>
 
-            <div className={layoutStyles.total}>
-              <span>Total</span>
-              <span>{Math.round(total)} FCFA</span>
-            </div>
+              <div className={layoutStyles.total}>
+                <span>Total</span>
+                <span>{Math.round(total)} FCFA</span>
+              </div>
 
-            <div className={layoutStyles.reassuranceList}>
-              <div><CheckCircle2 size={16} /> Tu confirmes en un clic</div>
-              <div><CheckCircle2 size={16} /> Le recap reste visible jusqu&apos;a validation</div>
-              <div><CheckCircle2 size={16} /> Tu suis tout ensuite dans tes reservations</div>
-            </div>
+              <div className={layoutStyles.reassuranceList}>
+                <div><CheckCircle2 size={16} /> Tu confirmes en un clic</div>
+                <div><CheckCircle2 size={16} /> Le recap reste visible jusqu&apos;a validation</div>
+                <div><CheckCircle2 size={16} /> Tu suis tout ensuite dans tes reservations</div>
+              </div>
 
-            {isLastStep ? (
               <Button
                 className={layoutStyles.confirmButton}
                 onClick={handleConfirm}
@@ -402,13 +382,9 @@ const BookingFlow = () => {
               >
                 {submitting ? 'Validation...' : 'Je confirme ma reservation'}
               </Button>
-            ) : (
-              <div className={layoutStyles.pendingConfirm}>
-                Termine les etapes pour debloquer la confirmation finale.
-              </div>
-            )}
-          </div>
-        </aside>
+            </div>
+          </aside>
+        )}
       </div>
     </MainLayout>
   );

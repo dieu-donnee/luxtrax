@@ -22,8 +22,8 @@ const PHONE_REGEX = /^[+\d\s\-()]{7,20}$/;
 
 const Profile = () => {
   usePageMeta(
-    'Mon profil | Luxtrax',
-    'Mets a jour tes infos et retrouve facilement ton historique de lavages sur Luxtrax.',
+    'Mon profil | LustraX',
+    'Gère tes infos et retrouve tes lavages terminés.',
   );
 
   const { user, loading: authLoading } = useAuth();
@@ -79,12 +79,12 @@ const Profile = () => {
     const { error } = await supabase.from('profiles').update(sanitized).eq('id', user.id);
     if (error) {
       console.error('[Profile]', error.code, error.message);
-      toast.error("On n'a pas pu enregistrer tes infos.");
+      toast.error("Oups, impossible de sauvegarder tes infos.");
       return;
     }
     setProfile(prev => prev ? { ...prev, ...sanitized } : null);
     setIsEditing(false);
-    toast.success('Parfait, ton profil est a jour.');
+    toast.success('C&apos;est tout bon, ton profil est à jour.');
   };
 
   const handleLogout = async () => {
@@ -138,13 +138,13 @@ const Profile = () => {
             className={styles.editBtn}
           >
             <Pencil size={14} />
-            {isEditing ? 'Fermer' : 'Modifier mes infos'}
+            {isEditing ? 'Fermer' : 'Modifier mon profil'}
           </Button>
         </section>
 
         {isEditing && (
           <section className={styles.card}>
-            <h2 className={styles.cardTitle}>Modifier mes coordonnees</h2>
+            <h2 className={styles.cardTitle}>Modifier mon profil</h2>
             <div className={styles.formGrid}>
               <Input
                 icon={<User size={18} />}
@@ -168,7 +168,7 @@ const Profile = () => {
                 maxLength={MAX_ADDR_LEN}
               />
             </div>
-            <Button onClick={handleSave}>Enregistrer</Button>
+            <Button onClick={handleSave}>C&apos;est bon</Button>
           </section>
         )}
 
@@ -177,8 +177,8 @@ const Profile = () => {
             <div className={styles.adminInfo}>
               <Settings size={20} className={styles.adminIcon} />
               <div>
-                <h3 className={styles.adminTitle}>Espace administration</h3>
-                <p className={styles.adminDesc}>Gere les services et le catalogue en quelques clics.</p>
+                <h3 className={styles.adminTitle}>Administration</h3>
+                <p className={styles.adminDesc}>Gère les services et le catalogue ici.</p>
               </div>
             </div>
             <Button variant="outline" size="sm" onClick={() => navigate('/admin/services')} className={styles.adminBtn}>
@@ -188,7 +188,7 @@ const Profile = () => {
         )}
 
         <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Informations personnelles</h2>
+          <h2 className={styles.cardTitle}>Infos perso</h2>
           <div className={styles.infoList}>
             <div className={styles.infoRow}>
               <span className={styles.infoLabel}>Telephone</span>
@@ -202,7 +202,7 @@ const Profile = () => {
         </section>
 
         <section className={styles.card}>
-          <h2 className={styles.cardTitle}>Historique des lavages</h2>
+          <h2 className={styles.cardTitle}>Derniers lavages</h2>
           {bookings.length > 0 ? (
             bookings.map((b) => (
               <div key={b.id} className={styles.historyRow}>
@@ -226,7 +226,7 @@ const Profile = () => {
           </button>
           <button className={styles.actionRow} onClick={handleLogout}>
             <LogOut size={18} />
-            <span>Se deconnecter</span>
+            <span>Se déconnecter</span>
             <ChevronRight size={18} />
           </button>
           <button className={styles.actionRowDanger} onClick={() => toast.info('Ecris-nous via le support pour cette demande.')}>

@@ -1,7 +1,6 @@
 .hero {
-  display: grid;
-  gap: 1rem;
-  margin-bottom: 1.75rem;
+  margin-bottom: 2rem;
+  width: 100%;
 }
 
 .content,
@@ -109,11 +108,11 @@
 }
 
 .wizardHeader {
-  margin-bottom: 0.9rem;
+  margin-bottom: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .wizardStepCount {
@@ -123,25 +122,25 @@
 }
 
 .wizardStepCount span {
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--muted-foreground);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
 }
 
 .wizardStepCount strong {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .wizardProgress {
-  padding: 0.45rem 0.75rem;
+  padding: 0.35rem 0.65rem;
   border-radius: 999px;
-  background: rgba(15, 118, 110, 0.1);
+  background: rgba(15, 118, 110, 0.08);
   color: var(--primary-strong);
-  font-size: 0.76rem;
+  font-size: 0.7rem;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -157,17 +156,17 @@
 
 .stepperButton {
   width: 100%;
-  min-height: 44px;
+  min-height: 38px;
   border: 1px solid var(--border);
-  border-radius: 0.95rem;
+  border-radius: 0.8rem;
   background: rgba(255, 255, 255, 0.62);
   color: var(--foreground);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  padding: 0.6rem 0.7rem;
-  font-size: 0.78rem;
+  gap: 0.35rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.72rem;
   font-weight: 700;
   transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
@@ -192,15 +191,16 @@
 }
 
 .stepperIndex {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   border-radius: 999px;
-  background: rgba(15, 118, 110, 0.14);
+  background: rgba(15, 118, 110, 0.1);
   color: var(--primary-strong);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 0.65rem;
 }
 
 .stepViewport {
@@ -208,18 +208,18 @@
 }
 
 .wizardActions {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
-.backButton {
-  order: 2;
-}
-
+.backButton,
 .nextButton {
-  order: 1;
+  width: auto;
+  min-width: 120px;
+  padding: 0.6rem 1.25rem;
 }
 
 .wizardHelpText {
@@ -238,8 +238,7 @@
 
 @media (min-width: 900px) {
   .hero {
-    grid-template-columns: 1.1fr 0.9fr;
-    align-items: stretch;
+    margin-bottom: 3rem;
   }
 
   .content {
@@ -252,16 +251,9 @@
   }
 
   .wizardActions {
-    grid-template-columns: minmax(0, 180px) minmax(0, 1fr);
-    align-items: center;
-  }
-
-  .backButton {
-    order: 1;
-  }
-
-  .nextButton {
-    order: 2;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
   }
 
   .benefits {

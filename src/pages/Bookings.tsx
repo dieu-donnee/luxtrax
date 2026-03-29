@@ -24,8 +24,8 @@ const FILTERS: { key: StatusFilter; label: string }[] = [
 
 const Bookings = () => {
   usePageMeta(
-    'Mes reservations | Luxtrax',
-    'Retrouve toutes tes reservations Luxtrax et verifie leur statut en un coup d oeil.',
+    'Mes réservations | LustraX',
+    'Retrouve tes lavages et vérifie leur statut.',
   );
 
   const { user, loading: authLoading } = useAuth();
@@ -69,8 +69,8 @@ const Bookings = () => {
               Ton suivi
             </span>
           </div>
-          <h1 className={styles.pageTitle}>Mes reservations</h1>
-          <p className={styles.subtitle}>Tu vois direct ce qui est en attente, en cours ou termine.</p>
+          <h1 className={styles.pageTitle}>Mes réservations</h1>
+          <p className={styles.subtitle}>En attente, en cours ou terminé : tout est là.</p>
         </header>
 
         <div className={styles.filters}>

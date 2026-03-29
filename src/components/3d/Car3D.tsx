@@ -1,128 +1,193 @@
-import React, { useRef, Suspense, useMemo } from 'react';
+import React, { useRef, Suspense, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Environment, ContactShadows, PerspectiveCamera, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
-const SEG = 8; // low-poly segment count for mobile perf
+type VehicleType = 'sedan' | 'suv' | 'coupe';
 
-const CarBody = () => {
+const CarModel = ({ type }: { type: VehicleType }) => {
   const groupRef = useRef<THREE.Group>(null);
 
-  useFrame((_, delta) => {
+  useFrame((state) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.4;
+      groupRef.current.rotation.y = Math.sin(state.clock.getElapsedTime() * 0.3) * 0.15;
     }
   });
 
-  const bodyMat = useMemo(() => ({ color: '#2563eb', metalness: 0.7, roughness: 0.2 }), []);
-  const glassMat = useMemo(() => ({ color: '#93c5fd', metalness: 0.9, roughness: 0.05, transparent: true, opacity: 0.5 }), []);
+  const bodyMat = useMemo(() => ({
+    color: '#1e293b',
+    metalness: 0.9,
+    roughness: 0.15,
+    envMapIntensity: 1.5,
+  }), []);
+
+  const glassMat = useMemo(() => ({
+    color: '#000',
+    metalness: 1,
+    roughness: 0.05,
+    transparent: true,
+    opacity: 0.7,
+  }), []);
 
   return (
-    <group ref={groupRef} position={[0, 0.05, 0]}>
-      {/* Body */}
-      <mesh position={[0, 0.35, 0]} castShadow>
-        <boxGeometry args={[2.4, 0.45, 1.05]} />
-        <meshStandardMaterial {...bodyMat} />
-      </mesh>
-      {/* Hood */}
-      <mesh position={[0.85, 0.42, 0]} rotation={[0, 0, -0.15]} castShadow>
-        <boxGeometry args={[0.7, 0.12, 1.0]} />
-        <meshStandardMaterial {...bodyMat} />
-      </mesh>
-      {/* Cabin */}
-      <mesh position={[-0.1, 0.72, 0]} castShadow>
-        <boxGeometry args={[1.3, 0.45, 0.95]} />
-        <meshStandardMaterial {...bodyMat} />
-      </mesh>
-      {/* Windshields */}
-      <mesh position={[0.5, 0.7, 0]} rotation={[0, 0, -0.35]}>
-        <boxGeometry args={[0.45, 0.4, 0.9]} />
-        <meshStandardMaterial {...glassMat} />
-      </mesh>
-      <mesh position={[-0.7, 0.68, 0]} rotation={[0, 0, 0.3]}>
-        <boxGeometry args={[0.35, 0.38, 0.88]} />
-        <meshStandardMaterial {...glassMat} />
-      </mesh>
-      {/* Lights */}
-      <mesh position={[1.21, 0.38, 0.35]}>
-        <boxGeometry args={[0.05, 0.12, 0.2]} />
-        <meshStandardMaterial color="#fef9c3" emissive="#fbbf24" emissiveIntensity={0.8} />
-      </mesh>
-      <mesh position={[1.21, 0.38, -0.35]}>
-        <boxGeometry args={[0.05, 0.12, 0.2]} />
-        <meshStandardMaterial color="#fef9c3" emissive="#fbbf24" emissiveIntensity={0.8} />
-      </mesh>
-      <mesh position={[-1.21, 0.38, 0.35]}>
-        <boxGeometry args={[0.05, 0.1, 0.18]} />
-        <meshStandardMaterial color="#fca5a5" emissive="#ef4444" emissiveIntensity={0.6} />
-      </mesh>
-      <mesh position={[-1.21, 0.38, -0.35]}>
-        <boxGeometry args={[0.05, 0.1, 0.18]} />
-        <meshStandardMaterial color="#fca5a5" emissive="#ef4444" emissiveIntensity={0.6} />
-      </mesh>
-      {/* Bumpers + Grille */}
-      <mesh position={[1.15, 0.18, 0]}>
-        <boxGeometry args={[0.15, 0.15, 0.9]} />
-        <meshStandardMaterial color="#1e293b" />
-      </mesh>
-      <mesh position={[-1.15, 0.18, 0]}>
-        <boxGeometry args={[0.15, 0.15, 0.9]} />
-        <meshStandardMaterial color="#1e293b" />
-      </mesh>
-      <mesh position={[1.22, 0.28, 0]}>
-        <boxGeometry args={[0.02, 0.12, 0.5]} />
-        <meshStandardMaterial color="#1e293b" />
-      </mesh>
-      {/* Wheels – low-poly cylinders */}
-      {[
-        [0.75, 0.12, 0.58],
-        [0.75, 0.12, -0.58],
-        [-0.75, 0.12, 0.58],
-        [-0.75, 0.12, -0.58],
-      ].map((pos, i) => (
-        <group key={i} position={pos as [number, number, number]}>
-          <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
-            <cylinderGeometry args={[0.18, 0.18, 0.12, SEG]} />
-            <meshStandardMaterial color="#0f172a" roughness={0.8} />
-          </mesh>
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.1, 0.1, 0.13, SEG]} />
-            <meshStandardMaterial color="#94a3b8" metalness={0.9} roughness={0.1} />
-          </mesh>
-        </group>
-      ))}
+    <group ref={groupRef} position={[0, -0.4, 0]}>
+      <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.2}>
+        {/* Main Body */}
+        {type === 'sedan' && (
+          <>
+            <mesh position={[0, 0.45, 0]} castShadow>
+              <boxGeometry args={[3.2, 0.45, 1.4]} />
+              <meshStandardMaterial {...bodyMat} />
+            </mesh>
+            <mesh position={[-0.1, 0.85, 0]} castShadow>
+              <boxGeometry args={[1.6, 0.5, 1.2]} />
+              <meshStandardMaterial {...bodyMat} />
+            </mesh>
+          </>
+        )}
+
+        {type === 'suv' && (
+          <>
+            <mesh position={[0, 0.6, 0]} castShadow>
+              <boxGeometry args={[3.0, 0.85, 1.5]} />
+              <meshStandardMaterial {...bodyMat} />
+            </mesh>
+            <mesh position={[-0.4, 1.25, 0]} castShadow>
+              <boxGeometry args={[1.8, 0.6, 1.3]} />
+              <meshStandardMaterial {...bodyMat} />
+            </mesh>
+          </>
+        )}
+
+        {type === 'coupe' && (
+          <>
+            <mesh position={[0, 0.35, 0]} castShadow>
+              <boxGeometry args={[3.4, 0.35, 1.5]} />
+              <meshStandardMaterial {...bodyMat} />
+            </mesh>
+            <mesh position={[-0.2, 0.65, 0]} castShadow>
+              <boxGeometry args={[1.4, 0.4, 1.3]} />
+              <meshStandardMaterial {...bodyMat} />
+            </mesh>
+          </>
+        )}
+
+        {/* Wheels */}
+        {[
+          [1.0, 0.2, 0.75],
+          [1.0, 0.2, -0.75],
+          [-1.0, 0.2, 0.75],
+          [-1.0, 0.2, -0.75],
+        ].map((pos, i) => (
+          <group key={i} position={pos as [number, number, number]}>
+            <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+              <cylinderGeometry args={[0.32, 0.32, 0.2, 32]} />
+              <meshStandardMaterial color="#020617" roughness={0.9} />
+            </mesh>
+            <mesh rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.22, 0.22, 0.22, 32]} />
+              <meshStandardMaterial color="#334155" metalness={1} roughness={0.1} />
+            </mesh>
+          </group>
+        ))}
+
+        {/* Lights */}
+        <mesh position={[1.6, 0.5, 0.5]}>
+          <boxGeometry args={[0.05, 0.15, 0.3]} />
+          <meshStandardMaterial color="#fff" emissive="#fff" emissiveIntensity={2} />
+        </mesh>
+        <mesh position={[1.6, 0.5, -0.5]}>
+          <boxGeometry args={[0.05, 0.15, 0.3]} />
+          <meshStandardMaterial color="#fff" emissive="#fff" emissiveIntensity={2} />
+        </mesh>
+      </Float>
     </group>
   );
 };
 
-const Ground = () => (
-  <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
-    <planeGeometry args={[5, 5, 1, 1]} />
-    <meshStandardMaterial color="#e2e8f0" />
-  </mesh>
-);
+const Car3D: React.FC<{ height?: string }> = ({ height = '320px' }) => {
+  const [type, setType] = useState<VehicleType>('sedan');
 
-const Car3D: React.FC<{ height?: string }> = ({ height = '280px' }) => {
   return (
-    <div style={{ width: '100%', height, borderRadius: '1rem', overflow: 'hidden' }}>
-      <Canvas
-        shadows
-        camera={{ position: [3, 2.2, 3], fov: 40 }}
-        dpr={[1, 1.5]}
-        performance={{ min: 0.5 }}
-        style={{ background: 'linear-gradient(180deg, #f0f4ff 0%, #e2e8f0 100%)' }}
-      >
+    <div style={{ position: 'relative', width: '100%', height, borderRadius: '1.25rem', overflow: 'hidden', background: '#000' }}>
+      <div style={{
+        position: 'absolute',
+        top: '1rem',
+        right: '1rem',
+        zIndex: 10,
+        display: 'flex',
+        gap: '0.5rem',
+        background: 'rgba(0,0,0,0.4)',
+        padding: '0.4rem',
+        borderRadius: '999px',
+        backdropFilter: 'blur(10px)',
+        border: '1px solid rgba(255,255,255,0.1)'
+      }}>
+        {(['sedan', 'suv', 'coupe'] as VehicleType[]).map((t) => (
+          <button
+            key={t}
+            onClick={() => setType(t)}
+            style={{
+              padding: '0.4rem 0.9rem',
+              borderRadius: '999px',
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              background: type === t ? '#fff' : 'transparent',
+              color: type === t ? '#000' : '#fff',
+              transition: 'all 0.2s',
+              cursor: 'pointer'
+            }}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      <Canvas shadows dpr={[1, 2]} gl={{ antialias: true }}>
+        <PerspectiveCamera makeDefault position={[5, 2.5, 5]} fov={30} />
         <Suspense fallback={null}>
-          <ambientLight intensity={0.6} />
-          <directionalLight position={[5, 5, 5]} intensity={1.2} castShadow shadow-mapSize={[512, 512]} />
-          <directionalLight position={[-3, 3, -3]} intensity={0.4} />
-          <CarBody />
-          <Ground />
-          <OrbitControls enableZoom={false} enablePan={false} maxPolarAngle={Math.PI / 2.3} minPolarAngle={Math.PI / 4} />
+          <Environment preset="city" />
+          <ambientLight intensity={0.5} />
+          <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1.5} castShadow />
+          <pointLight position={[-10, -10, -10]} intensity={0.5} color="#0ea5e9" />
+          <fog attach="fog" args={['#000', 5, 15]} />
+          <CarModel type={type} />
+          <ContactShadows
+            position={[0, -0.4, 0]}
+            opacity={0.65}
+            scale={10}
+            blur={2.5}
+            far={1.6}
+            color="#000"
+          />
+          <OrbitControls
+            enableZoom={false}
+            enablePan={false}
+            autoRotate
+            autoRotateSpeed={0.5}
+            minPolarAngle={Math.PI / 4}
+            maxPolarAngle={Math.PI / 2}
+          />
         </Suspense>
       </Canvas>
+
+      <div style={{
+        position: 'absolute',
+        bottom: '1rem',
+        left: '1.25rem',
+        color: 'rgba(255,255,255,0.4)',
+        fontSize: '0.65rem',
+        fontWeight: 600,
+        textTransform: 'uppercase',
+        letterSpacing: '0.1em'
+      }}>
+        Rendu Temps Réel • LustraX Premium 3D
+      </div>
     </div>
   );
 };
 
 export default Car3D;
+

@@ -10,17 +10,17 @@
   width: 100%;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 1.25rem 1rem 6rem;
+  padding: 1.25rem 2rem 6rem;
 }
 
 @media (min-width: 768px) {
   .content {
-    padding: 2rem 1.5rem 2.75rem;
+    padding: 2rem 3rem 2.75rem;
   }
 }
 
 @media (min-width: 1200px) {
   .content {
-    padding-inline: 2rem;
+    padding-inline: 4rem;
   }
 }

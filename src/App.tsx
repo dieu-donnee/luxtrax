@@ -10,16 +10,37 @@ import Review from './pages/Review';
 import Complaint from './pages/Complaint';
 import Bookings from './pages/Bookings';
 import AdminServices from './pages/AdminServices';
-import { useAuth } from '@clerk/react';
-import { setClerkTokenFetcher } from '@/integrations/supabase/client';
+import AdminOffers from './pages/AdminOffers';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase, setClerkTokenFetcher } from '@/integrations/supabase/client';
 import { useEffect } from 'react';
 
 function ClerkSupabaseSync() {
-  const { getToken } = useAuth();
+  const { user, getToken } = useAuth();
+
   useEffect(() => {
     // Lie le client Supabase au token Clerk (en utilisant le template 'supabase')
     setClerkTokenFetcher(() => getToken({ template: 'supabase' }));
   }, [getToken]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const syncProfile = async () => {
+      // Upsert le profil pour garantir son existence (nécessaire pour les réservations)
+      const { error } = await supabase.from('profiles').upsert({
+        id: user.id,
+        full_name: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+      }, { onConflict: 'id' });
+
+      if (error) {
+        console.error('[ClerkSupabaseSync] Erreur lors de la synchronisation du profil:', error);
+      }
+    };
+
+    syncProfile();
+  }, [user]);
+
   return null;
 }
 
@@ -39,6 +60,7 @@ function App() {
         <Route path="/review/:bookingId" element={<Review />} />
         <Route path="/complaint/:bookingId" element={<Complaint />} />
         <Route path="/admin/services" element={<AdminServices />} />
+        <Route path="/admin/offers" element={<AdminOffers />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

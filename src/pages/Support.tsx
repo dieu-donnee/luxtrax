@@ -8,16 +8,16 @@ import Input from '../components/ui/Input';
 import styles from './Support.module.css';
 
 const faqCategories = [
-  { icon: <Calendar size={24} />, label: 'Reservations', description: 'Changer une reservation ou verifier ou ca en est.' },
-  { icon: <CreditCard size={24} />, label: 'Paiements', description: 'Comprendre ton total et ce qui est facture.' },
-  { icon: <XCircle size={24} />, label: 'Annulation', description: 'Voir comment annuler facilement si besoin.' },
-  { icon: <Settings size={24} />, label: 'Technique', description: "Debloquer un souci de compte ou d'affichage." },
+  { icon: <Calendar size={24} />, label: 'Réservations', description: 'Changer un créneau ou voir où ça en est.' },
+  { icon: <CreditCard size={24} />, label: 'Paiements', description: 'Comprendre tes factures.' },
+  { icon: <XCircle size={24} />, label: 'Annulations', description: 'Comment annuler ton créneau.' },
+  { icon: <Settings size={24} />, label: 'Compte', description: "Un souci avec ton accès ?" },
 ];
 
 const Support = () => {
   usePageMeta(
-    'Support client | Luxtrax',
-    'Tu bloques sur une reservation ? Trouve vite une reponse ou contacte le support Luxtrax.',
+    'Besoin d&apos;aide ? | LustraX',
+    'Un souci avec ta réservation ? On est là pour t aider.',
   );
 
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
@@ -36,13 +36,13 @@ const Support = () => {
             <Sparkles size={14} />
             Centre d&apos;aide
           </span>
-          <h1 className={styles.pageTitle}>Tu bloques sur une reservation ?</h1>
-          <p className={styles.subtitle}>Regarde d&apos;abord les questions les plus courantes, puis ecris-nous si tu veux une aide directe.</p>
+          <h1 className={styles.pageTitle}>Besoin d&apos;un coup de main ?</h1>
+          <p className={styles.subtitle}>Jette un oeil aux questions fréquentes ou écris-nous direct.</p>
           <Input icon={<Search size={18} />} placeholder="Chercher une reponse rapide" />
         </header>
 
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Questions frequentes</h2>
+          <h2 className={styles.sectionTitle}>Questions fréquentes</h2>
           <div className={styles.faqGrid}>
             {faqCategories.map((cat) => (
               <article key={cat.label} className={styles.faqCard}>
@@ -55,7 +55,7 @@ const Support = () => {
         </section>
 
         <section className={styles.sectionCard}>
-          <h2 className={styles.sectionTitle}>Ecris-nous</h2>
+          <h2 className={styles.sectionTitle}>Écris-nous</h2>
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.fieldGroup}>
               <label className={styles.label}>Ton nom</label>
@@ -83,7 +83,7 @@ const Support = () => {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label className={styles.label}>Explique-nous vite ton souci</label>
+              <label className={styles.label}>C&apos;est quoi le souci ?</label>
               <textarea
                 className={styles.textarea}
                 value={form.message}
@@ -92,7 +92,7 @@ const Support = () => {
                 required
               />
             </div>
-            <Button type="submit">Envoyer</Button>
+            <Button type="submit">C&apos;est parti</Button>
           </form>
         </section>
 

@@ -86,10 +86,10 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({ selected, onSelect }) 
   };
 
   const vehicles = useMemo(() => [
-    { id: 'compact', label: 'Compact', icon: <Car size={24} /> },
-    { id: 'sedan', label: 'Sedan', icon: <Car size={24} /> },
-    { id: 'suv', label: 'SUV', icon: <Car size={24} /> },
-    { id: 'pickup', label: 'Pickup', icon: <Car size={24} /> },
+    { id: 'compact', label: 'Compact', icon: <Car size={20} /> },
+    { id: 'sedan', label: 'Sedan', icon: <Car size={20} /> },
+    { id: 'suv', label: 'SUV', icon: <Car size={20} /> },
+    { id: 'pickup', label: 'Pickup', icon: <Car size={20} /> },
   ], []);
 
   return (

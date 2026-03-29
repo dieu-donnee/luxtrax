@@ -1,7 +1,7 @@
 :root {
-  --primary: #0f766e;
-  --primary-strong: #115e59;
-  --primary-soft: #ccfbf1;
+  --primary: #0ea5e9;
+  --primary-strong: #0284c7;
+  --primary-soft: #e0f2fe;
   --accent: #f59e0b;
   --background: #f4efe7;
   --background-strong: #fbf8f3;
@@ -13,7 +13,7 @@
   --muted-foreground: #5f6d68;
   --border: rgba(23, 33, 31, 0.12);
   --border-strong: rgba(23, 33, 31, 0.18);
-  --ring: rgba(15, 118, 110, 0.22);
+  --ring: rgba(14, 165, 233, 0.2);
   --shadow: 0 24px 60px rgba(29, 33, 30, 0.12);
   --shadow-soft: 0 12px 28px rgba(29, 33, 30, 0.08);
   --error: #b91c1c;
@@ -38,7 +38,7 @@ body {
   font-family: var(--font-sans);
   color: var(--foreground);
   background:
-    radial-gradient(circle at top left, rgba(20, 184, 166, 0.11), transparent 26%),
+    radial-gradient(circle at top left, rgba(14, 165, 233, 0.12), transparent 26%),
     radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), transparent 22%),
     linear-gradient(180deg, #f7f1e8 0%, #f4efe7 44%, #efe5d9 100%);
   -webkit-font-smoothing: antialiased;

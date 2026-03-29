@@ -24,8 +24,8 @@
 .summaryCard {
   background: rgba(20, 26, 24, 0.92);
   color: #f5f7f6;
-  border-radius: 1.8rem;
-  padding: 1.5rem;
+  border-radius: var(--radius);
+  padding: 1.25rem;
   box-shadow: 0 24px 46px rgba(18, 23, 22, 0.2);
 }
 

@@ -1,18 +1,17 @@
 .bottomNav {
   position: fixed;
-  left: 0.9rem;
-  right: 0.9rem;
-  bottom: 0.85rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 60;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.45rem;
-  padding: 0.55rem;
-  background: rgba(255, 253, 249, 0.88);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 1.5rem;
-  box-shadow: var(--shadow);
+  grid-template-columns: repeat(5, 1fr);
+  height: 60px;
+  background: white;
+  border-top: 1px solid var(--border);
+  padding: 0 10px;
+  box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.05);
+  /* Flat bar, no notch needed for horizontal alignment */
 }
 
 @media (min-width: 768px) {
@@ -23,21 +22,39 @@
 
 .navItem {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
-  min-height: 56px;
-  padding: 0.55rem 0.4rem;
-  border-radius: 1rem;
   text-decoration: none;
   color: var(--muted-foreground);
-  font-size: 0.72rem;
-  font-weight: 700;
   transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
 }
 
 .active {
-  color: var(--foreground);
-  background: linear-gradient(180deg, rgba(204, 251, 241, 0.95), rgba(255, 255, 255, 0.88));
+  color: var(--primary);
+}
+
+.special {
+  height: 50px;
+  width: 50px;
+  background: var(--primary) !important;
+  color: white !important;
+  border-radius: 50% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(14, 165, 233, 0.2);
+  z-index: 10;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  align-self: center;
+  justify-self: center;
+}
+
+.special:active {
+  transform: scale(0.92);
+}
+
+.special span {
+  display: none; /* Hide label for FAB style */
 }
