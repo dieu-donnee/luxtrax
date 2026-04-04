@@ -122,7 +122,7 @@ const Profile = () => {
             </div>
             <div>
               <h1 className={styles.name}>{profile?.full_name || 'Utilisateur'}</h1>
-              <p className={styles.email}>{user.email}</p>
+              <p className={styles.email}>{user.primaryEmailAddress?.emailAddress || ''}</p>
             </div>
           </div>
 

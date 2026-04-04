@@ -1,6 +1,6 @@
 import React, { useRef, Suspense, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows, PerspectiveCamera, Float } from '@react-three/drei';
+import { OrbitControls, ContactShadows, PerspectiveCamera, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
 type VehicleType = 'sedan' | 'suv' | 'coupe';
@@ -21,7 +21,7 @@ const CarModel = ({ type }: { type: VehicleType }) => {
     envMapIntensity: 1.5,
   }), []);
 
-  const glassMat = useMemo(() => ({
+  const _glassMat = useMemo(() => ({
     color: '#000',
     metalness: 1,
     roughness: 0.05,
@@ -148,11 +148,9 @@ const Car3D: React.FC<{ height?: string }> = ({ height = '320px' }) => {
       <Canvas shadows dpr={[1, 2]} gl={{ antialias: true }}>
         <PerspectiveCamera makeDefault position={[5, 2.5, 5]} fov={30} />
         <Suspense fallback={null}>
-          <Environment preset="city" />
-          <ambientLight intensity={0.5} />
+          <ambientLight intensity={0.6} />
           <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1.5} castShadow />
           <pointLight position={[-10, -10, -10]} intensity={0.5} color="#0ea5e9" />
-          <fog attach="fog" args={['#000', 5, 15]} />
           <CarModel type={type} />
           <ContactShadows
             position={[0, -0.4, 0]}

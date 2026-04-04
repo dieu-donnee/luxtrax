@@ -42,7 +42,7 @@ const AdminOffers = () => {
 
   const fetchOffers = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await (supabase.from('offers') as any).select('*').order('created_at', { ascending: false });
+    const { data, error } = await (supabase as any).from('offers').select('*').order('created_at', { ascending: false });
     if (error) toast.error('Erreur lors du chargement des offres');
     else setOffers(data as any as Offer[]);
     setLoading(false);
@@ -78,7 +78,7 @@ const AdminOffers = () => {
     };
 
     if (editingId) {
-      const { error } = await (supabase.from('offers') as any).update(payload).eq('id', editingId);
+      const { error } = await (supabase as any).from('offers').update(payload).eq('id', editingId);
       if (error) toast.error('Erreur lors de la modification');
       else {
         toast.success('Offre modifiee');
@@ -87,7 +87,7 @@ const AdminOffers = () => {
         resetForm();
       }
     } else {
-      const { error } = await (supabase.from('offers') as any).insert([payload]);
+      const { error } = await (supabase as any).from('offers').insert([payload]);
       if (error) toast.error("Erreur lors de l'ajout");
       else {
         toast.success('Offre ajoutee');
@@ -99,7 +99,7 @@ const AdminOffers = () => {
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Supprimer cette offre ?')) return;
-    const { error } = await (supabase.from('offers') as any).delete().eq('id', id);
+    const { error } = await (supabase as any).from('offers').delete().eq('id', id);
     if (error) toast.error('Erreur lors de la suppression');
     else {
       toast.success('Offre supprimee');
