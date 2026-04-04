@@ -148,11 +148,9 @@ const Car3D: React.FC<{ height?: string }> = ({ height = '320px' }) => {
       <Canvas shadows dpr={[1, 2]} gl={{ antialias: true }}>
         <PerspectiveCamera makeDefault position={[5, 2.5, 5]} fov={30} />
         <Suspense fallback={null}>
-          <Environment preset="city" />
-          <ambientLight intensity={0.5} />
+          <ambientLight intensity={0.6} />
           <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1.5} castShadow />
           <pointLight position={[-10, -10, -10]} intensity={0.5} color="#0ea5e9" />
-          <fog attach="fog" args={['#000', 5, 15]} />
           <CarModel type={type} />
           <ContactShadows
             position={[0, -0.4, 0]}
