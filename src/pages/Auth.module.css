@@ -112,6 +112,93 @@
   background: transparent;
 }
 
+/* Role Picker */
+.rolePickerContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.rolePickerTitle {
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.roleCards {
+  display: grid;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.roleCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.5rem 1rem;
+  border-radius: 1.4rem;
+  border: 2px solid var(--border);
+  background: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.25s;
+  text-align: center;
+}
+
+.roleCard:hover {
+  border-color: var(--primary);
+  background: rgba(15, 118, 110, 0.04);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(15, 118, 110, 0.12);
+}
+
+.roleCard strong {
+  font-size: 1.05rem;
+}
+
+.roleCard p {
+  font-size: 0.85rem;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+.roleIconWrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--primary);
+}
+
+.roleIconProvider {
+  background: rgba(245, 158, 11, 0.1);
+  color: hsl(38, 92%, 50%);
+}
+
+.changeRoleBtn {
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  transition: color 0.2s;
+}
+
+.changeRoleBtn:hover {
+  color: var(--foreground);
+}
+
 @media (min-width: 980px) {
   .authContainer {
     grid-template-columns: 1.05fr 0.95fr;
@@ -125,5 +212,9 @@
 
   .authPanel {
     padding: 1.5rem;
+  }
+
+  .roleCards {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
