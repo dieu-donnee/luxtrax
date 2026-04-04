@@ -87,7 +87,7 @@ const AdminOffers = () => {
         resetForm();
       }
     } else {
-      const { error } = await (supabase.from('offers') as any).insert([payload]);
+      const { error } = await (supabase as any).from('offers').insert([payload]);
       if (error) toast.error("Erreur lors de l'ajout");
       else {
         toast.success('Offre ajoutee');
