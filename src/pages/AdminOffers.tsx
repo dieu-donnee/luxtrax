@@ -78,7 +78,7 @@ const AdminOffers = () => {
     };
 
     if (editingId) {
-      const { error } = await (supabase.from('offers') as any).update(payload).eq('id', editingId);
+      const { error } = await (supabase as any).from('offers').update(payload).eq('id', editingId);
       if (error) toast.error('Erreur lors de la modification');
       else {
         toast.success('Offre modifiee');
