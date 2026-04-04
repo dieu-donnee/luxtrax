@@ -27,7 +27,7 @@ const OfferCarousel = () => {
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
 
   const fetchOffers = useCallback(async () => {
-    const { data, error } = await (supabase.from('offers') as any)
+    const { data, error } = await (supabase as any).from('offers')
       .select('*')
       .eq('is_active', true)
       .order('created_at', { ascending: false });

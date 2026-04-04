@@ -99,7 +99,7 @@ const AdminOffers = () => {
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Supprimer cette offre ?')) return;
-    const { error } = await (supabase.from('offers') as any).delete().eq('id', id);
+    const { error } = await (supabase as any).from('offers').delete().eq('id', id);
     if (error) toast.error('Erreur lors de la suppression');
     else {
       toast.success('Offre supprimee');

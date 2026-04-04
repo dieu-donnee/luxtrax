@@ -21,7 +21,7 @@ const CarModel = ({ type }: { type: VehicleType }) => {
     envMapIntensity: 1.5,
   }), []);
 
-  const glassMat = useMemo(() => ({
+  const _glassMat = useMemo(() => ({
     color: '#000',
     metalness: 1,
     roughness: 0.05,
