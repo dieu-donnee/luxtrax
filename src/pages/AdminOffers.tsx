@@ -42,7 +42,7 @@ const AdminOffers = () => {
 
   const fetchOffers = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await (supabase.from('offers') as any).select('*').order('created_at', { ascending: false });
+    const { data, error } = await (supabase as any).from('offers').select('*').order('created_at', { ascending: false });
     if (error) toast.error('Erreur lors du chargement des offres');
     else setOffers(data as any as Offer[]);
     setLoading(false);
