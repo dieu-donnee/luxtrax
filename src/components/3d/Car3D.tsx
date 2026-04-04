@@ -1,6 +1,6 @@
 import React, { useRef, Suspense, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows, PerspectiveCamera, Float } from '@react-three/drei';
+import { OrbitControls, ContactShadows, PerspectiveCamera, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
 type VehicleType = 'sedan' | 'suv' | 'coupe';
