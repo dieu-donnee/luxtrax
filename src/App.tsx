@@ -11,6 +11,7 @@ import Complaint from './pages/Complaint';
 import Bookings from './pages/Bookings';
 import AdminServices from './pages/AdminServices';
 import AdminOffers from './pages/AdminOffers';
+import ProviderDashboard from './pages/ProviderDashboard';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase, setClerkTokenFetcher } from '@/integrations/supabase/client';
 import { useEffect } from 'react';
@@ -19,7 +20,6 @@ function ClerkSupabaseSync() {
   const { user, getToken } = useAuth();
 
   useEffect(() => {
-    // Lie le client Supabase au token Clerk (en utilisant le template 'supabase')
     setClerkTokenFetcher(() => getToken({ template: 'supabase' }));
   }, [getToken]);
 
@@ -27,14 +27,18 @@ function ClerkSupabaseSync() {
     if (!user) return;
 
     const syncProfile = async () => {
-      // Upsert le profil pour garantir son existence (nécessaire pour les réservations)
+      // Read role from Clerk unsafeMetadata (set at signup)
+      const meta = user.unsafeMetadata as Record<string, unknown> | undefined;
+      const role = meta?.role === 'provider' ? 'provider' : 'client';
+
       const { error } = await supabase.from('profiles').upsert({
         id: user.id,
         full_name: user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        role: role as any,
       }, { onConflict: 'id' });
 
       if (error) {
-        console.error('[ClerkSupabaseSync] Erreur lors de la synchronisation du profil:', error);
+        console.error('[ClerkSupabaseSync] Erreur sync profil:', error);
       }
     };
 
@@ -59,6 +63,7 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/review/:bookingId" element={<Review />} />
         <Route path="/complaint/:bookingId" element={<Complaint />} />
+        <Route path="/provider" element={<ProviderDashboard />} />
         <Route path="/admin/services" element={<AdminServices />} />
         <Route path="/admin/offers" element={<AdminOffers />} />
         <Route path="*" element={<Navigate to="/" replace />} />
